@@ -57,3 +57,24 @@ p {
 p b {
   color: var(--ion-text-color, #000000);
 }
+.tablero {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  .mostrar-intro {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    span {
+      font-size: 14px;
+      line-height: 16px;
+      color: #8c8c8c;
+      margin: 0;
+    }
+  }
+}
+ion-checkbox {
+  --size: 14px;
+}

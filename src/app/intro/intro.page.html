@@ -1,0 +1,98 @@
+<!-- <ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title> {{title}} </ion-title>
+  </ion-toolbar>
+</ion-header> -->
+
+<ion-content [fullscreen]="true">
+  <!-- <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-title size="large">{{title}}</ion-title>
+    </ion-toolbar>
+  </ion-header> -->
+
+  <!-- <div id="container">
+    <strong>Ready to create an app?</strong>
+    <p>Skeleton of a Ionic based App with firebase as a Backend</p>
+    <p>
+      Check the
+      <a
+        target="_blank"
+        rel="noopener noreferrer"
+        href="https://ionicframework.com/docs/components"
+        >UI Components</a
+      >
+    </p>
+  </div> -->
+  <ion-slides pager="true" [options]="slideOpts">
+    <ion-slide>
+      <img
+        src="https://firebasestorage.googleapis.com/v0/b/depositos-sx.appspot.com/o/mobil-apps-images%2Fpapelsa-75-splash-min.png?alt=media&token=499ec7c7-6bd3-4c39-882e-75c6f276e451"
+      />
+
+      <h2>Bienvenido!</h2>
+      <p>Sistema de ventas telefónico SX-CALLCENTER</p>
+      <div class="tablero">
+        <ion-button
+          color="teritiary"
+          fill="clear"
+          expand="block"
+          routerLink="/home"
+        >
+          <ion-label>Accesar</ion-label>
+          <ion-icon name="log-in-outline" slot="start"></ion-icon>
+        </ion-button>
+        <div class="mostrar-intro">
+          <span class="ion-padding-end">Mostrar al iniciar la aplicación </span>
+          <ion-checkbox [(ngModel)]="showIntro"></ion-checkbox>
+        </div>
+      </div>
+    </ion-slide>
+
+    <ion-slide>
+      <img
+        src="https://firebasestorage.googleapis.com/v0/b/depositos-sx.appspot.com/o/mobil-apps-images%2Fpapelsa-venta-mostrador-1.jpg?alt=media&token=1a8de10a-c541-4a98-a1f7-6b51b4f99cc8"
+      />
+
+      <h2>Ventas</h2>
+      <p>
+        Diseñado para la mejor atención telefónica, cómo si estubieras en la
+        sucursal físicamente
+      </p>
+    </ion-slide>
+
+    <ion-slide>
+      <img
+        src="https://firebasestorage.googleapis.com/v0/b/depositos-sx.appspot.com/o/mobil-apps-images%2Fpapelsa-almacen-2.jpg?alt=media&token=d0969bfa-f6f2-48e9-94b4-39b07987df11"
+      />
+
+      <h2>Alacenes</h2>
+      <p>
+        Aprovecha la oportunidad de atender a tus clientes ofreciendoles
+        productos de cualquiera de nuestros alamacenes
+      </p>
+    </ion-slide>
+    <ion-slide>
+      <img
+        src="https://firebasestorage.googleapis.com/v0/b/depositos-sx.appspot.com/o/mobil-apps-images%2Fpapelsa-cortes-1.jpg?alt=media&token=52d6fee9-657f-47f7-95c5-45302d067c88"
+      />
+
+      <h2>Papel cortado</h2>
+      <p>
+        Todas las cortadoras de la empresa a tu disposición para la venta de
+        material cortado
+      </p>
+    </ion-slide>
+    <ion-slide>
+      <img
+        src="https://firebasestorage.googleapis.com/v0/b/depositos-sx.appspot.com/o/mobil-apps-images%2Fpapelsa-empaques-2.jpg?alt=media&token=e0074177-8999-475d-8b50-a0fefe6bed79"
+      />
+
+      <h2>Embarques</h2>
+      <p>
+        Realiza todas tus ventas con entrga a domicilio utilizando nuestra
+        logística de embarques
+      </p>
+    </ion-slide>
+  </ion-slides>
+</ion-content>
