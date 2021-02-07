@@ -12,12 +12,30 @@
     "importHelpers": true,
     "target": "es2015",
     "module": "es2020",
-    "lib": ["es2018", "dom"]
+    "lib": ["es2018", "dom"],
+    "paths": {
+      "@papx/utils": [
+        "./src/app/utils/index.ts"
+      ],
+      "@papx/models": [
+        "./src/app/@models/index.ts"
+      ],
+      "@papx/data-access": [
+        "./src/app/@data-access/index.ts"
+      ],
+      "@papx/auth": [
+        "./src/app/@auth/index.ts"
+      ],
+      "@papx/shared": [
+        "./src/app/shared/index.ts"
+      ],
+    }
   },
   "angularCompilerOptions": {
     "enableI18nLegacyMessageIdFormat": false,
     "strictInjectionParameters": true,
     "strictInputAccessModifiers": true,
     "strictTemplates": true
-  }
+  },
+
 }
