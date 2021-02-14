@@ -7,8 +7,7 @@ import { Component } from '@angular/core';
 })
 export class HomePage {
   title = 'Luxor-Fire based APP';
-
   constructor() {}
 
-  // ionViewDidEnter() {}
+  ionViewDidEnter() {}
 }

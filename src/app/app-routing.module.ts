@@ -16,6 +16,11 @@ const routes: Routes = [
     canActivate: [IntroductionGuard],
   },
   {
+    path: 'cart',
+    loadChildren: () =>
+      import('./cart/cart.module').then((m) => m.CartPageModule),
+  },
+  {
     path: '',
     redirectTo: 'intro',
     pathMatch: 'full',
