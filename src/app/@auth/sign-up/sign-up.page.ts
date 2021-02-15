@@ -113,7 +113,7 @@ export class SignUpPage implements OnInit {
         async (res) => {
           const user = await res;
           console.log('User registered: ', user);
-          this.router.navigate(['/']);
+          this.router.navigate(['/', 'pending']);
         },
         (err) => console.error('Signup Error: ', err)
       );
