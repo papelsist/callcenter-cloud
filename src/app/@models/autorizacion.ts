@@ -8,7 +8,9 @@ export interface Autorizacion {
 
 export type TipoDeAutorizacion =
   | 'TRANSACCION_BANCARIA'
-  | 'VENTA_SIN_EXISTENCIA';
+  | 'VENTA_SIN_EXISTENCIA'
+  | 'DESCUENTO_ESPECIAL'
+  | 'EXISTENCIA_FALTANTE';
 
 export interface AutorizacionRechazo {
   user: string;
