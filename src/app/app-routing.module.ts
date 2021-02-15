@@ -1,6 +1,44 @@
 import { NgModule } from '@angular/core';
 import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
+
+import {
+  canActivate,
+  hasCustomClaim,
+  emailVerified,
+} from '@angular/fire/auth-guard';
+import {
+  redirectLoggedInToHome,
+  redirectUnverifiedToPending,
+  redirectVeifiedToHome,
+  redirectUnauthorized,
+} from '@papx/auth';
+
 import { IntroductionGuard } from './intro/intro.guard';
+
+const routes2: Routes = [
+  {
+    path: '',
+    ...canActivate(redirectUnauthorized),
+    children: [
+      {
+        path: 'home',
+        loadChildren: () =>
+          import('./home/home.module').then((m) => m.HomePageModule),
+      },
+      {
+        path: 'intro',
+        loadChildren: () =>
+          import('./intro/intro.module').then((m) => m.IntroPageModule),
+        canActivate: [IntroductionGuard],
+      },
+      {
+        path: '',
+        redirectTo: 'home',
+        pathMatch: 'full',
+      },
+    ],
+  },
+];
 
 const routes: Routes = [
   {
@@ -29,7 +67,7 @@ const routes: Routes = [
 
 @NgModule({
   imports: [
-    RouterModule.forRoot(routes, { preloadingStrategy: PreloadAllModules }),
+    RouterModule.forRoot(routes2, { preloadingStrategy: PreloadAllModules }),
   ],
   exports: [RouterModule],
 })

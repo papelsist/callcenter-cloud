@@ -1,0 +1,84 @@
+<ion-header>
+  <ion-toolbar color="tertiary">
+    <ion-buttons slot="start">
+      <ion-button routerLink="/home">
+        <ion-icon name="home" slot="icon-only"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>Callcenter App</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <ion-grid>
+    <ion-row class="ion-justify-content-center">
+      <ion-col
+        class="ion-align-self-center"
+        size-xs="12"
+        size-sm="8"
+        size-md="6"
+        size-lg="6"
+      >
+        <div class="ion-text-center">
+          <h3>Acceso al sistema</h3>
+        </div>
+        <div>
+          <form [formGroup]="form">
+            <ion-item>
+              <ion-label position="floating">Email</ion-label>
+              <ion-input
+                type="email"
+                name="email"
+                formControlName="email"
+                placeholder="Email"
+                autocomplete="on"
+                autofocus="true"
+                inputmode="email"
+              ></ion-input>
+            </ion-item>
+
+            <ion-item class="ion-margin-top">
+              <ion-label position="floating">Password</ion-label>
+              <ion-input
+                type="password"
+                name="password"
+                autocomplete="current-password"
+                placeholder="Digite su contraseña"
+                formControlName="password"
+                enterkeyhint="enter"
+                (keyup.enter)="doEnter($event)"
+              ></ion-input>
+            </ion-item>
+            <ion-button
+              expand="block"
+              [disabled]="form.invalid || ((loading$ | async))"
+              type="submit"
+              class="ion-margin-top"
+              (click)="login()"
+            >
+              <ion-icon name="log-in" slot="start"></ion-icon>
+              <ion-label>Accesar</ion-label>
+              <ion-spinner
+                slot="end"
+                name="lines"
+                *ngIf="loading$ | async"
+              ></ion-spinner>
+            </ion-button>
+          </form>
+        </div>
+        <div *ngIf="error$ | async as error" class="ion-padding">
+          <ion-note color="danger"> {{error}} </ion-note>
+        </div>
+        <div class="ion-padding">
+          Si no tienes cuenta y eres empleado de Papel S.A. de C.V. autorizado
+          para el acceso solicita tu
+          <a routerLink="/signup"> registro</a>
+          <p>
+            Olvidé mi
+            <a routerLink="/restorpassword"> contraseña</a>
+          </p>
+        </div>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+</ion-content>

@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { AuthService } from '../@auth/auth.service';
 
 @Component({
   selector: 'app-home',
@@ -6,8 +7,9 @@ import { Component } from '@angular/core';
   styleUrls: ['home.page.scss'],
 })
 export class HomePage {
-  title = 'Luxor-Fire based APP';
-  constructor() {}
+  title = 'Callcenter App';
+  user$ = this.auth.user$;
+  constructor(private auth: AuthService) {}
 
   ionViewDidEnter() {}
 }

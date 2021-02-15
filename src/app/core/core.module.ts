@@ -6,9 +6,8 @@ import { HttpClientModule } from '@angular/common/http';
 import { throwIfAlreadyLoaded } from '../utils';
 
 // app
-import { environment } from '../../environments/environment';
 import { DataAccessModule } from '@papx/data-access';
-import { AuthModule } from '@papx/auth';
+import { AuthModule } from '../@auth/auth.module';
 
 @NgModule({
   imports: [CommonModule, HttpClientModule, DataAccessModule, AuthModule],

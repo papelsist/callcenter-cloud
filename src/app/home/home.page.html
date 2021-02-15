@@ -19,17 +19,17 @@
     </ion-toolbar>
   </ion-header>
 
-  <div id="container">
-    <strong>Ready to create an app?</strong>
-    <p>Skeleton of a Ionic based App with firebase as a Backend</p>
+  <div id="container" *ngIf="user$ | async as user">
+    <div class="home-image">
+      <img
+        src="https://firebasestorage.googleapis.com/v0/b/depositos-sx.appspot.com/o/mobil-apps-images%2Fpapelsa-75-splash-min.png?alt=media&token=499ec7c7-6bd3-4c39-882e-75c6f276e451"
+      />
+    </div>
+    <strong>SIIPAPX Callcenter App</strong>
     <p>
-      Check the
-      <a
-        target="_blank"
-        rel="noopener noreferrer"
-        href="https://ionicframework.com/docs/components"
-        >UI Components</a
-      >
+      Bienvenido
+      <ion-text color="warning">{{user.displayName}}</ion-text>
+      al sistema de ventas telefónicas de Papel S.A.
     </p>
     <ion-button
       routerLink="/intro"

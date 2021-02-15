@@ -1,0 +1,123 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>SX-DEPOSITOS</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <ion-grid [formGroup]="form">
+    <ion-row>
+      <ion-col class="ion-align-self-center">
+        <ion-list-header color="tertiary">
+          <ion-label>
+            <h1 class="ion-text-center">Registro de usario</h1>
+          </ion-label>
+        </ion-list-header>
+      </ion-col>
+    </ion-row>
+    <ion-row>
+      <ion-col class="ion-align-self-center">
+        <ion-item>
+          <ion-label position="floating">Email</ion-label>
+          <ion-input
+            placeholder="Cuenta de correo electrónico"
+            formControlName="email"
+          ></ion-input>
+          <ion-icon
+            slot="start"
+            name="mail"
+            [color]="validColor('email')"
+          ></ion-icon>
+        </ion-item>
+        <ion-note *ngIf="hasEmailError()" [color]="errorColor">
+          <p class="error-section">Cuenta de correo inválida</p>
+        </ion-note>
+      </ion-col>
+    </ion-row>
+    <ion-row>
+      <ion-col>
+        <ion-item>
+          <ion-label position="floating">Usuario</ion-label>
+          <ion-input
+            placeholder="Nombre de usuario"
+            formControlName="displayName"
+          ></ion-input>
+          <ion-icon
+            slot="start"
+            name="person"
+            [color]="validColor('displayName')"
+          ></ion-icon>
+        </ion-item>
+        <ion-note *ngIf="displayNameError() " [color]="errorColor">
+          <p class="error-section">{{displayNameError()}}</p>
+        </ion-note>
+      </ion-col>
+    </ion-row>
+    <ion-row>
+      <ion-col>
+        <ion-item>
+          <ion-label position="floating">Contraseña</ion-label>
+          <ion-input
+            #password
+            placeholder="Digite la contraseña"
+            formControlName="password"
+            [type]="showPassword ? 'text': 'password'"
+          ></ion-input>
+          <ion-icon
+            slot="start"
+            name="key"
+            [color]="validColor('confirmPassword')"
+          ></ion-icon>
+          <ion-buttons slot="end">
+            <ion-button (click)="showPassword = !showPassword" tabindex="-1">
+              <ion-icon
+                slot="icon-only"
+                [name]="showPassword ? 'eye': 'eye-off' "
+              ></ion-icon>
+            </ion-button>
+          </ion-buttons>
+        </ion-item>
+        <ion-note *ngIf="passwordError() " [color]="errorColor">
+          <p class="error-section">{{passwordError()}}</p>
+        </ion-note>
+      </ion-col>
+    </ion-row>
+    <ion-row>
+      <ion-col>
+        <ion-item>
+          <ion-label position="floating">Confirmación</ion-label>
+          <ion-input
+            placeholder="Contraseña"
+            formControlName="confirmPassword"
+            type="password"
+          ></ion-input>
+
+          <ion-icon
+            slot="start"
+            name="checkmark-done"
+            [color]="validColor('confirmPassword')"
+          ></ion-icon>
+        </ion-item>
+        <ion-note
+          *ngIf="hasError('confirmPassword', 'mustMatch') "
+          [color]="errorColor"
+        >
+          <p class="error-section">La contraseña no coincide</p>
+        </ion-note>
+      </ion-col>
+    </ion-row>
+    <ion-row>
+      <ion-col>
+        <ion-button
+          color="primary"
+          expand="block"
+          [disabled]="form.invalid"
+          (click)="signup()"
+        >
+          <ion-icon name="send" slot="start"></ion-icon>
+          <ion-label>Registrar</ion-label>
+        </ion-button>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+</ion-content>

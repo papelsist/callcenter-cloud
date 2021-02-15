@@ -1,0 +1,30 @@
+<ion-header>
+  <ion-toolbar color="tertiary">
+    <ion-title>SX-DEPOSITOS</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <div class="wrapper">
+    <div class="container">
+      <ng-container *ngIf="user$ | async as user">
+        <h1>Validación de cuenta pendiente!</h1>
+        <p>
+          <ion-text color="primary"> {{user.displayName}} </ion-text>. Tu cuenta
+          ha sido creada exitosamente, por razones de seguridad es necesrio que
+          confirmes tu identidad mediante el correo electrónico que te fué
+          enviado
+        </p>
+        <p>
+          Una vez que valides tu registro podras accesar al sistema si no
+          recibiste el correo o bien este ya caducó puedes solicitarlo
+          nuevamente
+        </p>
+        <ion-button fill="clear" (click)="sendVerifiactionMail(user)">
+          <ion-label> Enviar correo de confirmación </ion-label>
+          <ion-icon name="send" slot="end"></ion-icon>
+        </ion-button>
+      </ng-container>
+    </div>
+  </div>
+</ion-content>
