@@ -17,6 +17,10 @@
       "@papx/utils": [
         "./src/app/utils/index.ts"
       ],
+      "@papx/core": [
+        "./src/app/core/index.ts"
+      ],
+
       "@papx/models": [
         "./src/app/@models/index.ts"
       ],
