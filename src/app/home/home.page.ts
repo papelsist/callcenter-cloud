@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { AngularFireMessaging } from '@angular/fire/messaging';
 import { AuthService } from '../@auth/auth.service';
 
 @Component({
@@ -9,7 +10,15 @@ import { AuthService } from '../@auth/auth.service';
 export class HomePage {
   title = 'Callcenter App';
   user$ = this.auth.user$;
-  constructor(private auth: AuthService) {}
+  host = location.href;
+  constructor(private auth: AuthService, private afm: AngularFireMessaging) {}
 
   ionViewDidEnter() {}
+
+  requestPermission() {
+    this.afm.requestPermission.subscribe(
+      () => console.log('Permission granted!'),
+      (error) => console.log(error)
+    );
+  }
 }

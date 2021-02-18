@@ -12,6 +12,7 @@ import { throwIfAlreadyLoaded } from '../utils/angular';
 import { AngularFireModule } from '@angular/fire';
 import { AngularFirestoreModule } from '@angular/fire/firestore';
 import { AngularFireFunctionsModule } from '@angular/fire/functions';
+import { AngularFireMessagingModule } from '@angular/fire/messaging';
 import {
   AngularFireAuth,
   AngularFireAuthModule,
@@ -46,6 +47,7 @@ export function initializeApp1(afa: AngularFireAuth): any {
     AngularFireAuthModule,
     AngularFirestoreModule,
     AngularFireFunctionsModule,
+    AngularFireMessagingModule,
   ],
   providers: [
     {

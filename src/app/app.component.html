@@ -10,11 +10,19 @@
         <ion-item detail routerLink="/pedidos" (click)="menu.close()"
           >Pedidos</ion-item
         >
-        <ion-item detail routerLink="/facturas">Facturas</ion-item>
-        <ion-item detail routerLink="/tableros">Tableros</ion-item>
-        <ion-item detail routerLink="/productos">Prductos</ion-item>
-        <ion-item detail routerLink="/catalogos">Catalogos</ion-item>
-        <ion-item button>
+        <ion-item detail routerLink="/facturas" (click)="menu.close()"
+          >Facturas</ion-item
+        >
+        <ion-item detail routerLink="/tableros" (click)="menu.close()"
+          >Tableros</ion-item
+        >
+        <ion-item detail routerLink="/productos" (click)="menu.close()"
+          >Prductos</ion-item
+        >
+        <ion-item detail routerLink="/catalogos" (click)="menu.close()"
+          >Catalogos</ion-item
+        >
+        <ion-item button (click)="signOut(); menu.close()">
           <ion-label> Salir </ion-label>
           <ion-icon slot="end" name="log-out"></ion-icon>
         </ion-item>

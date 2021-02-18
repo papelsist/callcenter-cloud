@@ -1,0 +1,20 @@
+<ng-container *ngIf="state$  | async as state">
+  <papx-ventas-header
+    title="Cotizaciones"
+    [filterActivated]="state.filterByUser"
+    (filter)="onFilter()"
+  ></papx-ventas-header>
+
+  <ion-content>
+    State: <br />
+    <pre>
+      {{state | json}}
+    </pre>
+  </ion-content>
+  <!-- fab placed to the top end -->
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+    <ion-fab-button routerLink="create">
+      <ion-icon name="add"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+</ng-container>

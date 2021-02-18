@@ -1,6 +1,7 @@
 import * as functions from 'firebase-functions';
 import * as admin from 'firebase-admin';
 import { initSdk, getFirestore } from './init';
+import { addPedido } from './pedidos';
 
 initSdk(); // Init Firebase SDK
 const firestore = getFirestore();
@@ -71,3 +72,4 @@ export const onCreateUser = functions.auth.user().onCreate(async (user) => {
   return null;
 });
 exports.createSiipapUser = createSiipapUser;
+exports.addPedido = addPedido;

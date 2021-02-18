@@ -53,6 +53,9 @@ export interface Pedido {
   facturaSerie?: string;
   facturaFolio?: string;
   uuid?: string;
+  validoHasta?: string;
+  createLog?: any;
+  updateLog?: any;
 }
 
 export interface PedidoDet {

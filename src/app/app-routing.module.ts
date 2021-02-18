@@ -15,6 +15,8 @@ import {
 
 import { IntroductionGuard } from './intro/intro.guard';
 
+const verified = () => emailVerified;
+
 const routes2: Routes = [
   {
     path: '',
@@ -32,6 +34,14 @@ const routes2: Routes = [
         canActivate: [IntroductionGuard],
       },
       {
+        path: 'ventas',
+        loadChildren: () =>
+          import('./ventas/ventas-tab/ventas-tab.module').then(
+            (m) => m.VentasTabPageModule
+          ),
+        ...canActivate(verified),
+      },
+      {
         path: '',
         redirectTo: 'home',
         pathMatch: 'full',
@@ -45,7 +55,6 @@ const routes: Routes = [
     path: 'home',
     loadChildren: () =>
       import('./home/home.module').then((m) => m.HomePageModule),
-    // canActivate: [IntroductionGuard],
   },
   {
     path: 'intro',

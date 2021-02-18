@@ -6,7 +6,7 @@ import {
   Validators,
 } from '@angular/forms';
 
-import { LoadingController } from '@ionic/angular';
+import { AlertController, LoadingController } from '@ionic/angular';
 import { BehaviorSubject } from 'rxjs';
 import { Router } from '@angular/router';
 import { passwordMatch } from './password-match';
@@ -59,6 +59,7 @@ export class SignUpPage implements OnInit {
   constructor(
     private authService: AuthService,
     private loadingController: LoadingController,
+    private alert: AlertController,
     private router: Router
   ) {}
 
@@ -85,37 +86,17 @@ export class SignUpPage implements OnInit {
     });
 
     loading.present();
-    /*
-    this.authService
-      .createUser(email, password)
-      .then((userCredentials) => {
-        userCredentials.user.updateProfile({ displayName });
-        this.error$.next(null);
-        this.router.navigate(['/']);
-      })
-      .catch((error) => {
-        switch (error.code) {
-          case 'auth/email-already-in-use':
-            this.error$.next('Usuario ya registrado');
-            break;
-          default:
-            console.error('Auth error:', error);
-            this.error$.next(error.message);
-            break;
-        }
-      })
-      .then(() => loading.dismiss());
-    */
+
     this.authService
       .createSiipapUser(email, password, displayName)
       .pipe(finalize(() => loading.dismiss()))
       .subscribe(
         async (res) => {
           const user = await res;
-          console.log('User registered: ', user);
+          // console.log('User registered: ', user.displayName);
           this.router.navigate(['/', 'pending']);
         },
-        (err) => console.error('Signup Error: ', err)
+        (err) => this.handelError(err)
       );
   }
 
@@ -152,5 +133,14 @@ export class SignUpPage implements OnInit {
 
   hasError(prop: string, code: string) {
     return this.controls[prop].hasError(code);
+  }
+
+  async handelError(err) {
+    const a = await this.alert.create({
+      message: err.message,
+      header: 'Error registrando usuario',
+      buttons: ['Aceptar'],
+    });
+    await a.present();
   }
 }

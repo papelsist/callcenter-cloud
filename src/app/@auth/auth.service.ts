@@ -15,10 +15,9 @@ import {
 
 import { AngularFirestore } from '@angular/fire/firestore';
 
-import { environment } from '../../environments/environment';
-import { User, UserInfo } from '../@models/user';
+import { environment } from '@papx/environment/environment';
+import { User, UserInfo, UsuarioDto } from '../@models/user';
 import { mapUser } from './utils';
-import firebase from 'firebase/app';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -40,6 +39,14 @@ export class AuthService {
       return user ? this.getUserByEmail(user.email) : of(null);
     }),
     catchError((err) => throwError(err))
+  );
+
+  readonly userDto$ = this.user$.pipe(
+    map((u) => {
+      const { uid, email, displayName } = u;
+      return { uid, email, displayName };
+    })
+    // pluck<User, UsuarioDto>('uid', 'displayName', 'email')
   );
 
   constructor(
@@ -118,7 +125,6 @@ export class AuthService {
         });
         return user;
       }),
-      tap((user) => {}),
       catchError((err) => throwError(err))
     );
   }

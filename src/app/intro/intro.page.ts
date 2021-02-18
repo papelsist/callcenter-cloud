@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { SlideOptions } from '../shared/slide-options';
+import { SlideOptions } from '@papx/utils';
 
 @Component({
   selector: 'app-intro',

@@ -14,13 +14,21 @@
     "module": "es2020",
     "lib": ["es2018", "dom"],
     "paths": {
-      "@papx/utils": [
-        "./src/app/utils/index.ts"
+      "@papx/environment/*": [
+        "./src/environments/*"
       ],
       "@papx/core": [
         "./src/app/core/index.ts"
       ],
-
+      "@papx/common/*": [
+        "./src/app/common/*"
+      ],
+      "@papx/shared": [
+        "./src/app/shared/index.ts"
+      ],
+      "@papx/utils": [
+        "./src/app/utils/index.ts"
+      ],
       "@papx/models": [
         "./src/app/@models/index.ts"
       ],
@@ -30,9 +38,7 @@
       "@papx/auth": [
         "./src/app/@auth/index.ts"
       ],
-      "@papx/shared": [
-        "./src/app/shared/index.ts"
-      ],
+
     }
   },
   "angularCompilerOptions": {

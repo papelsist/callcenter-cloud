@@ -13,7 +13,7 @@ export interface Cliente {
   permiteCheque: boolean;
   folioRFC: number;
   chequeDevuelto: number;
-  activo: true;
+  activo: boolean;
   juridico: boolean;
   medios?: Partial<MedioDeContacto[]>;
   direccion: Direccion;

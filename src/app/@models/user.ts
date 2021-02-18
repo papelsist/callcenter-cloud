@@ -13,9 +13,15 @@ export interface User {
 }
 
 export interface UserInfo extends User {
-  nombre: 'Ruben Cancino ';
-  numeroDeEmpleado: 9999;
-  puesto: 'ND';
-  roles: ['ROLE_ADMIN'];
-  sucursal: 'OFICINAS';
+  nombre: string;
+  numeroDeEmpleado: number;
+  puesto: string;
+  roles: string[];
+  sucursal: string;
+}
+
+export interface UsuarioDto {
+  uid: string;
+  displayName: string;
+  email: string;
 }

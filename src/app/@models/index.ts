@@ -16,3 +16,4 @@ export * from './descuento-por-volumen';
 export * from './formaDePago';
 export * from './descuento-por-volumen';
 export * from './pedidos-model';
+export * from './ventas';
