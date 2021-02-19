@@ -1,0 +1,5 @@
+.precios {
+  display: grid;
+  align-items: center;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+}

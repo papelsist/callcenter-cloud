@@ -63,6 +63,7 @@ export interface PedidoDet {
   clave: string;
   descripcion: string;
   producto: Partial<Producto>;
+  productoId: string;
   unidad: string;
   presentacion?: string;
   gramos: number;
@@ -211,7 +212,7 @@ export interface RecepcionDeEnvio {
 }
 
 export interface PedidoSummary {
-  importe: number;
+  importeBruto: number;
   descuento: number;
   descuentoImporte: number;
   subtotal: number;

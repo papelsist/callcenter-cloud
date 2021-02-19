@@ -8,9 +8,16 @@ import { throwIfAlreadyLoaded } from '../utils';
 // app
 import { DataAccessModule } from '@papx/data-access';
 import { AuthModule } from '../@auth/auth.module';
+import { ProductoSelectorModule } from '../shared/productos/producto-selector/producto-selector.module';
 
 @NgModule({
-  imports: [CommonModule, HttpClientModule, DataAccessModule, AuthModule],
+  imports: [
+    CommonModule,
+    HttpClientModule,
+    DataAccessModule,
+    AuthModule,
+    ProductoSelectorModule.forRoot(),
+  ],
 })
 export class CoreModule {
   constructor(

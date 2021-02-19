@@ -1,0 +1,88 @@
+<ion-grid [formGroup]="form">
+  <ion-row>
+    <ion-col>
+      <ion-item formGroupName="corte">
+        <ion-label position="floating">Tamaños</ion-label>
+        <ion-input
+          #tantosComponent
+          type="number"
+          autofocus
+          inputmode="numeric"
+          formControlName="tantos"
+          clearOnEdit="true"
+        ></ion-input>
+      </ion-item>
+    </ion-col>
+    <ion-col size="6">
+      <ion-item>
+        <ion-label position="floating"> Buscar por clave </ion-label>
+        <ion-input
+          class="ion-text-uppercase"
+          placeholder="Clave"
+          (keyup.enter)="findProductByClave(claveField.value)"
+          clearOnEdit="false"
+          #claveField
+        ></ion-input>
+      </ion-item>
+    </ion-col>
+  </ion-row>
+  <ion-row>
+    <ion-col>
+      <papx-item-producto-field
+        [producto]="producto"
+        (selection)="findProducto()"
+      ></papx-item-producto-field>
+    </ion-col>
+  </ion-row>
+  <ion-row>
+    <ion-col>
+      <ion-item>
+        <ion-label position="stacked">Cantidad</ion-label>
+        <ion-input type="number" formControlName="cantidad"></ion-input>
+      </ion-item>
+    </ion-col>
+    <ion-col>
+      <ion-item>
+        <ion-label position="floating">Precio</ion-label>
+        <ion-input
+          color="primary"
+          value="{{ form.get('precio').value || 0.0 | currency }}"
+          readonly
+          tabindex="-1"
+        ></ion-input>
+      </ion-item>
+    </ion-col>
+    <ion-col>
+      <ion-item>
+        <ion-label position="floating"
+          >Descuento
+          <ion-text color="warning"
+            >({{ form.get("descuento").value / 100 | percent }})</ion-text
+          >
+        </ion-label>
+        <ion-input
+          color="primary"
+          value="{{ form.get('descuentoImporte').value || 0.0 | currency }}"
+          readonly
+          tabindex="-1"
+        ></ion-input>
+      </ion-item>
+    </ion-col>
+    <ion-col>
+      <ion-item>
+        <ion-label position="floating">Subtotal</ion-label>
+        <ion-input
+          color="primary"
+          value="{{ form.get('subtotal').value | currency }}"
+          readonly
+          tabindex="-1"
+        ></ion-input>
+      </ion-item>
+    </ion-col>
+  </ion-row>
+</ion-grid>
+<papx-corte-field [parent]="form"></papx-corte-field>
+<papx-existencia-field
+  [producto]="controls.producto.valueChanges | async"
+  [existencias]="existencia"
+></papx-existencia-field>

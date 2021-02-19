@@ -1,4 +1,12 @@
-import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  EventEmitter,
+  Input,
+  OnInit,
+  Output,
+} from '@angular/core';
+import { PedidoDet } from '@papx/models';
 
 @Component({
   selector: 'papx-pedido-item-list',
@@ -7,6 +15,8 @@ import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PedidoItemListComponent implements OnInit {
+  @Input() items: Partial<PedidoDet[]> = [];
+  @Output() addItem = new EventEmitter();
   constructor() {}
 
   ngOnInit() {}

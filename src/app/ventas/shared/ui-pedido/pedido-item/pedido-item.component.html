@@ -1,1 +1,40 @@
-<h2>Pedido ITEM</h2>
+<ion-item button>
+  <ion-label class="ion-text-wrap">
+    <h2>
+      {{ getLabel() }}
+    </h2>
+    <div class="precios">
+      <p>
+        {{ item.precio | currency }}
+        <sub *ngIf="detalle">Precio</sub>
+      </p>
+      <p>
+        {{ item.importe | currency }}
+        <sub *ngIf="detalle">Imp. bruto</sub>
+      </p>
+      <p>
+        {{ item.descuentoImporte | currency }}
+        <sub *ngIf="detalle"
+          >Desc
+          {{ item.descuento / 100 | percent }}
+        </sub>
+      </p>
+    </div>
+    <div *ngIf="item.corte">
+      <ion-chip color="warning">
+        <ion-icon name="cut"></ion-icon>
+        <ion-label>Cortes</ion-label>
+      </ion-chip>
+    </div>
+  </ion-label>
+  <ion-avatar slot="start">
+    <ion-text color="secondary">
+      {{ item.cantidad }}
+    </ion-text>
+  </ion-avatar>
+  <div slot="end">
+    <ion-text color="primary">
+      {{ item.subtotal | currency }}
+    </ion-text>
+  </div>
+</ion-item>

@@ -1,3 +1,5 @@
+import firebase from 'firebase/app';
+
 export interface Producto {
   id?: string;
   clave: string;
@@ -27,7 +29,7 @@ export interface Producto {
   imageUrl?: string;
   productoSat?: string;
   unidadSat?: string;
-  existencias?: { [key: string]: Almacen };
+  existencia?: { [key: string]: Almacen };
   existenciaTotal?: number;
   dateCreated: string;
   lastUpdated: string;
@@ -36,10 +38,9 @@ export interface Producto {
 }
 
 export interface Almacen {
-  nombre: string;
   cantidad: number;
-  apartados: number;
-  disponible: number;
+  apartado: number;
+  lastUpdated: firebase.firestore.Timestamp;
 }
 
 export interface ProductoCategoria {

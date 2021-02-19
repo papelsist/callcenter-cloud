@@ -23,8 +23,8 @@
       "@papx/common/*": [
         "./src/app/common/*"
       ],
-      "@papx/shared": [
-        "./src/app/shared/index.ts"
+      "@papx/shared/*": [
+        "./src/app/shared/*"
       ],
       "@papx/utils": [
         "./src/app/utils/index.ts"

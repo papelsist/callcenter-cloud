@@ -8,7 +8,7 @@ import {
 } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 
-import { PedidoCreateDto } from '@papx/models';
+import { PedidoCreateDto, PedidoDet } from '@papx/models';
 
 @Component({
   selector: 'papx-pedido-create-form',
@@ -18,7 +18,9 @@ import { PedidoCreateDto } from '@papx/models';
 })
 export class PedidoCreateFormComponent implements OnInit {
   @Output() save = new EventEmitter<PedidoCreateDto>();
+  @Output() addItem = new EventEmitter();
   @Input() data: Partial<PedidoCreateDto> = {};
+  @Input() partidas: Partial<PedidoDet[]> = [];
   form = this.buildForm();
   constructor() {}
 

@@ -16,26 +16,27 @@
   <papx-pedido-create-form
     #form
     [data]="data"
+    [partidas]="partidas$ | async"
     (save)="onSave($event)"
+    (addItem)="addItem()"
   ></papx-pedido-create-form>
 </ion-content>
 
-<!-- <ion-footer>
-  <ion-toolbar>
-    <ion-title> Footer </ion-title>
+<ion-footer>
+  <ion-toolbar class="ion-no-padding">
+    <ion-buttons slot="start">
+      <ion-button (click)="addItem()">
+        <ion-label>Agregar</ion-label>
+        <ion-icon name="add-circle" slot="start"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title class="ion-text-center" color="success">
+      Total: {{100.00 | currency}}
+    </ion-title>
     <ion-buttons slot="end">
       <ion-button>
-        <ion-icon name="close-circle" slot="start"></ion-icon>
-        <ion-label>Cancelar</ion-label>
-      </ion-button>
-      <ion-button
-        color="primary"
-        [disabled]="!form.canSubmit"
-        (click)="form.submit()"
-      >
-        <ion-icon name="checkmark-circle" slot="start"></ion-icon>
-        <ion-label>Salvar</ion-label>
+        <ion-icon name="save" slot="icon-only"></ion-icon>
       </ion-button>
     </ion-buttons>
   </ion-toolbar>
-</ion-footer> -->
+</ion-footer>

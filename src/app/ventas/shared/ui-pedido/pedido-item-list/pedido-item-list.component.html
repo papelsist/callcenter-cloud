@@ -1,1 +1,21 @@
-<h2>Pedidos Items</h2>
+<ion-item-divider color="light" sticky>
+  <ion-label> Partidas </ion-label>
+  <ion-button
+    size="small"
+    fill="clear"
+    slot="end"
+    color="medium"
+    class="add-button"
+    (click)="addItem.emit()"
+  >
+    <ion-label> Agregar </ion-label>
+    <ion-icon name="add" slot="start"></ion-icon>
+  </ion-button>
+</ion-item-divider>
+<ion-list class="ion-no-padding">
+  <papx-pedido-item
+    *ngFor="let it of items; index as idx"
+    [item]="it"
+    [index]="idx"
+  ></papx-pedido-item>
+</ion-list>

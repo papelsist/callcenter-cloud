@@ -44,6 +44,14 @@
   </ion-row>
   <ion-row>
     <ion-col>
+      <papx-pedido-item-list
+        [items]="partidas"
+        (addItem)="addItem.emit()"
+      ></papx-pedido-item-list>
+    </ion-col>
+  </ion-row>
+  <ion-row>
+    <ion-col>
       <ion-toolbar>
         <ion-buttons slot="end">
           <ion-button (click)="submit()" [disabled]="form.invalid">

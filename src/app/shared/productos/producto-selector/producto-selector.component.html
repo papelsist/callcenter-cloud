@@ -1,0 +1,47 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Inventario de productos</ion-title>
+  </ion-toolbar>
+</ion-header>
+<ion-content [fullscreen]="true" *ngIf="filteredProducts$ | async as productos">
+  <ion-searchbar
+    placeholder="Buscar producto"
+    cancelButtonText="Cancelar"
+    color="primary"
+    showCancelButton="focus"
+    debounce="250"
+    (ionChange)="search($event)"
+  ></ion-searchbar>
+  <ion-list>
+    <ion-item *ngFor="let prod of productos" button (click)="select(prod)">
+      <ion-label [color]="!prod.activo ? 'danger' : ''">
+        <ion-grid class="ion-no-padding">
+          <ion-row>
+            <ion-col>
+              <h2>
+                {{ prod.descripcion }}
+                <span class="ion-padding-start" *ngIf="!prod.activo">
+                  DESCONTINUADO
+                </span>
+              </h2>
+            </ion-col>
+            <ion-col size="2">
+              <ion-text>
+                <h2>Exi:</h2>
+              </ion-text>
+            </ion-col>
+          </ion-row>
+          <ion-row class="ion-align-items-end">
+            <ion-col>
+              <ion-text color="secondary">
+                <h4>
+                  {{ prod.clave }}
+                </h4>
+              </ion-text>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+      </ion-label>
+    </ion-item>
+  </ion-list>
+</ion-content>
