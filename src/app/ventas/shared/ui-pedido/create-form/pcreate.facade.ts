@@ -2,9 +2,8 @@ import { Injectable } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 
 import { BehaviorSubject, Observable } from 'rxjs';
-import { distinctUntilChanged } from 'rxjs/operators';
 
-import { Pedido, PedidoDet, PedidoSummary, TipoDePedido } from '@papx/models';
+import { Pedido, PedidoDet, PedidoSummary } from '@papx/models';
 import { recalcularPartidas, buildSummary } from '../../../utils';
 import { ItemController } from '../../ui-pedido-item';
 
