@@ -212,7 +212,7 @@ export interface RecepcionDeEnvio {
 }
 
 export interface PedidoSummary {
-  importeBruto: number;
+  importe: number;
   descuento: number;
   descuentoImporte: number;
   subtotal: number;
@@ -245,4 +245,5 @@ export interface PedidoItemParams {
   clienteCredito?: ClienteCredito; // Cuando hay descuento fijo
   descuento: number;
   descuentoEspecial?: number;
+  sucursal?: string;
 }

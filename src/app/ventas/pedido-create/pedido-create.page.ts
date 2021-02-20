@@ -1,8 +1,17 @@
-import { Component, OnInit } from '@angular/core';
-import { AlertController, LoadingController } from '@ionic/angular';
+import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
+import {
+  ActionSheetController,
+  AlertController,
+  LoadingController,
+  PopoverController,
+} from '@ionic/angular';
+
 import { VentasDataService } from '../@data-access';
 import { ItemController } from '../shared/ui-pedido-item';
+
 import { PedidoCreateFacade } from './pedido-create.facade';
+import { PedidoCreateFormComponent } from '../shared/ui-pedido/create-form/pcreate-form.component';
+
 import * as test from './test.data';
 @Component({
   selector: 'app-pedido-create',
@@ -12,23 +21,19 @@ import * as test from './test.data';
 })
 export class PedidoCreatePage implements OnInit {
   data = test.demoPedidoCre();
-  partidas = test.TEST_PARTIDAS;
+
   partidas$ = this.facade.partidas$;
+  @ViewChild(PedidoCreateFormComponent) form: PedidoCreateFormComponent;
   constructor(
     private facade: PedidoCreateFacade,
     private dataService: VentasDataService,
     private alertController: AlertController,
     private loadingController: LoadingController,
-    private itemController: ItemController
+    private itemController: ItemController,
+    private actionSheet: ActionSheetController
   ) {}
 
   ngOnInit() {}
-
-  async addItem() {
-    const item = await this.itemController.addItem();
-    console.log('Item: ', item);
-    return item ? this.facade.addItem(item) : null;
-  }
 
   async onSave(event: any) {
     // this.startLoading();
@@ -62,5 +67,25 @@ export class PedidoCreatePage implements OnInit {
       message: err.message,
     });
     await alert.present();
+  }
+
+  async showOptions(ev: any) {
+    const actionSheet = await this.actionSheet.create({
+      header: 'Operaciones',
+      cssClass: 'create-options',
+      buttons: [
+        {
+          text: 'Descuento especial',
+          icon: 'barbell',
+          handler: async () => this.form.setDescuentoEspecial(),
+        },
+        {
+          text: 'Cerrar',
+          role: 'cancel',
+          icon: 'close',
+        },
+      ],
+    });
+    await actionSheet.present();
   }
 }

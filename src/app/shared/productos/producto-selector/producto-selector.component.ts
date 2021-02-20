@@ -1,12 +1,16 @@
-import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
-import { ModalController } from '@ionic/angular';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  Input,
+  OnInit,
+  ViewChild,
+} from '@angular/core';
+import { IonSearchbar, ModalController } from '@ionic/angular';
 
-import { BehaviorSubject } from 'rxjs';
-import { map, withLatestFrom } from 'rxjs/operators';
+import { BehaviorSubject, Observable } from 'rxjs';
+import { map, startWith, withLatestFrom } from 'rxjs/operators';
 
 import { Producto } from '@papx/models';
-import { ProductoService } from '../data-access';
-
 @Component({
   selector: 'sxcc-producto-selector',
   templateUrl: './producto-selector.component.html',
@@ -16,25 +20,34 @@ import { ProductoService } from '../data-access';
 export class ProductoSelectorComponent implements OnInit {
   filter$ = new BehaviorSubject<string>('');
 
-  productos$ = this.service.activos$;
+  @Input() productos$: Observable<Producto[]>; // this.service.activos$;
+  @Input() tipo: 'CREDITO' | 'CONTADO';
 
-  filteredProducts$ = this.filter$.pipe(
-    withLatestFrom(this.productos$),
-    map(([term, productos]) => {
-      return productos.filter(
-        (item) =>
-          item.clave.toLowerCase().includes(term.toLowerCase()) ||
-          item.descripcion.toLowerCase().includes(term.toLowerCase())
-      );
-    })
-  );
+  @ViewChild(IonSearchbar) searchBar: IonSearchbar;
 
-  constructor(
-    private service: ProductoService,
-    private modalCtrl: ModalController
-  ) {}
+  filteredProducts$: Observable<Producto[]>;
 
-  ngOnInit() {}
+  constructor(private modalCtrl: ModalController) {}
+
+  ngOnInit() {
+    this.filteredProducts$ = this.filter$.pipe(
+      startWith(''),
+      withLatestFrom(this.productos$),
+      map(([term, productos]) => {
+        return !term
+          ? []
+          : productos.filter(
+              (item) =>
+                item.clave.toLowerCase().includes(term.toLowerCase()) ||
+                item.descripcion.toLowerCase().includes(term.toLowerCase())
+            );
+      })
+    );
+  }
+
+  async ionViewDidEnter() {
+    await this.searchBar.setFocus();
+  }
 
   search({ target: { value } }) {
     this.filter$.next(value);

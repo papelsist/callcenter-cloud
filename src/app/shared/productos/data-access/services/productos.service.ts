@@ -7,6 +7,9 @@ import { AngularFirestore } from '@angular/fire/firestore';
 
 import sortBy from 'lodash-es/sortBy';
 import keyBy from 'lodash-es/keyBy';
+import sumBy from 'lodash-es/sumBy';
+import toNumber from 'lodash-es/toNumber';
+
 import { Producto } from '@papx/models';
 
 @Injectable({ providedIn: 'root' })
@@ -17,6 +20,13 @@ export class ProductoService {
     )
     .valueChanges()
     .pipe(
+      map((productos) =>
+        productos.map((item) => {
+          const values = Object.values(item.existencia);
+          const disponible = sumBy(values, (r) => toNumber(r.cantidad));
+          return { ...item, disponible };
+        })
+      ),
       map((productos) => sortBy(productos, 'linea')),
       shareReplay(),
       catchError((error: any) => throwError(error))

@@ -37,7 +37,7 @@
   <ion-row>
     <ion-col>
       <ion-item>
-        <ion-label position="stacked">Cantidad</ion-label>
+        <ion-label position="floating">Cantidad</ion-label>
         <ion-input type="number" formControlName="cantidad"></ion-input>
       </ion-item>
     </ion-col>
@@ -52,7 +52,7 @@
         ></ion-input>
       </ion-item>
     </ion-col>
-    <ion-col>
+    <!-- <ion-col>
       <ion-item>
         <ion-label position="floating"
           >Descuento
@@ -67,13 +67,13 @@
           tabindex="-1"
         ></ion-input>
       </ion-item>
-    </ion-col>
+    </ion-col> -->
     <ion-col>
       <ion-item>
-        <ion-label position="floating">Subtotal</ion-label>
+        <ion-label position="floating">Importe</ion-label>
         <ion-input
           color="primary"
-          value="{{ form.get('subtotal').value | currency }}"
+          value="{{ form.get('importe').value | currency }}"
           readonly
           tabindex="-1"
         ></ion-input>
@@ -81,8 +81,13 @@
     </ion-col>
   </ion-row>
 </ion-grid>
-<papx-corte-field [parent]="form"></papx-corte-field>
+<papx-corte-field
+  [parent]="form"
+  *ngIf="controls.tantos.value > 0"
+></papx-corte-field>
 <papx-existencia-field
   [producto]="controls.producto.valueChanges | async"
   [existencias]="existencia"
+  [sucursal]="params.sucursal"
 ></papx-existencia-field>
+<papx-pedido-item-validation [parent]="form"></papx-pedido-item-validation>

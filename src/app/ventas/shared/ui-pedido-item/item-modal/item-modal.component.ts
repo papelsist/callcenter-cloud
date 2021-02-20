@@ -22,4 +22,7 @@ export class ItemModalComponent implements OnInit {
   close() {
     this.controller.dismiss();
   }
+  onSave(event: any) {
+    this.controller.dismiss(event);
+  }
 }

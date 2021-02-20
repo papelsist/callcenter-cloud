@@ -7,7 +7,7 @@ import { map, tap } from 'rxjs/operators';
 @Component({
   selector: 'papx-corte-field',
   template: `
-    <ion-grid [formGroup]="form">
+    <ion-grid [formGroup]="form" class="ion-no-margin">
       <ion-row>
         <ion-col>
           <!-- <span>
@@ -26,18 +26,16 @@ import { map, tap } from 'rxjs/operators';
           </ion-item>
         </ion-col>
         <ion-col>
+          <papx-instruccion-field [parent]="form"></papx-instruccion-field>
+        </ion-col>
+        <ion-col>
           <ion-item>
             <ion-label position="floating">Precio</ion-label>
             <ion-input type="number" formControlName="precio"></ion-input>
           </ion-item>
         </ion-col>
       </ion-row>
-      <ion-row>
-        <ion-col>
-          <!-- <papex-instruccion-corte [parent]="form"></sxcc-instruccion-corte> -->
-          <papx-instruccion-field [parent]="form"></papx-instruccion-field>
-        </ion-col>
-      </ion-row>
+
       <ion-row *ngIf="isEspecial$ | async">
         <ion-col>
           <ion-item>
@@ -45,7 +43,7 @@ import { map, tap } from 'rxjs/operators';
               >Instucción espeical para el corte</ion-label
             >
             <ion-textarea
-              class="ion-text-capitalize"
+              class="ion-text-uppercase"
               formControlName="instruccionEspecial"
               autocapitalize="words"
               color="tertiary"
@@ -71,6 +69,16 @@ import { map, tap } from 'rxjs/operators';
       </ion-row>
     </ion-grid>
   `,
+  styles: [
+    `
+      ion-item-divider {
+        --padding-top: 0px;
+        --padding-bottom: 0px;
+        --inner-padding-top: 0px;
+        height: 20px;
+      }
+    `,
+  ],
 })
 export class CorteFieldComponent implements OnInit {
   @Input() parent: FormGroup;

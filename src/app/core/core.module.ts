@@ -9,6 +9,7 @@ import { throwIfAlreadyLoaded } from '../utils';
 import { DataAccessModule } from '@papx/data-access';
 import { AuthModule } from '../@auth/auth.module';
 import { ProductoSelectorModule } from '../shared/productos/producto-selector/producto-selector.module';
+import { VentasDataAccesModule } from '../ventas/@data-access/ventas-data-access.module';
 
 @NgModule({
   imports: [
@@ -17,6 +18,7 @@ import { ProductoSelectorModule } from '../shared/productos/producto-selector/pr
     DataAccessModule,
     AuthModule,
     ProductoSelectorModule.forRoot(),
+    VentasDataAccesModule,
   ],
 })
 export class CoreModule {

@@ -1,6 +1,16 @@
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { FormaDePago, PedidoItemParams, TipoDePedido } from '@papx/models';
+import {
+  Corte,
+  FormaDePago,
+  PedidoDet,
+  PedidoItemParams,
+  PedidoSummary,
+  Producto,
+  TipoDePedido,
+} from '@papx/models';
 import { ItemValitators } from './item.validators';
+
+import round from 'lodash-es/round';
 
 /**
  * Pure factory function
@@ -28,7 +38,7 @@ export function buildForm(builder: FormBuilder): FormGroup {
     comentario: [''],
     corte: builder.group(
       {
-        tantos: [{ value: null }],
+        tantos: [{ value: null }, { updateOn: 'blur' }],
         instruccion: [null],
         instruccionEspecial: [{ value: null, disabled: true }],
         cantidad: [0],
@@ -47,5 +57,143 @@ export function getParams(): PedidoItemParams {
     tipo: TipoDePedido.CONTADO,
     formaDePago: FormaDePago.EFECTIVO,
     descuento: 0,
+    sucursal: 'TACUBA',
+  };
+}
+
+/**
+ * Copia las propiedades del producto que se ocupan en PedidoDet
+ *
+ * @param producto
+ */
+export function extractData(producto: Producto) {
+  const {
+    clave,
+    descripcion,
+    unidad,
+    presentacion,
+    gramos,
+    nacional,
+    modoVenta,
+  } = producto;
+  return {
+    clave,
+    descripcion,
+    unidad,
+    presentacion,
+    gramos,
+    nacional,
+    modoVenta,
+    producto: reduceProducto(producto),
+  };
+}
+
+export function reduceProducto(producto: Producto) {
+  const {
+    id,
+    clave,
+    descripcion,
+    precioCredito,
+    precioContado,
+    unidad,
+    kilos,
+    gramos,
+    modoVenta,
+    presentacion,
+  } = producto;
+  return {
+    id,
+    clave,
+    descripcion,
+    precioCredito,
+    precioContado,
+    unidad,
+    kilos,
+    gramos,
+    modoVenta,
+    presentacion,
+  };
+}
+
+export function calcularKilos(cantidad: number, producto: Producto) {
+  const factor = producto.unidad === 'MIL' ? 1 / 1000 : 1;
+  const kilos = cantidad * factor * producto.kilos;
+  return round(kilos, 3);
+}
+
+export function buildPedidoItem(
+  params: PedidoItemParams,
+  formData: any
+): Partial<PedidoDet> {
+  const corte: Corte = formData.corte;
+  const producto: Producto = formData.producto;
+  const cantidad: number = formData.cantidad;
+  const produtoData = extractData(producto);
+
+  const item: PedidoDet = {
+    ...formData,
+    ...produtoData,
+    cantidad,
+    kilos: calcularKilos(cantidad, producto),
+    precioOriginal:
+      params.tipo === TipoDePedido.CREDITO
+        ? producto.precioCredito
+        : producto.precioContado,
+  };
+
+  if (corte.tantos > 0) {
+    if (corte.instruccion !== 'ESPECIAL') {
+      corte.instruccionEspecial = null;
+    }
+    item.corte = corte;
+    item.importeCortes = round(corte.cantidad * corte.precio, 2);
+  } else {
+    item.corte = null;
+    item.importeCortes = 0.0;
+  }
+  return item;
+}
+
+export function calcularImportes(
+  producto: Producto,
+  cantidad: number,
+  params: PedidoItemParams
+): PedidoSummary {
+  console.log('Recalculando parametros: ', params);
+  if (!producto) {
+    return {
+      importe: 0,
+      descuento: 0,
+      descuentoImporte: 0,
+      subtotal: 0,
+      impuesto: 0,
+      total: 0,
+      kilos: 0.0,
+    };
+  }
+  const { tipo, descuento, descuentoEspecial } = params;
+  const { precioCredito, precioContado, unidad, modoVenta } = producto;
+  const factor = unidad === 'MIL' ? 1 / 1000 : 1;
+  const precio = tipo === TipoDePedido.CREDITO ? precioCredito : precioContado;
+  const importe = round(cantidad * factor * precio);
+  const descuentoFinal =
+    modoVenta === 'N'
+      ? 0.0
+      : descuentoEspecial > 0
+      ? descuentoEspecial
+      : descuento;
+  const descuentoImporte = round(importe * (descuentoFinal / 100), 2);
+  const subtotal = importe - descuentoImporte;
+  const impuesto = round(subtotal * 0.16, 2);
+  const total = subtotal + impuesto;
+  const kilos = calcularKilos(cantidad, producto);
+  return {
+    importe: importe,
+    descuento,
+    descuentoImporte,
+    subtotal,
+    impuesto,
+    total,
+    kilos,
   };
 }

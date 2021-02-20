@@ -44,12 +44,20 @@ const routes: Routes = [
       ),
   },
   {
+    path: 'cotizaciones/create/item',
+    loadChildren: () =>
+      import('../pedido-item/pedido-item.module').then(
+        (m) => m.PedidoItemPageModule
+      ),
+  },
+  {
     path: 'cotizaciones/:id',
     loadChildren: () =>
       import('../pedido-edit/pedido-edit.module').then(
         (m) => m.PedidoEditPageModule
       ),
   },
+
   {
     path: '',
     redirectTo: '/ventas/cotizaciones',

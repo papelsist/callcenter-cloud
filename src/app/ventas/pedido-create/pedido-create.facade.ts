@@ -17,7 +17,7 @@ let _state: State = {
   sucursal: { id: '402880fc5e4ec411015e4ec64e70012e' },
   usuario: null,
   pedido: { fecha: new Date().toISOString() },
-  partidas: test.TEST_PARTIDAS,
+  partidas: [],
 };
 
 @Injectable()

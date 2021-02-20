@@ -9,7 +9,11 @@
   </ion-toolbar>
 </ion-header>
 <ion-content>
-  <papx-pedido-item-form [data]="data" #form></papx-pedido-item-form>
+  <papx-pedido-item-form
+    [data]="data"
+    (save)="onSave($event)"
+    #form
+  ></papx-pedido-item-form>
 </ion-content>
 <ion-footer class="ion-no-border">
   <ion-toolbar>

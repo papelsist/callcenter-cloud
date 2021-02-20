@@ -7,11 +7,15 @@ import { ItemModalComponent } from './item-modal/item-modal.component';
 export class ItemController {
   constructor(private modalController: ModalController) {}
 
-  async addItem(): Promise<Partial<PedidoDet> | null> {
+  async addItem(
+    tipo?: 'CREDITO' | 'CONTADO'
+  ): Promise<Partial<PedidoDet> | null> {
     console.log('Agregando Pedido item');
     const modal = await this.modalController.create({
       component: ItemModalComponent,
-      componentProps: {},
+      componentProps: {
+        tipo,
+      },
     });
     await modal.present();
     const { data } = await modal.onWillDismiss<Partial<PedidoDet>>();

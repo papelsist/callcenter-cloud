@@ -2,20 +2,39 @@ import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
+  HostListener,
   Input,
   OnInit,
+  Output,
+  EventEmitter,
+  ViewChild,
 } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
+import { IonInput } from '@ionic/angular';
+import { BaseComponent } from '@papx/core';
 
 import {
   PedidoDet,
   Producto,
   PedidoItemParams,
   TipoDePedido,
+  PedidoSummary,
 } from '@papx/models';
 import { ProductoController } from '@papx/shared/productos/producto-selector';
-
-import { buildForm, getParams } from './item-factory';
+import { combineLatest, Observable } from 'rxjs';
+import {
+  debounceTime,
+  distinctUntilChanged,
+  map,
+  takeUntil,
+  tap,
+} from 'rxjs/operators';
+import {
+  buildForm,
+  getParams,
+  buildPedidoItem,
+  calcularImportes,
+} from './item-factory';
 
 @Component({
   selector: 'papx-pedido-item-form',
@@ -23,10 +42,11 @@ import { buildForm, getParams } from './item-factory';
   styleUrls: ['./item-form.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ItemFormComponent implements OnInit {
+export class ItemFormComponent extends BaseComponent implements OnInit {
   @Input() data: Partial<PedidoDet> = { cantidad: 0 };
   @Input() params: PedidoItemParams = getParams();
   @Input() tipo: TipoDePedido;
+  @Output() save = new EventEmitter<Partial<PedidoDet>>();
   existencia = {};
 
   form: FormGroup = buildForm(this.fb);
@@ -40,18 +60,43 @@ export class ItemFormComponent implements OnInit {
     instruccionEspecial: this.form.get('corte.instruccionEspecial'),
     corte: this.form.get('corte'),
   };
+
+  totales$: Observable<PedidoSummary> = combineLatest([
+    this.controls.producto.valueChanges.pipe(distinctUntilChanged()),
+    this.controls.cantidad.valueChanges.pipe(
+      debounceTime(600),
+      distinctUntilChanged()
+    ),
+  ]).pipe(
+    map(([producto, cantidad]) =>
+      calcularImportes(producto, cantidad, this.params)
+    )
+  );
+
+  @ViewChild('tantosComponent') tantosElement: IonInput;
   constructor(
     private fb: FormBuilder,
     private productoController: ProductoController,
     private cd: ChangeDetectorRef
-  ) {}
+  ) {
+    super();
+  }
 
   ngOnInit() {
-    this.form.controls;
+    this.addListeners();
+    this.totales$.subscribe((res) => console.log('Totales: ', res));
+  }
+
+  ngAfterViewInit() {
+    setTimeout(() => {
+      this.tantosElement.setFocus();
+    }, 600);
   }
 
   findProductByClave(clave: string) {
-    // this.lookupByClave(clave);
+    this.productoController.findByClave(clave).subscribe((p) => {
+      if (p) this.selectNewProduct(p);
+    });
   }
 
   async findProducto() {
@@ -68,9 +113,6 @@ export class ItemFormComponent implements OnInit {
     descripcion.setValue(prod.descripcion);
     precio.setValue(this.isCredito ? precioCredito : precioContado);
     this.existencia = this.producto.existencia;
-    console.log('Producto: ', this.producto);
-    console.log('Existencias: ', this.producto.existencia);
-
     this.cd.markForCheck();
   }
 
@@ -82,6 +124,22 @@ export class ItemFormComponent implements OnInit {
     return this.tipo === TipoDePedido.CREDITO;
   }
 
-  cancel() {}
-  onSubmit() {}
+  onSubmit() {
+    if (this.form.valid) {
+      const item = buildPedidoItem(this.params, this.form.getRawValue());
+      this.save.emit(item);
+    }
+  }
+
+  @HostListener('keydown.f2', ['$event'])
+  onHotKeyFindFactura(event: KeyboardEvent) {
+    event.preventDefault();
+    this.findProducto();
+  }
+
+  private addListeners() {
+    this.totales$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((importes) => this.form.patchValue(importes));
+  }
 }

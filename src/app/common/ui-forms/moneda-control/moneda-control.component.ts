@@ -15,6 +15,7 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
         placeholder="Moneda"
         interface="popover"
         (ionChange)="onSelection($event)"
+        [disabled]="disabled"
         [value]="value"
       >
         <ion-select-option
@@ -56,6 +57,7 @@ export class MonedaControlComponent implements OnInit, ControlValueAccessor {
 
   writeValue(obj: any): void {
     this.value = obj;
+    this.cd.markForCheck();
   }
 
   registerOnChange(fn: any): void {

@@ -30,7 +30,7 @@ export interface Producto {
   productoSat?: string;
   unidadSat?: string;
   existencia?: { [key: string]: Almacen };
-  existenciaTotal?: number;
+  disponible?: number;
   dateCreated: string;
   lastUpdated: string;
   createUser: string;
@@ -38,7 +38,7 @@ export interface Producto {
 }
 
 export interface Almacen {
-  cantidad: number;
+  cantidad: number | string;
   apartado: number;
   lastUpdated: firebase.firestore.Timestamp;
 }
