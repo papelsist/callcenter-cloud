@@ -3,11 +3,13 @@ import { FormControl, FormGroup, Validators } from '@angular/forms';
 
 import { BehaviorSubject, Observable } from 'rxjs';
 
-import { Pedido, PedidoDet, PedidoSummary } from '@papx/models';
+import { Pedido, PedidoDet, PedidoSummary, TipoDePedido } from '@papx/models';
 import { recalcularPartidas, buildSummary } from '../../../utils';
 import { ItemController } from '../../ui-pedido-item';
 
 import * as test from './test.data';
+import { ClienteSelectorController } from '@papx/shared/clientes/cliente-selector';
+import { distinctUntilChanged, startWith } from 'rxjs/operators';
 
 interface State {
   partidas: Partial<PedidoDet>[];
@@ -56,7 +58,10 @@ export class PcreateFacade {
   };
   private store = new BehaviorSubject<State>(this._store);
 
-  constructor(private itemController: ItemController) {}
+  constructor(
+    private itemController: ItemController,
+    private clienteController: ClienteSelectorController
+  ) {}
 
   setPedido(data: Partial<Pedido>) {
     this.form.patchValue(data);
@@ -113,6 +118,21 @@ export class PcreateFacade {
     return this;
   }
 
+  async cambiarCliente() {
+    if (!this.permiteCambios) return;
+    const props = {
+      tipo: this.isCredito ? 'CREDITO' : 'TODOS',
+    };
+    const selected = await this.clienteController.selectCliente(props);
+    if (selected) {
+      this.controls.cliente.setValue(selected);
+    }
+  }
+
+  get permiteCambios() {
+    return this.form.valid;
+  }
+
   get tipo() {
     return this.controls.tipo.value;
   }
@@ -123,5 +143,9 @@ export class PcreateFacade {
 
   get descuentoEspecial() {
     return this.form.get('descuentoEspecial').value;
+  }
+
+  isCredito() {
+    return this.tipo === TipoDePedido.CREDITO;
   }
 }

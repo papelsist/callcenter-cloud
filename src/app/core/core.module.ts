@@ -7,9 +7,13 @@ import { throwIfAlreadyLoaded } from '../utils';
 
 // app
 import { DataAccessModule } from '@papx/data-access';
-import { AuthModule } from '../@auth/auth.module';
-import { ProductoSelectorModule } from '../shared/productos/producto-selector/producto-selector.module';
 import { VentasDataAccesModule } from '../ventas/@data-access/ventas-data-access.module';
+import { ClienteDataAccessModule } from '@papx/shared/clientes/@data-access/cliente-data-access.module';
+import { ProductoDataAccessModules } from '@papx/shared/productos/data-access';
+import { AuthModule } from '../@auth/auth.module';
+
+import { ProductoSelectorModule } from '@papx/shared/productos/producto-selector';
+import { ClienteSelectorModule } from '@papx/shared/clientes/cliente-selector';
 
 @NgModule({
   imports: [
@@ -17,8 +21,11 @@ import { VentasDataAccesModule } from '../ventas/@data-access/ventas-data-access
     HttpClientModule,
     DataAccessModule,
     AuthModule,
-    ProductoSelectorModule.forRoot(),
+    ClienteDataAccessModule,
+    ProductoDataAccessModules,
     VentasDataAccesModule,
+    ProductoSelectorModule.forRoot(),
+    ClienteSelectorModule.forRoot(),
   ],
 })
 export class CoreModule {

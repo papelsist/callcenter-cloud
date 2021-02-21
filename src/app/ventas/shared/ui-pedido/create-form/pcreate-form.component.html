@@ -1,7 +1,11 @@
 <ion-grid [formGroup]="form">
   <ion-row>
     <ion-col class="ion-align-self-center">
-      <papx-cliente-field [parent]="form"></papx-cliente-field>
+      <papx-cliente-field
+        [cliente]="cliente$ | async"
+        [disabled]="form.disabled"
+        (changeCliente)="onChangeCliente()"
+      ></papx-cliente-field>
     </ion-col>
     <ion-col>
       <papx-sucursal-control formControlName="sucursal"></papx-sucursal-control>

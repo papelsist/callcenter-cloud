@@ -3,24 +3,28 @@ import {
   Component,
   Input,
   OnInit,
+  Output,
+  EventEmitter,
 } from '@angular/core';
-import { FormGroup } from '@angular/forms';
+
+import { Cliente } from '@papx/models';
+
+import { PcreateFacade } from '../create-form/pcreate.facade';
 
 @Component({
   selector: 'papx-cliente-field',
   template: `
-    <ion-item button>
-      <ion-label>
+    <ion-item button [disabled]="disabled" (click)="changeCliente.emit()">
+      <ion-label class="ion-text-wrap">
         <h2>
-          {{ cliente?.nombre }}
-          <ion-text color="secondary">
-            <sub>({{ cliente?.rfc }})</sub>
+          {{ getLabel() }}
+          <ion-text color="danger" *ngIf="cliente">
+            <sub *ngIf="!cliente.activo">SUSPENDIDO</sub>
           </ion-text>
         </h2>
-        <ion-text color="danger">
-          <p *ngIf="!cliente.activo">SUSPENDIDO</p>
-        </ion-text>
-        <p></p>
+        <p *ngIf="cliente">
+          <ion-text color="secondary"> RFC: {{ cliente?.rfc }} </ion-text>
+        </p>
       </ion-label>
       <ion-icon slot="start" name="people"></ion-icon>
       <ion-icon slot="end" name="search"></ion-icon>
@@ -38,16 +42,14 @@ import { FormGroup } from '@angular/forms';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ClienteFieldComponent implements OnInit {
-  @Input() parent: FormGroup;
+  @Input() cliente: Partial<Cliente>;
+  @Input() disabled: boolean = false;
+  @Output() changeCliente = new EventEmitter();
   constructor() {}
 
   ngOnInit() {}
 
-  get cliente() {
-    return this.parent.get('cliente').value;
+  getLabel() {
+    return this.cliente ? `${this.cliente.nombre}` : 'Seleccione un cliente';
   }
-
-  // get value() {
-  //   return this.parent.get('cliente').value;
-  // }
 }

@@ -1,0 +1,37 @@
+<ion-header translucent="true">
+  <ion-toolbar>
+    <ion-title> Catálogo de clientes </ion-title>
+  </ion-toolbar>
+</ion-header>
+<ion-content>
+  <ion-list-header>
+    <ion-searchbar
+      showCancelButton="focus"
+      animated
+      placeholder="Buscar cliente"
+      color="tertiary"
+      (ionChange)="onSearch($event)"
+      (ionCancel)="close()"
+    ></ion-searchbar>
+  </ion-list-header>
+  <ion-list lines="full">
+    <ion-item *ngFor="let c of clientes$ | async" (click)="select(c)" button>
+      <ion-label class="ion-text-wrap">
+        <ion-text>
+          {{ c.nombre }}
+        </ion-text>
+        <ion-text color="secondary">
+          <ion-grid class="ion-no-padding">
+            <ion-row>
+              <ion-col>
+                <h4>RFC: {{ c.rfc }}</h4>
+              </ion-col>
+            </ion-row>
+          </ion-grid>
+        </ion-text>
+      </ion-label>
+
+      <ion-note slot="end" color="secondary"> Crédito </ion-note>
+    </ion-item>
+  </ion-list>
+</ion-content>
