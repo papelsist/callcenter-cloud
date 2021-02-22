@@ -49,7 +49,7 @@ export class ProductoSelectorComponent implements OnInit {
     await this.searchBar.setFocus();
   }
 
-  search({ target: { value } }) {
+  search({ target: { value } }: any) {
     this.filter$.next(value);
   }
 

@@ -27,12 +27,12 @@ import { PedidoDet } from '@papx/models';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CorteItemsListComponent {
-  @Input() partidas: PedidoDet[] = [];
+  @Input() partidas: Partial<PedidoDet>[] = [];
   @Input() parent: FormGroup;
 
   constructor() {}
 
-  doReorder(ev: CustomEvent<ItemReorderEventDetail>) {
+  doReorder(ev: any) {
     // The `from` and `to` properties contain the index of the item
     // when the drag started and ended, respectively
     console.log('Dragged from index', ev.detail.from, 'to', ev.detail.to);

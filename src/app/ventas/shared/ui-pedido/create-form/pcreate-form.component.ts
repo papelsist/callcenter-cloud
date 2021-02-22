@@ -86,7 +86,7 @@ export class PedidoCreateFormComponent extends BaseComponent implements OnInit {
     await this.facade.cambiarCliente();
   }
 
-  segmentChanged({ detail: { value } }) {
+  segmentChanged({ detail: { value } }: any) {
     this.segment = value;
     // this.cd.markForCheck();
   }

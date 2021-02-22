@@ -126,7 +126,7 @@ export class EnvioDireccionComponent
     return currentValue.id === compareValue.id;
   }
 
-  onSelection({ detail: { value } }) {
+  onSelection({ detail: { value } }: any) {
     this.value = value;
     this.onChange(value);
     this.dc.markForCheck();

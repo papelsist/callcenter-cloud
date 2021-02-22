@@ -184,7 +184,7 @@ export class DireccionEditComponent implements OnInit {
     );
   }
 
-  buscar(zip: string) {
+  buscar(zip: any) {
     this.service.fetchData(zip).subscribe(
       (res) => {
         const data = res.map((item) => item.response);

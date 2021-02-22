@@ -63,7 +63,7 @@ export class ExistenciaFieldComponent implements OnInit {
     console.log('SSucursal:', this.sucursal);
   }
 
-  getLabel(key: string) {
+  getLabel(key: any) {
     if (key === 'cf5febrero') return '5 FEBRERO';
     if (key === 'vertiz176') return 'VERTIZ 176';
     if (key === 'calle4') return 'CALLE 4';

@@ -55,7 +55,7 @@ export class ClienteSelectorComponent implements OnInit {
     this.modalCtrl.dismiss(c);
   }
 
-  onSearch({ target: { value } }) {
+  onSearch({ target: { value } }: any) {
     this.filter$.next(value);
   }
 }

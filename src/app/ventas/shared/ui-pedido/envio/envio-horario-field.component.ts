@@ -93,12 +93,12 @@ export class EnvioHorarioFieldComponent implements ControlValueAccessor {
     this.cd.markForCheck();
   }
 
-  setHoraInicial({ detail: { value } }) {
+  setHoraInicial({ detail: { value } }: any) {
     const horario = { horaInicial: value, horaFinal: this.value.horaFinal };
     this.onChange(horario);
   }
 
-  setHoraFinal({ detail: { value } }) {
+  setHoraFinal({ detail: { value } }: any) {
     const horario = { horaFinal: value, horaInicial: this.value.horaInicial };
     this.onChange(horario);
   }

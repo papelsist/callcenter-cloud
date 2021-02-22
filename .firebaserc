@@ -2,5 +2,14 @@
   "projects": {
     "development": "papx-ws-dev",
     "default": "papx-ws-dev"
+  },
+  "targets": {
+    "papx-ws-dev": {
+      "hosting": {
+        "callcenter": [
+          "papel-callcenter-dev"
+        ]
+      }
+    }
   }
 }

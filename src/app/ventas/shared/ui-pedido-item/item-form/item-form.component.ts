@@ -93,7 +93,7 @@ export class ItemFormComponent extends BaseComponent implements OnInit {
     }, 600);
   }
 
-  findProductByClave(clave: string) {
+  findProductByClave(clave: any) {
     this.productoController.findByClave(clave).subscribe((p) => {
       if (p) this.selectNewProduct(p);
     });

@@ -12,7 +12,8 @@ import { Observable } from 'rxjs';
 import capitalize from 'lodash-es/capitalize';
 import words from 'lodash-es/words';
 
-import { differenceInHours } from 'date-fns/fp';
+// import { differenceInHours } from 'date-fns/fp';
+import differenceInHours from 'date-fns/differenceInHours';
 
 import { BaseComponent } from '@papx/core';
 import { ClienteDireccion } from '@papx/models';
@@ -245,7 +246,7 @@ export class EnvioComponent extends BaseComponent implements OnInit {
       );
   }
 
-  setEnvio({ detail: { checked } }) {
+  setEnvio({ detail: { checked } }: any) {
     checked ? this.form.enable() : this.form.disable();
   }
 

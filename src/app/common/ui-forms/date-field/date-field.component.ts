@@ -76,7 +76,7 @@ export class DateFieldComponent implements ControlValueAccessor {
     this.cd.markForCheck();
   }
 
-  setDate({ detail: { value } }) {
+  setDate({ detail: { value } }: any) {
     this.onChange(value);
   }
 }

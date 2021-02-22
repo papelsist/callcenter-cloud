@@ -15,7 +15,7 @@ import { PedidoDet } from '@papx/models';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PedidoItemListComponent implements OnInit {
-  @Input() items: Partial<PedidoDet[]> = [];
+  @Input() items: Partial<PedidoDet>[] = [];
   @Output() addItem = new EventEmitter();
   @Input() disabled = false;
   @Input() fabButton = true;
