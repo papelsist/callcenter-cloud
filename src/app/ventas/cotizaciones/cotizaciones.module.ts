@@ -1,13 +1,13 @@
 import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
 import { RouterModule, Routes } from '@angular/router';
 
-import { IonicModule } from '@ionic/angular';
+import { CommonUiCoreModule } from '@papx/common/ui-core';
+import { CommonUiForms } from '@papx/common/ui-forms';
 
 import { CotizacionesPage } from './cotizaciones.page';
 import { SharedVentasModule } from '../shared/shared-ventas.module';
-import { VentasDataAccesModule } from '../@data-access/ventas-data-access.module';
+
+import { SharedPedidosListModule } from '../shared/pedidos-list';
 
 const routes: Routes = [
   {
@@ -18,11 +18,10 @@ const routes: Routes = [
 
 @NgModule({
   imports: [
-    CommonModule,
-    FormsModule,
-    IonicModule,
+    CommonUiCoreModule,
+    CommonUiForms,
     SharedVentasModule,
-    VentasDataAccesModule,
+    SharedPedidosListModule,
     RouterModule.forChild(routes),
   ],
   declarations: [CotizacionesPage],

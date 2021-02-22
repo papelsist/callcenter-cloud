@@ -1,0 +1,15 @@
+.main-row {
+  display: grid;
+  align-items: center;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  span {
+    text-align: center;
+    font-size: 0.8rem;
+  }
+  .warning {
+    color: #ffc409;
+  }
+  .danger {
+    color: #eb445a;
+  }
+}

@@ -1,0 +1,33 @@
+<ion-list>
+  <!-- <ion-list-header>
+    <ion-label>Cotizaciones</ion-label>
+  </ion-list-header> -->
+  <ion-item *ngFor="let pedido of pedidos; index as idx">
+    <ion-label class="ion-text-wrap">
+      <h2>
+        {{ pedido.nombre }}
+        <span class="ion-padding-start ion-hide-md-down">
+          F.Pago: {{ pedido.formaDePago }}
+        </span>
+      </h2>
+      <p>
+        <ion-text color="warning">
+          {{ pedido.sucursal }}
+        </ion-text>
+
+        <span class="ion-padding-start">
+          {{ getDate(pedido.fecha) | date: "dd/MM/yyyy" }}
+        </span>
+
+        <sub class="ion-padding-start"> ({{ pedido.updateUser }}) </sub>
+      </p>
+    </ion-label>
+
+    <ion-badge slot="start" color="tertiary">
+      {{ pedido.folio }}
+    </ion-badge>
+    <ion-chip slot="end">
+      {{ pedido.total | currency }}
+    </ion-chip>
+  </ion-item>
+</ion-list>

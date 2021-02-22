@@ -54,8 +54,18 @@ export class CotizacionesFacade {
     private dataService: VentasDataService,
     private auth: AuthService
   ) {
-    combineLatest([auth.userInfo$, this.filterByUser$])
-      .pipe(map(([user, filterByUser]) => ({ user, filterByUser })))
+    combineLatest([
+      auth.userInfo$,
+      this.filterByUser$,
+      this.dataService.pendientes$,
+    ])
+      .pipe(
+        map(([user, filterByUser, cotizaciones]) => ({
+          user,
+          filterByUser,
+          cotizaciones,
+        }))
+      )
       .subscribe((data) => {
         this.store.next((_state = { ..._state, ...data }));
       });

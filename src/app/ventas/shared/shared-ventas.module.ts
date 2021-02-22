@@ -1,14 +1,13 @@
 import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { IonicModule } from '@ionic/angular';
 
+import { CommonUiCoreModule } from '@papx/common/ui-core';
 import { FilterVentasButtonComponent } from './filter-ventas/filter-button.component';
 import { VentasHeaderComponent } from './ventas-header/ventas-header.component';
 
 const COMPONENTS = [VentasHeaderComponent, FilterVentasButtonComponent];
 
 @NgModule({
-  imports: [CommonModule, IonicModule],
+  imports: [CommonUiCoreModule],
   declarations: [...COMPONENTS],
   exports: [...COMPONENTS],
 })

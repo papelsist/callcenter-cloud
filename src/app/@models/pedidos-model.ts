@@ -4,6 +4,7 @@ import { FormaDePago } from './formaDePago';
 import { Producto } from './producto';
 import { Sucursal } from './sucursal';
 import { Transporte } from './transporte';
+import firebase from 'firebase/app';
 
 export interface Pedido {
   id?: string;
@@ -56,6 +57,7 @@ export interface Pedido {
   validoHasta?: string;
   createLog?: any;
   updateLog?: any;
+  cerrado?: firebase.firestore.Timestamp;
 }
 
 export interface PedidoDet {

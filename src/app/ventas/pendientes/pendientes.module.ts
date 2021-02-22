@@ -1,20 +1,23 @@
 import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-
-import { IonicModule } from '@ionic/angular';
-
-import { PendientesPageRoutingModule } from './pendientes-routing.module';
+import { Routes, RouterModule } from '@angular/router';
 
 import { PendientesPage } from './pendientes.page';
+import { CommonUiCoreModule } from '@papx/common/ui-core';
+import { SharedVentasModule } from '../shared/shared-ventas.module';
+
+const routes: Routes = [
+  {
+    path: '',
+    component: PendientesPage,
+  },
+];
 
 @NgModule({
   imports: [
-    CommonModule,
-    FormsModule,
-    IonicModule,
-    PendientesPageRoutingModule
+    CommonUiCoreModule,
+    SharedVentasModule,
+    RouterModule.forChild(routes),
   ],
-  declarations: [PendientesPage]
+  declarations: [PendientesPage],
 })
 export class PendientesPageModule {}

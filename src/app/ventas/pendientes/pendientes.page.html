@@ -1,9 +1,37 @@
-<ion-header>
-  <ion-toolbar>
-    <ion-title>pendientes</ion-title>
-  </ion-toolbar>
-</ion-header>
+<papx-ventas-header
+  title="Pendientes"
+  [filterActivated]="false"
+  (filter)="onFilter($event)"
+></papx-ventas-header>
 
 <ion-content>
+  <ion-list *ngIf="pedidos$ | async as pedidos">
+    <ion-item *ngFor="let pedido of pedidos; index as idx">
+      <ion-label class="ion-text-wrap">
+        <div class="main-row">
+          <h2>{{ pedido.nombre }}</h2>
+          <!-- <span class="danger"
+            >{{getDate(pedido.lastUpdated) | date: 'dd/MM/yyyy: HHmm '}}</span
+          > -->
+          <ion-text [color]="getRetrasoColor(pedido)">
+            <span> {{fromNow(pedido.lastUpdated)}} </span>
+          </ion-text>
+        </div>
+        <p>
+          <ion-text color="warning"> {{ pedido.sucursal }} </ion-text>
 
+          <span class="ion-padding-start">
+            {{ getDate(pedido.fecha) | date: "dd/MM/yyyy" }}
+          </span>
+
+          <sub class="ion-padding-start"> ({{ pedido.updateUser }}) </sub>
+        </p>
+      </ion-label>
+
+      <ion-badge slot="start" color="warning"> {{ pedido.folio }} </ion-badge>
+      <ion-chip slot="end" color="primary">
+        {{ pedido.total | currency }}
+      </ion-chip>
+    </ion-item>
+  </ion-list>
 </ion-content>

@@ -1,20 +1,23 @@
 import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { RouterModule, Routes } from '@angular/router';
 
-import { IonicModule } from '@ionic/angular';
-
-import { FacturasPageRoutingModule } from './facturas-routing.module';
+import { CommonUiCoreModule } from '@papx/common/ui-core';
+import { SharedVentasModule } from '../shared/shared-ventas.module';
 
 import { FacturasPage } from './facturas.page';
+const routes: Routes = [
+  {
+    path: '',
+    component: FacturasPage,
+  },
+];
 
 @NgModule({
   imports: [
-    CommonModule,
-    FormsModule,
-    IonicModule,
-    FacturasPageRoutingModule
+    CommonUiCoreModule,
+    SharedVentasModule,
+    RouterModule.forChild(routes),
   ],
-  declarations: [FacturasPage]
+  declarations: [FacturasPage],
 })
 export class FacturasPageModule {}

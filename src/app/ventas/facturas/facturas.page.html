@@ -1,9 +1,34 @@
-<ion-header>
-  <ion-toolbar>
-    <ion-title>facturas</ion-title>
-  </ion-toolbar>
-</ion-header>
+<papx-ventas-header
+  title="Facturas"
+  [filterActivated]="false"
+  (filter)="onFilter()"
+></papx-ventas-header>
 
 <ion-content>
+  <ion-list *ngIf="facturas$ | async as facturas">
+    <ion-item *ngFor="let pedido of facturas; index as idx">
+      <ion-label class="ion-text-wrap">
+        <h2>
+          {{ pedido.nombre }}
+          <span class="ion-padding-start ion-hide-md-down">
+            F.Pago: {{ pedido.formaDePago }}
+          </span>
+        </h2>
+        <p>
+          <ion-text color="warning"> {{ pedido.sucursal }} </ion-text>
 
+          <span class="ion-padding-start">
+            {{ getDate(pedido.fecha) | date: "dd/MM/yyyy" }}
+          </span>
+
+          <sub class="ion-padding-start"> ({{ pedido.updateUser }}) </sub>
+        </p>
+      </ion-label>
+
+      <ion-badge slot="start" color="tertiary"> {{ pedido.folio }} </ion-badge>
+      <ion-chip slot="end" color="success">
+        {{ pedido.total | currency }}
+      </ion-chip>
+    </ion-item>
+  </ion-list>
 </ion-content>

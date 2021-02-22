@@ -6,11 +6,14 @@
   ></papx-ventas-header>
 
   <ion-content>
-    State: <br />
-    <pre>
+    <papx-pedidos-list [pedidos]="state.cotizaciones"></papx-pedidos-list>
+
+    <!-- <pre>
+      State: <br />
       {{state | json}}
-    </pre>
+    </pre> -->
   </ion-content>
+
   <!-- fab placed to the top end -->
   <ion-fab vertical="bottom" horizontal="end" slot="fixed">
     <ion-fab-button routerLink="create">

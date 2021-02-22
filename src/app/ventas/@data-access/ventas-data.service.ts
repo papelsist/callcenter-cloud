@@ -12,7 +12,11 @@ import { Observable, throwError } from 'rxjs';
 import { AngularFireFunctions } from '@angular/fire/functions';
 import { catchError } from 'rxjs/operators';
 
-type PedidoStatus = 'COTIZACION' | 'PENDIENTE' | 'FACTURADO';
+type PedidoStatus =
+  | 'COTIZACION'
+  | 'CERRADO'
+  | 'FACTURADO'
+  | 'FACTURADO_TIMBRADO';
 
 /**
  * Factory function than creates QueryFn instances specific of the status property
@@ -20,7 +24,7 @@ type PedidoStatus = 'COTIZACION' | 'PENDIENTE' | 'FACTURADO';
  */
 const getFilter = (status: PedidoStatus): QueryFn => {
   return (ref: CollectionReference) =>
-    ref.where('status', '==', status).limit(50);
+    ref.where('status', '==', status).limit(5);
 };
 
 export interface VentasQueryParams {
@@ -34,8 +38,8 @@ export interface VentasQueryParams {
 export class VentasDataService {
   PEDIDOS_COLLECTION = 'pedidos';
   readonly cotizaciones$ = this.fetchVentas('COTIZACION');
-  readonly pendientes$ = this.fetchVentas('PENDIENTE');
-  readonly facturas$ = this.fetchVentas('COTIZACION');
+  readonly pendientes$ = this.fetchVentas('CERRADO');
+  readonly facturas$ = this.fetchVentas('FACTURADO_TIMBRADO');
 
   constructor(
     private afs: AngularFirestore,
@@ -48,12 +52,15 @@ export class VentasDataService {
   }
 
   private getPedidos(qf: QueryFn) {
-    return this.afs.collection<Pedido>(this.PEDIDOS_COLLECTION, qf);
+    return this.afs
+      .collection<Pedido>(this.PEDIDOS_COLLECTION, qf)
+      .valueChanges();
   }
 
+  /*
   fechVentas(params: VentasQueryParams) {
     return this.afs
-      .collection(this.PEDIDOS_COLLECTION, (ref) => {
+      .collection<Pedido>(this.PEDIDOS_COLLECTION, (ref) => {
         let query = ref.limitToLast(params.max).orderBy('fecha');
         if (params.desde) query = ref.where('fecha', '>=', params.desde);
         if (params.status) query = query.where('status', '==', params.status);
@@ -63,6 +70,7 @@ export class VentasDataService {
       })
       .valueChanges({ idField: 'id' });
   }
+  */
 
   /**
    * Create a new entity of Pedido using  firebase callable funtion
