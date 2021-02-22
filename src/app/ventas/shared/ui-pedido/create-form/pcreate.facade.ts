@@ -1,15 +1,28 @@
 import { Injectable } from '@angular/core';
-import { FormControl, FormGroup, Validators } from '@angular/forms';
+import {
+  FormBuilder,
+  FormControl,
+  FormGroup,
+  Validators,
+} from '@angular/forms';
 
 import { BehaviorSubject, Observable } from 'rxjs';
 
-import { Pedido, PedidoDet, PedidoSummary, TipoDePedido } from '@papx/models';
+import {
+  Cliente,
+  Pedido,
+  PedidoDet,
+  PedidoSummary,
+  TipoDePedido,
+} from '@papx/models';
 import { recalcularPartidas, buildSummary } from '../../../utils';
 import { ItemController } from '../../ui-pedido-item';
 
 import * as test from './test.data';
 import { ClienteSelectorController } from '@papx/shared/clientes/cliente-selector';
-import { distinctUntilChanged, startWith } from 'rxjs/operators';
+import { distinctUntilChanged, map, startWith } from 'rxjs/operators';
+import { createEnvioForm } from './pedido-form-factory';
+import { PedidoForm } from '../pedido-form';
 
 interface State {
   partidas: Partial<PedidoDet>[];
@@ -17,6 +30,8 @@ interface State {
 
 @Injectable()
 export class PcreateFacade {
+  readonly form = new PedidoForm(this.fb);
+  /*
   readonly form: FormGroup = new FormGroup({
     cliente: new FormControl(null, Validators.required),
     sucursal: new FormControl(null, Validators.required),
@@ -26,10 +41,15 @@ export class PcreateFacade {
       { value: 'MXN', disabled: true },
       Validators.required
     ),
-    comprador: new FormControl(null),
-    comentario: new FormControl(null),
+    comprador: new FormControl(null, Validators.maxLength(50)),
+    comentario: new FormControl(null, Validators.maxLength(250)),
     descuentoEspecial: new FormControl(null),
+    usoDeCfdi: new FormControl('G01', Validators.required),
+    cfdiMail: new FormControl(null, Validators.email),
+    envio: createEnvioForm(this.fb),
+    corteImporte: new FormControl(null),
   });
+  */
 
   readonly controls = {
     cliente: this.form.get('cliente'),
@@ -41,6 +61,7 @@ export class PcreateFacade {
   private _currentPartidas = [];
   private _partidas = new BehaviorSubject<Partial<PedidoDet>[]>([]);
   partidas$ = this._partidas.asObservable();
+  cortes$ = this.partidas$.pipe(map((items) => items.filter((it) => it.corte)));
 
   _summary = new BehaviorSubject<PedidoSummary>({
     importe: 0.0,
@@ -60,7 +81,8 @@ export class PcreateFacade {
 
   constructor(
     private itemController: ItemController,
-    private clienteController: ClienteSelectorController
+    private clienteController: ClienteSelectorController,
+    private fb: FormBuilder
   ) {}
 
   setPedido(data: Partial<Pedido>) {
@@ -97,8 +119,8 @@ export class PcreateFacade {
   }
 
   async addItem() {
-    const item = test.TEST_PARTIDAS[0];
-    // const item = await this.itemController.addItem(this.tipo);
+    // const item = test.TEST_PARTIDAS[0];
+    const item = await this.itemController.addItem(this.tipo);
     if (item) {
       this._currentPartidas = [...this._currentPartidas, item];
       this._partidas.next(this._currentPartidas);
@@ -119,18 +141,18 @@ export class PcreateFacade {
   }
 
   async cambiarCliente() {
-    if (!this.permiteCambios) return;
     const props = {
       tipo: this.isCredito ? 'CREDITO' : 'TODOS',
     };
     const selected = await this.clienteController.selectCliente(props);
     if (selected) {
-      this.controls.cliente.setValue(selected);
+      this.setCliente(selected);
     }
   }
 
-  get permiteCambios() {
-    return this.form.valid;
+  setCliente(cliente: Partial<Cliente>) {
+    this.controls.cliente.setValue(cliente);
+    this.form.get('cfdiMail').setValue(cliente.cfdiMail);
   }
 
   get tipo() {

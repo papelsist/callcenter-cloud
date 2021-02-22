@@ -10,7 +10,7 @@ import {
 import { AlertController } from '@ionic/angular';
 
 import { startWith, takeUntil, tap } from 'rxjs/operators';
-import { merge } from 'rxjs';
+import { merge, Observable } from 'rxjs';
 
 import { BaseComponent } from '@papx/core';
 import { PedidoCreateDto, TipoDePedido } from '@papx/models';
@@ -29,8 +29,10 @@ export class PedidoCreateFormComponent extends BaseComponent implements OnInit {
 
   form = this.facade.form;
   partidas$ = this.facade.partidas$;
+  cortes$ = this.facade.cortes$;
   summary$ = this.facade.summary$;
-  cliente$;
+  cliente$: Observable<any>;
+  segment = 'partidas';
 
   constructor(private facade: PcreateFacade, private alert: AlertController) {
     super();
@@ -80,8 +82,13 @@ export class PedidoCreateFormComponent extends BaseComponent implements OnInit {
     return this.form.get('cliente').value;
   }
 
-  onChangeCliente() {
-    this.facade.cambiarCliente();
+  async onChangeCliente() {
+    await this.facade.cambiarCliente();
+  }
+
+  segmentChanged({ detail: { value } }) {
+    this.segment = value;
+    // this.cd.markForCheck();
   }
 
   async setDescuentoEspecial() {

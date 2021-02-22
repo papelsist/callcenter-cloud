@@ -17,6 +17,8 @@ import { PedidoDet } from '@papx/models';
 export class PedidoItemListComponent implements OnInit {
   @Input() items: Partial<PedidoDet[]> = [];
   @Output() addItem = new EventEmitter();
+  @Input() disabled = false;
+  @Input() fabButton = true;
   constructor() {}
 
   ngOnInit() {}
