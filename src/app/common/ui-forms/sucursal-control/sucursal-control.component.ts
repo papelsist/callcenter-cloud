@@ -89,7 +89,6 @@ export class SucursalControlComponent implements OnInit, ControlValueAccessor {
   }
 
   onSelection({ detail: { value } }: any) {
-    console.log('Seleccionando: ', value);
     this.value = value;
     this.onChange(value);
     this.cd.markForCheck();

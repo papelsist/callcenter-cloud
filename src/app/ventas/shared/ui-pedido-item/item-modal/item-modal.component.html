@@ -11,6 +11,8 @@
 <ion-content>
   <papx-pedido-item-form
     [data]="data"
+    [tipo]="tipo"
+    [sucursal]="sucursal"
     (save)="onSave($event)"
     #form
   ></papx-pedido-item-form>
@@ -18,7 +20,7 @@
 <ion-footer class="ion-no-border">
   <ion-toolbar>
     <ion-buttons slot="start">
-      <ion-button (click)="close()">
+      <ion-button (click)="close()" tabindex="-99">
         <ion-icon slot="start" name="arrow-back"></ion-icon>
         Cancelar
       </ion-button>

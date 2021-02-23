@@ -13,13 +13,7 @@ import { FormBuilder, FormGroup } from '@angular/forms';
 import { IonInput } from '@ionic/angular';
 import { BaseComponent } from '@papx/core';
 
-import {
-  PedidoDet,
-  Producto,
-  PedidoItemParams,
-  TipoDePedido,
-  PedidoSummary,
-} from '@papx/models';
+import { PedidoDet, Producto, TipoDePedido, PedidoSummary } from '@papx/models';
 import { ProductoController } from '@papx/shared/productos/producto-selector';
 import { combineLatest, Observable } from 'rxjs';
 import {
@@ -29,12 +23,7 @@ import {
   takeUntil,
   tap,
 } from 'rxjs/operators';
-import {
-  buildForm,
-  getParams,
-  buildPedidoItem,
-  calcularImportes,
-} from './item-factory';
+import { buildForm, buildPedidoItem, calcularImportes } from './item-factory';
 
 @Component({
   selector: 'papx-pedido-item-form',
@@ -44,8 +33,9 @@ import {
 })
 export class ItemFormComponent extends BaseComponent implements OnInit {
   @Input() data: Partial<PedidoDet> = { cantidad: 0 };
-  @Input() params: PedidoItemParams = getParams();
+  // @Input() params: PedidoItemParams;
   @Input() tipo: TipoDePedido;
+  @Input() sucursal: string;
   @Output() save = new EventEmitter<Partial<PedidoDet>>();
   existencia = {};
 
@@ -69,11 +59,12 @@ export class ItemFormComponent extends BaseComponent implements OnInit {
     ),
   ]).pipe(
     map(([producto, cantidad]) =>
-      calcularImportes(producto, cantidad, this.params)
+      calcularImportes(producto, cantidad, this.tipo)
     )
   );
 
   @ViewChild('tantosComponent') tantosElement: IonInput;
+  @ViewChild('cantidad') cantidadEl: IonInput;
   constructor(
     private fb: FormBuilder,
     private productoController: ProductoController,
@@ -94,8 +85,13 @@ export class ItemFormComponent extends BaseComponent implements OnInit {
   }
 
   findProductByClave(clave: any) {
-    this.productoController.findByClave(clave).subscribe((p) => {
-      if (p) this.selectNewProduct(p);
+    this.productoController.findByClave(clave).subscribe(async (p) => {
+      if (p) {
+        this.selectNewProduct(p);
+        await this.cantidadEl.setFocus();
+        const ne = await this.cantidadEl.getInputElement();
+        ne.select();
+      }
     });
   }
 
@@ -126,7 +122,7 @@ export class ItemFormComponent extends BaseComponent implements OnInit {
 
   onSubmit() {
     if (this.form.valid) {
-      const item = buildPedidoItem(this.params, this.form.getRawValue());
+      const item = buildPedidoItem(this.tipo, this.form.getRawValue());
       this.save.emit(item);
     }
   }
@@ -135,6 +131,10 @@ export class ItemFormComponent extends BaseComponent implements OnInit {
   onHotKeyFindFactura(event: KeyboardEvent) {
     event.preventDefault();
     this.findProducto();
+  }
+
+  onEnter() {
+    this.onSubmit();
   }
 
   private addListeners() {

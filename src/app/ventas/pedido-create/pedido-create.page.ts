@@ -1,11 +1,13 @@
-import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { Router } from '@angular/router';
 import {
   ActionSheetController,
   AlertController,
   LoadingController,
-  PopoverController,
 } from '@ionic/angular';
 
+import { AuthService } from '@papx/auth';
+import { Pedido, User } from '@papx/models';
 import { VentasDataService } from '../@data-access';
 
 import { PedidoCreateFacade } from './pedido-create.facade';
@@ -18,33 +20,40 @@ import { PedidoCreateFormComponent } from '../shared/ui-pedido/create-form/pcrea
   providers: [PedidoCreateFacade],
 })
 export class PedidoCreatePage implements OnInit {
-  data = {};
+  data = {
+    sucursal: 'TACUBA',
+    sucursalId: '402880fc5e4ec411015e4ec64e70012e',
+  };
   errors: any;
+  user$ = this.authService.userInfo$;
 
-  partidas$ = this.facade.partidas$;
   @ViewChild(PedidoCreateFormComponent) form: PedidoCreateFormComponent;
   constructor(
-    private facade: PedidoCreateFacade,
-    private dataService: VentasDataService,
+    private authService: AuthService,
     private alertController: AlertController,
     private loadingController: LoadingController,
-    private actionSheet: ActionSheetController
+    private actionSheet: ActionSheetController,
+    private dataService: VentasDataService,
+    private router: Router
   ) {}
 
   ngOnInit() {}
 
-  async onSave(event: any) {
+  async onSave(pedido: Partial<Pedido>, user: User) {
     // this.startLoading();
-    console.log('Salvando pedido: ', event);
-    /*
-    this.dataService.addPedido(event).subscribe(
-      (p) => console.log('Pedido: ', p),
+    pedido.createUser = user.displayName;
+    pedido.updateUser = user.displayName;
+    pedido.status = 'COTIZACION';
+    // console.log('Salvando pedido: ', pedido);
+
+    this.dataService.addPedido(pedido).subscribe(
+      (res) => {
+        console.log('Saved done, res: ', res);
+        this.router.navigate(['/', 'ventas', 'cotizaciones']);
+      },
       async (err) => this.handleHerror(err),
-      () => {
-        console.log('Terminated');
-      }
+      () => console.log('Terminated')
     );
-    */
   }
 
   onErrors(event: any) {
@@ -90,5 +99,9 @@ export class PedidoCreatePage implements OnInit {
       ],
     });
     await actionSheet.present();
+  }
+
+  async showErrors(errors: any) {
+    console.log('Mostrar errores: ', errors);
   }
 }

@@ -12,6 +12,7 @@ import isEmpty from 'lodash-es/isEmpty';
 export class PedidoValidators {
   static ImporteMinimo(formGroup: FormGroup): ValidationErrors | null {
     const total: number = formGroup.get('total').value;
+    const res = total < 10 ? { importeMinimo: true } : null;
     return total < 10 ? { importeMinimo: true } : null;
   }
 

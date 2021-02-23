@@ -13,7 +13,7 @@ import { startWith, takeUntil, tap, map } from 'rxjs/operators';
 import { merge, Observable } from 'rxjs';
 
 import { BaseComponent } from '@papx/core';
-import { PedidoCreateDto, TipoDePedido } from '@papx/models';
+import { Pedido, PedidoCreateDto, TipoDePedido } from '@papx/models';
 import { PcreateFacade } from './pcreate.facade';
 
 @Component({
@@ -24,8 +24,8 @@ import { PcreateFacade } from './pcreate.facade';
   providers: [PcreateFacade],
 })
 export class PedidoCreateFormComponent extends BaseComponent implements OnInit {
-  @Output() save = new EventEmitter<PedidoCreateDto>();
-  @Input() data: Partial<PedidoCreateDto> = {};
+  @Output() save = new EventEmitter<Partial<Pedido>>();
+  @Input() data: Partial<Pedido> = {};
   @Output() errors = new EventEmitter();
 
   form = this.facade.form;
@@ -55,6 +55,7 @@ export class PedidoCreateFormComponent extends BaseComponent implements OnInit {
   addListeners() {
     this.recalculoListener();
     this.errorsListener();
+    this.sucursalListener();
   }
 
   recalculoListener() {
@@ -79,13 +80,25 @@ export class PedidoCreateFormComponent extends BaseComponent implements OnInit {
       .subscribe((errors) => this.errors.emit(errors));
   }
 
+  private sucursalListener() {
+    this.form
+      .get('sucursalEntity')
+      .valueChanges.pipe(takeUntil(this.destroy$))
+      .subscribe((s) => {
+        if (s) {
+          this.form.get('sucursal').setValue(s.nombre);
+          this.form.get('sucursalId').setValue(s.id);
+        }
+      });
+  }
+
   get canSubmit() {
     return this.form.valid;
   }
 
   submit() {
     if (this.canSubmit) {
-      const data = this.form.value;
+      const data = this.facade.resolvePedidoData();
       this.save.emit(data);
     }
   }

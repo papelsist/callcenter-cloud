@@ -10,6 +10,7 @@ export interface Pedido {
   id?: string;
   fecha: string;
   sucursal: string | Partial<Sucursal>;
+  sucursalId?: string;
   folio?: number;
   cliente: Partial<Cliente>;
   nombre: string;
@@ -243,9 +244,18 @@ export interface PedidoParams {
  */
 export interface PedidoItemParams {
   tipo: TipoDePedido;
+  // formaDePago: FormaDePago;
+  sucursal?: string;
+  descuento: number;
+  descuentoEspecial?: number;
+}
+/*
+export interface PedidoItemParams {
+  tipo: TipoDePedido;
   formaDePago: FormaDePago;
   clienteCredito?: ClienteCredito; // Cuando hay descuento fijo
   descuento: number;
   descuentoEspecial?: number;
   sucursal?: string;
 }
+*/

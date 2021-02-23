@@ -37,6 +37,7 @@ import { Producto } from '@papx/models';
             <ion-input
               value="{{ item.value['cantidad'] | number: '1.3-3' }}"
               readonly
+              tabindex="-99"
               [color]="getColor(item.value['cantidad'])"
             ></ion-input>
           </ion-item>

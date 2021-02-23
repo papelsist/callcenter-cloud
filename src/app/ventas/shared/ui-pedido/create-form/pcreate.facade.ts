@@ -81,13 +81,13 @@ export class PcreateFacade {
   private store = new BehaviorSubject<State>(this._store);
 
   errors$ = this.form.statusChanges.pipe(
-    //startWith('VALID'),
+    startWith('VALID'),
     map(() => {
-      if (this.form.pristine) return [];
-      let errors = getFormValidationErrors(this.form);
+      const errors = [];
+      if (this.form.errors) errors.push(this.form.errors);
       if (this.form.get('envio').enabled) {
         const envio = this.form.get('envio') as FormGroup;
-        errors = [...errors, ...getFormValidationErrors(envio)];
+        if (envio.errors) errors.push(envio.errors);
       }
       return errors;
     })
@@ -99,7 +99,12 @@ export class PcreateFacade {
   ) {}
 
   setPedido(data: Partial<Pedido>) {
-    this.form.patchValue(data);
+    let value: any = { ...data };
+    if (data.sucursal && data.sucursalId) {
+      const sucursalEntity = { id: data.sucursalId, nombre: data.sucursal };
+      value = { ...value, sucursalEntity };
+    }
+    this.form.patchValue(value);
   }
 
   recalcular() {
@@ -123,7 +128,7 @@ export class PcreateFacade {
 
     const summary = buildSummary(this._currentPartidas);
     this._summary.next(summary);
-    this.form.get('total').setValue(summary.total);
+    this.form.patchValue(summary);
     // this.form.markAsDirty();
   }
 
@@ -133,7 +138,7 @@ export class PcreateFacade {
   }
 
   async addItem() {
-    const item = await this.itemController.addItem(this.tipo);
+    const item = await this.itemController.addItem(this.tipo, this.sucursal);
     if (item) {
       this._currentPartidas = [...this._currentPartidas, item];
       this._partidas.next(this._currentPartidas);
@@ -172,7 +177,19 @@ export class PcreateFacade {
 
   setCliente(cliente: Partial<Cliente>) {
     this.controls.cliente.setValue(cliente);
-    this.form.get('cfdiMail').setValue(cliente.cfdiMail);
+    this.form.get('cfdiMail').setValue(cliente.cfdiMail, { emitEvent: false });
+    this.form.get('nombre').setValue(cliente.nombre, { emitEvent: false });
+
+    // Side effect to update other controls
+    if (cliente.credito) {
+      if (this.tipo !== TipoDePedido.CREDITO) {
+        this.controls.tipo.setValue(TipoDePedido.CREDITO, {
+          emitEvent: false,
+          onlySelf: true,
+        });
+      }
+    }
+    this.recalcular();
   }
 
   get tipo() {
@@ -186,8 +203,30 @@ export class PcreateFacade {
   get descuentoEspecial() {
     return this.form.get('descuentoEspecial').value;
   }
+  get sucursal() {
+    return this.form.get('sucursal').value;
+  }
 
   isCredito() {
     return this.tipo === TipoDePedido.CREDITO;
+  }
+
+  resolvePedidoData(): Partial<Pedido> {
+    return {
+      ...this.form.value,
+      cliente: this.cleanCliente(),
+      partidas: [...this._currentPartidas],
+      appVersion: 2,
+    };
+  }
+
+  private cleanCliente() {
+    const { id, nombre, rfc, clave } = this.cliente;
+    return {
+      id,
+      nombre,
+      rfc,
+      clave,
+    };
   }
 }

@@ -5,7 +5,7 @@ import {
   OnInit,
 } from '@angular/core';
 import { ModalController } from '@ionic/angular';
-import { PedidoDet } from '@papx/models';
+import { PedidoDet, TipoDePedido } from '@papx/models';
 
 @Component({
   selector: 'papx-pedido-item-modal',
@@ -15,6 +15,8 @@ import { PedidoDet } from '@papx/models';
 })
 export class ItemModalComponent implements OnInit {
   @Input() data: Partial<PedidoDet>;
+  @Input() tipo: TipoDePedido;
+  @Input() sucursal: string;
   constructor(private controller: ModalController) {}
 
   ngOnInit() {}

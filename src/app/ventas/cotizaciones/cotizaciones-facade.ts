@@ -57,7 +57,7 @@ export class CotizacionesFacade {
     combineLatest([
       auth.userInfo$,
       this.filterByUser$,
-      this.dataService.pendientes$,
+      this.dataService.cotizaciones$,
     ])
       .pipe(
         map(([user, filterByUser, cotizaciones]) => ({

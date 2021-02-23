@@ -11,9 +11,7 @@ import { Observable } from 'rxjs';
 
 import capitalize from 'lodash-es/capitalize';
 import words from 'lodash-es/words';
-
-// import { differenceInHours } from 'date-fns/fp';
-import differenceInHours from 'date-fns/differenceInHours';
+import { differenceInHours } from 'date-fns';
 
 import { BaseComponent } from '@papx/core';
 import { ClienteDireccion } from '@papx/models';

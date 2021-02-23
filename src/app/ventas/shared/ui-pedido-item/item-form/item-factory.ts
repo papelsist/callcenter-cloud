@@ -3,7 +3,6 @@ import {
   Corte,
   FormaDePago,
   PedidoDet,
-  PedidoItemParams,
   PedidoSummary,
   Producto,
   TipoDePedido,
@@ -52,14 +51,14 @@ export function buildForm(builder: FormBuilder): FormGroup {
   return form;
 }
 
-export function getParams(): PedidoItemParams {
-  return {
-    tipo: TipoDePedido.CONTADO,
-    formaDePago: FormaDePago.EFECTIVO,
-    descuento: 0,
-    sucursal: 'TACUBA',
-  };
-}
+// export function getParams(): PedidoItemParams {
+//   return {
+//     tipo: TipoDePedido.CONTADO,
+//     formaDePago: FormaDePago.EFECTIVO,
+//     descuento: 0,
+//     sucursal: 'TACUBA',
+//   };
+// }
 
 /**
  * Copia las propiedades del producto que se ocupan en PedidoDet
@@ -122,7 +121,8 @@ export function calcularKilos(cantidad: number, producto: Producto) {
 }
 
 export function buildPedidoItem(
-  params: PedidoItemParams,
+  // params: PedidoItemParams,
+  tipo: TipoDePedido,
   formData: any
 ): Partial<PedidoDet> {
   const corte: Corte = formData.corte;
@@ -136,7 +136,7 @@ export function buildPedidoItem(
     cantidad,
     kilos: calcularKilos(cantidad, producto),
     precioOriginal:
-      params.tipo === TipoDePedido.CREDITO
+      tipo === TipoDePedido.CREDITO
         ? producto.precioCredito
         : producto.precioContado,
   };
@@ -157,9 +157,9 @@ export function buildPedidoItem(
 export function calcularImportes(
   producto: Producto,
   cantidad: number,
-  params: PedidoItemParams
+  tipo: TipoDePedido
 ): PedidoSummary {
-  console.log('Recalculando parametros: ', params);
+  console.log('Recalculando importe para: ', tipo);
   if (!producto) {
     return {
       importe: 0,
@@ -171,7 +171,8 @@ export function calcularImportes(
       kilos: 0.0,
     };
   }
-  const { tipo, descuento, descuentoEspecial } = params;
+  const descuento = 0.0;
+  const descuentoEspecial = 0.0;
   const { precioCredito, precioContado, unidad, modoVenta } = producto;
   const factor = unidad === 'MIL' ? 1 / 1000 : 1;
   const precio = tipo === TipoDePedido.CREDITO ? precioCredito : precioContado;

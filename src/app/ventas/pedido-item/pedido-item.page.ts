@@ -9,7 +9,5 @@ import { ItemController } from '../shared/ui-pedido-item';
 export class PedidoItemPage implements OnInit {
   constructor(private itemController: ItemController) {}
 
-  ngOnInit() {
-    this.itemController.addItem('CREDITO');
-  }
+  ngOnInit() {}
 }

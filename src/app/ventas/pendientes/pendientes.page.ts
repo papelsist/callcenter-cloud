@@ -3,11 +3,9 @@ import { VentasDataService } from '../@data-access';
 
 import firebase from 'firebase/app';
 
-import formatDistanceToNow from 'date-fns/formatDistanceToNow';
-import parseISO from 'date-fns/parseISO';
-import differenceInHours from 'date-fns/differenceInHours';
-import addBusinessDays from 'date-fns/addBusinessDays';
-import es from 'date-fns/locale/es';
+import { formatDistanceToNow, parseISO, differenceInHours } from 'date-fns';
+import { es } from 'date-fns/locale';
+
 import { Pedido } from '@papx/models';
 
 @Component({

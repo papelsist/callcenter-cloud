@@ -1,11 +1,13 @@
 import {
+  AfterViewInit,
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
   Input,
   OnInit,
+  ViewChild,
 } from '@angular/core';
-import { ModalController } from '@ionic/angular';
+import { IonSearchbar, ModalController } from '@ionic/angular';
 
 import { Cliente } from '@papx/models';
 
@@ -19,10 +21,11 @@ import { ClientesDataService } from '../@data-access/clientes-data.service';
   styleUrls: ['./cliente-selector.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ClienteSelectorComponent implements OnInit {
+export class ClienteSelectorComponent implements OnInit, AfterViewInit {
   @Input() tipo: 'CREDITO' | 'CONTADO' | 'TODOS' = 'CREDITO';
   filter$ = new BehaviorSubject('');
   clientes$: Observable<Partial<Cliente>[]>;
+  @ViewChild(IonSearchbar) searchBar: IonSearchbar;
 
   constructor(
     private modalCtrl: ModalController,
@@ -45,6 +48,11 @@ export class ClienteSelectorComponent implements OnInit {
     } else {
       this.clientes$ = from([]);
     }
+  }
+  ngAfterViewInit() {
+    setTimeout(() => {
+      this.searchBar.setFocus();
+    }, 600);
   }
 
   close() {

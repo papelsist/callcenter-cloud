@@ -13,10 +13,10 @@ export class PedidoForm extends FormGroup {
     super(
       {
         cliente: new FormControl(null, Validators.required),
-        sucursal: new FormControl(
-          { id: '402880fc5e4ec411015e4ec64e70012e' },
-          Validators.required
-        ),
+        nombre: new FormControl(null),
+        sucursal: new FormControl(null, Validators.required),
+        sucursalId: new FormControl(null),
+        sucursalEntity: new FormControl(null, Validators.required),
         formaDePago: new FormControl(FormaDePago.EFECTIVO, Validators.required),
         tipo: new FormControl(TipoDePedido.CONTADO, Validators.required),
         moneda: new FormControl(
@@ -29,6 +29,11 @@ export class PedidoForm extends FormGroup {
         usoDeCfdi: new FormControl('G01', Validators.required),
         cfdiMail: new FormControl(null),
         envio: createEnvioForm(fb),
+        importe: new FormControl(0.0, Validators.required),
+        descuento: new FormControl(0.0, Validators.required),
+        descuentoImporte: new FormControl(0.0, Validators.required),
+        subtotal: new FormControl(0.0, Validators.required),
+        impuesto: new FormControl(0.0, Validators.required),
         total: new FormControl(0.0, Validators.required),
         corteImporte: new FormControl(null),
       },

@@ -106,15 +106,11 @@ import { PcreateFacade } from '../../pcreate.facade';
         align-items: center;
         grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
         text-align: end;
-        span {
-          padding: 10px;
-          border: 1px solid red;
-        }
       }
       .imp {
         padding: 10px;
-        border: 1px solid red;
         margin: 5px;
+        // border: 1px solid red;
       }
     `,
   ],
