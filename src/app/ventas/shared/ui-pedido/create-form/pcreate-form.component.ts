@@ -9,7 +9,7 @@ import {
 
 import { AlertController } from '@ionic/angular';
 
-import { startWith, takeUntil, tap } from 'rxjs/operators';
+import { startWith, takeUntil, tap, map } from 'rxjs/operators';
 import { merge, Observable } from 'rxjs';
 
 import { BaseComponent } from '@papx/core';
@@ -26,6 +26,7 @@ import { PcreateFacade } from './pcreate.facade';
 export class PedidoCreateFormComponent extends BaseComponent implements OnInit {
   @Output() save = new EventEmitter<PedidoCreateDto>();
   @Input() data: Partial<PedidoCreateDto> = {};
+  @Output() errors = new EventEmitter();
 
   form = this.facade.form;
   partidas$ = this.facade.partidas$;
@@ -33,6 +34,7 @@ export class PedidoCreateFormComponent extends BaseComponent implements OnInit {
   summary$ = this.facade.summary$;
   cliente$: Observable<any>;
   segment = 'partidas';
+  hasErrors$ = this.facade.errors$.pipe(map((errors) => errors.length > 0));
 
   constructor(private facade: PcreateFacade, private alert: AlertController) {
     super();
@@ -40,16 +42,28 @@ export class PedidoCreateFormComponent extends BaseComponent implements OnInit {
 
   ngOnInit() {
     this.facade.setPedido(this.data);
-
     this.cliente$ = this.controls.cliente.valueChanges.pipe(
       startWith(this.cliente) /**Important!  Needs to start with*/
     );
+    this.addListeners();
 
+    this.facade.errors$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((errors) => this.errors.emit(errors));
+  }
+
+  addListeners() {
+    this.recalculoListener();
+    this.errorsListener();
+  }
+
+  recalculoListener() {
     merge(
       this.facade.controls.tipo.valueChanges.pipe(
         tap((tipo) => {
+          // Side effect para limpiar el descuento especial
           if (tipo === TipoDePedido.CREDITO && this.facade.descuentoEspecial) {
-            this.facade.setDescuentoEspecial(0.0);
+            this.facade.setDescuentoEspecial(0.0, true); // Sin detonar eventos
           }
         })
       ),
@@ -57,6 +71,12 @@ export class PedidoCreateFormComponent extends BaseComponent implements OnInit {
     )
       .pipe(takeUntil(this.destroy$))
       .subscribe(() => this.facade.recalcular());
+  }
+
+  errorsListener() {
+    this.facade.errors$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((errors) => this.errors.emit(errors));
   }
 
   get canSubmit() {
@@ -91,6 +111,9 @@ export class PedidoCreateFormComponent extends BaseComponent implements OnInit {
     // this.cd.markForCheck();
   }
 
+  /**
+   * TODO Mover a componente de opciones o al facade
+   */
   async setDescuentoEspecial() {
     if (this.facade.tipo === TipoDePedido.CREDITO) return; // No procede
     const alert = await this.alert.create({

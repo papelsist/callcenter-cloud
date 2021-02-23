@@ -10,7 +10,6 @@ export class ItemController {
   async addItem(
     tipo?: 'CREDITO' | 'CONTADO'
   ): Promise<Partial<PedidoDet> | null> {
-    console.log('Agregando Pedido item');
     const modal = await this.modalController.create({
       component: ItemModalComponent,
       componentProps: {

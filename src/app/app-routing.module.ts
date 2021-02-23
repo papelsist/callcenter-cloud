@@ -39,7 +39,7 @@ const routes2: Routes = [
           import('./ventas/ventas-tab/ventas-tab.module').then(
             (m) => m.VentasTabPageModule
           ),
-        ...canActivate(verified),
+        // ...canActivate(verified),
       },
       {
         path: '',

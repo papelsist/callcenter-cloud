@@ -51,7 +51,7 @@ import { SUCURSALES } from './sucursales';
   ],
 })
 export class SucursalControlComponent implements OnInit, ControlValueAccessor {
-  onChange: any;
+  onChange: any = () => {};
   onTouch: any;
   disabled = false;
   value: Partial<Sucursal>;
@@ -89,7 +89,7 @@ export class SucursalControlComponent implements OnInit, ControlValueAccessor {
   }
 
   onSelection({ detail: { value } }: any) {
-    // const detail = {e}
+    console.log('Seleccionando: ', value);
     this.value = value;
     this.onChange(value);
     this.cd.markForCheck();

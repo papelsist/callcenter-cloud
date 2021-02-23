@@ -11,6 +11,7 @@ import { PedidoItemComponent } from './pedido-item/pedido-item.component';
 import { ResumenSectionComponent } from './create-form/sections/resumen-section/resumen-section.component';
 import { EnvioModule } from './envio/envio.module';
 import { CorteItemsListComponent } from './corte-items/corte-items-list.component';
+import { PedidoValidationComponent } from './validation/pedido-validation.component';
 
 const components = [
   ClienteFieldComponent,
@@ -20,6 +21,7 @@ const components = [
   PedidoItemListComponent,
   ResumenSectionComponent,
   CorteItemsListComponent,
+  PedidoValidationComponent,
 ];
 
 @NgModule({

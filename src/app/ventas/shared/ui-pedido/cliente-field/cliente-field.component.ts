@@ -15,7 +15,7 @@ import { PcreateFacade } from '../create-form/pcreate.facade';
   selector: 'papx-cliente-field',
   template: `
     <ion-item button [disabled]="disabled" (click)="changeCliente.emit()">
-      <ion-label class="ion-text-wrap">
+      <ion-label class="ion-text-wrap" [color]="!this.cliente ? 'warning' : ''">
         <h2>
           {{ getLabel() }}
           <ion-text color="danger" *ngIf="cliente">
@@ -47,7 +47,9 @@ export class ClienteFieldComponent implements OnInit {
   @Output() changeCliente = new EventEmitter();
   constructor() {}
 
-  ngOnInit() {}
+  ngOnInit() {
+    console.log('Cliente: ', this.cliente);
+  }
 
   getLabel() {
     return this.cliente ? `${this.cliente.nombre}` : 'Seleccione un cliente';

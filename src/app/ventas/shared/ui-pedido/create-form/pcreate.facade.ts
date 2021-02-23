@@ -23,6 +23,7 @@ import { ClienteSelectorController } from '@papx/shared/clientes/cliente-selecto
 import { distinctUntilChanged, map, startWith } from 'rxjs/operators';
 import { createEnvioForm } from './pedido-form-factory';
 import { PedidoForm } from '../pedido-form';
+import { getFormValidationErrors } from '@papx/utils';
 
 interface State {
   partidas: Partial<PedidoDet>[];
@@ -79,6 +80,18 @@ export class PcreateFacade {
   };
   private store = new BehaviorSubject<State>(this._store);
 
+  errors$ = this.form.statusChanges.pipe(
+    //startWith('VALID'),
+    map(() => {
+      if (this.form.pristine) return [];
+      let errors = getFormValidationErrors(this.form);
+      if (this.form.get('envio').enabled) {
+        const envio = this.form.get('envio') as FormGroup;
+        errors = [...errors, ...getFormValidationErrors(envio)];
+      }
+      return errors;
+    })
+  );
   constructor(
     private itemController: ItemController,
     private clienteController: ClienteSelectorController,
@@ -110,6 +123,7 @@ export class PcreateFacade {
 
     const summary = buildSummary(this._currentPartidas);
     this._summary.next(summary);
+    this.form.get('total').setValue(summary.total);
     // this.form.markAsDirty();
   }
 
@@ -119,7 +133,6 @@ export class PcreateFacade {
   }
 
   async addItem() {
-    // const item = test.TEST_PARTIDAS[0];
     const item = await this.itemController.addItem(this.tipo);
     if (item) {
       this._currentPartidas = [...this._currentPartidas, item];
@@ -135,8 +148,15 @@ export class PcreateFacade {
     this.recalcular();
   }
 
-  setDescuentoEspecial(descuento: number) {
-    this.form.get('descuentoEspecial').setValue(descuento);
+  setDescuentoEspecial(descuento: number, slinetly = false) {
+    if (slinetly) {
+      this.form
+        .get('descuentoEspecial')
+        .setValue(descuento, { emitEvent: false, onlySelf: true });
+    } else {
+      this.form.get('descuentoEspecial').setValue(descuento);
+      this.recalcular();
+    }
     return this;
   }
 

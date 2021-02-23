@@ -59,9 +59,7 @@ export class ExistenciaFieldComponent implements OnInit {
   @Input() sucursal;
   constructor() {}
 
-  ngOnInit() {
-    console.log('SSucursal:', this.sucursal);
-  }
+  ngOnInit() {}
 
   getLabel(key: any) {
     if (key === 'cf5febrero') return '5 FEBRERO';

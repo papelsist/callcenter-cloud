@@ -15,8 +15,13 @@ import { FormGroup } from '@angular/forms';
           {{ t.descripcion }}
         </ion-select-option>
       </ion-select>
-      <ion-icon name="document-text" slot="start"></ion-icon>
+      <ion-icon
+        name="document-text"
+        slot="start"
+        [color]="control.valid ? 'secondary' : ''"
+      ></ion-icon>
     </ion-item>
+    <ion-note *ngIf="getError() as err" color="danger"> {{ err }} </ion-note>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
   styles: [
@@ -39,4 +44,14 @@ export class TipoDePedidoComponent {
   @Input() label = 'Tipo';
 
   constructor() {}
+
+  get control() {
+    return this.parent.get('tipo');
+  }
+
+  getError(): string | null {
+    return this.control.hasError('required') && this.parent.dirty
+      ? 'Se requiere el tipo'
+      : null;
+  }
 }

@@ -9,6 +9,7 @@ import { PedidoSummary } from '@papx/models';
 
 import capitalize from 'lodash-es/capitalize';
 import words from 'lodash-es/words';
+import { PcreateFacade } from '../../pcreate.facade';
 
 @Component({
   selector: 'papx-pedido-sumary-section',
@@ -90,8 +91,33 @@ import words from 'lodash-es/words';
         </ion-col>
       </ion-row>
     </ion-grid>
+    <div *ngIf="summary$ | async as summary" class="summary">
+      <span class="imp"> Importe: {{ summary.importe | currency }} </span>
+      <span class="imp"> Descuento: {{ summary.descuento | currency }} </span>
+      <span class="imp"> Subtotal: {{ summary.subtotal | currency }} </span>
+      <span class="imp"> IVA: {{ summary.impuesto | currency }} </span>
+      <span class="imp"> Total: {{ summary.total | currency }} </span>
+    </div>
   `,
-  styles: [``],
+  styles: [
+    `
+      .summary {
+        display: grid;
+        align-items: center;
+        grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+        text-align: end;
+        span {
+          padding: 10px;
+          border: 1px solid red;
+        }
+      }
+      .imp {
+        padding: 10px;
+        border: 1px solid red;
+        margin: 5px;
+      }
+    `,
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ResumenSectionComponent implements OnInit {
@@ -107,7 +133,8 @@ export class ResumenSectionComponent implements OnInit {
     header: 'Usos de CFDI',
     cssClass: 'cfdi-field',
   };
-  constructor() {}
+  summary$ = this.facade.summary$;
+  constructor(private facade: PcreateFacade) {}
 
   ngOnInit() {}
 

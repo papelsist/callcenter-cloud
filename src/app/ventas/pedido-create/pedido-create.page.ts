@@ -7,12 +7,10 @@ import {
 } from '@ionic/angular';
 
 import { VentasDataService } from '../@data-access';
-import { ItemController } from '../shared/ui-pedido-item';
 
 import { PedidoCreateFacade } from './pedido-create.facade';
 import { PedidoCreateFormComponent } from '../shared/ui-pedido/create-form/pcreate-form.component';
 
-import * as test from './test.data';
 @Component({
   selector: 'app-pedido-create',
   templateUrl: './pedido-create.page.html',
@@ -20,7 +18,8 @@ import * as test from './test.data';
   providers: [PedidoCreateFacade],
 })
 export class PedidoCreatePage implements OnInit {
-  data = test.demoPedidoCre();
+  data = {};
+  errors: any;
 
   partidas$ = this.facade.partidas$;
   @ViewChild(PedidoCreateFormComponent) form: PedidoCreateFormComponent;
@@ -29,7 +28,6 @@ export class PedidoCreatePage implements OnInit {
     private dataService: VentasDataService,
     private alertController: AlertController,
     private loadingController: LoadingController,
-    private itemController: ItemController,
     private actionSheet: ActionSheetController
   ) {}
 
@@ -38,7 +36,7 @@ export class PedidoCreatePage implements OnInit {
   async onSave(event: any) {
     // this.startLoading();
     console.log('Salvando pedido: ', event);
-
+    /*
     this.dataService.addPedido(event).subscribe(
       (p) => console.log('Pedido: ', p),
       async (err) => this.handleHerror(err),
@@ -46,6 +44,11 @@ export class PedidoCreatePage implements OnInit {
         console.log('Terminated');
       }
     );
+    */
+  }
+
+  onErrors(event: any) {
+    this.errors = event;
   }
 
   async startLoading(message: string = 'Procesando') {

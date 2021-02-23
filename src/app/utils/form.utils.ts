@@ -33,7 +33,7 @@ export const getDireccionKey = (dd: any): string => {
   return key;
 };
 
-export function getFormValidationErrors(form: FormGroup) {
+export function getFormValidationErrors(form: FormGroup): any[] {
   const result = [];
   Object.keys(form.controls).forEach((key) => {
     const controlErrors: ValidationErrors = form.get(key).errors;

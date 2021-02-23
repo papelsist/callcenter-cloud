@@ -85,3 +85,7 @@
     [summary]="summary$ | async"
   ></papx-pedido-sumary-section>
 </div>
+<papx-pedido-validation
+  [parent]="form"
+  *ngIf="hasErrors$ | async"
+></papx-pedido-validation>

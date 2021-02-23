@@ -4,20 +4,12 @@
       {{ getLabel() }}
     </h2>
     <div class="precios">
+      <p class="ion-hide-sm-up">Cant: {{ item.cantidad | number: "1.3-3" }}</p>
+      <p>Precio: {{ item.precio | currency }}</p>
+      <p>Imp: {{ item.importe | currency }}</p>
       <p>
-        {{ item.precio | currency }}
-        <sub *ngIf="detalle">Precio</sub>
-      </p>
-      <p>
-        {{ item.importe | currency }}
-        <sub *ngIf="detalle">Imp. bruto</sub>
-      </p>
-      <p>
+        Desc: <small>({{ item.descuento / 100 | percent }})</small>:
         {{ item.descuentoImporte | currency }}
-        <sub *ngIf="detalle"
-          >Desc
-          {{ item.descuento / 100 | percent }}
-        </sub>
       </p>
     </div>
     <div *ngIf="item.corte">
@@ -27,11 +19,11 @@
       </ion-chip>
     </div>
   </ion-label>
-  <ion-avatar slot="start">
+  <ion-note slot="start" class="ion-hide-sm-down">
     <ion-text color="secondary">
       {{ item.cantidad }}
     </ion-text>
-  </ion-avatar>
+  </ion-note>
   <div slot="end">
     <ion-text color="primary">
       {{ item.subtotal | currency }}
