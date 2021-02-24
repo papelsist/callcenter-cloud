@@ -3,6 +3,8 @@
     *ngFor="let it of items; index as idx"
     [item]="it"
     [index]="idx"
+    [disabled]="disabled"
+    (selection)="onSelection(idx, $event)"
   ></papx-pedido-item>
 </ion-list>
 <ion-fab vertical="bottom" horizontal="start" slot="fixed" *ngIf="fabButton">

@@ -2,13 +2,16 @@ import { Injectable } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 
 import { BehaviorSubject, Observable, Subscription } from 'rxjs';
-import { map, startWith } from 'rxjs/operators';
+import { map, startWith, switchMap } from 'rxjs/operators';
+
+import unique from 'lodash-es/uniq';
 
 import {
   Cliente,
   Pedido,
   PedidoDet,
   PedidoSummary,
+  Producto,
   TipoDePedido,
 } from '@papx/models';
 import { ClientesDataService } from '@papx/shared/clientes/@data-access/clientes-data.service';
@@ -16,6 +19,7 @@ import { ClienteSelectorController } from '@papx/shared/clientes/cliente-selecto
 import { recalcularPartidas, buildSummary } from '../../../utils';
 import { ItemController } from '../../ui-pedido-item';
 import { PedidoForm } from '../pedido-form';
+import { ProductoService } from '@papx/shared/productos/data-access';
 
 interface State {
   partidas: Partial<PedidoDet>[];
@@ -32,7 +36,7 @@ export class PcreateFacade {
     tipo: this.form.get('tipo'),
   };
 
-  private _currentPartidas = [];
+  private _currentPartidas: any[] = [];
   private _partidas = new BehaviorSubject<Partial<PedidoDet>[]>([]);
   partidas$ = this._partidas.asObservable();
   cortes$ = this.partidas$.pipe(map((items) => items.filter((it) => it.corte)));
@@ -66,12 +70,23 @@ export class PcreateFacade {
       return errors;
     })
   );
+
+  liveProducts$: Observable<Producto[]> = this.partidas$.pipe(
+    map((partidas) => partidas.map((i) => i.clave)),
+    map((claves) => unique(claves)),
+    switchMap((claves) => this.productoDataService.findByClaves(claves))
+  );
+  liveProductosSub: Subscription;
+
   constructor(
     private itemController: ItemController,
     private clienteController: ClienteSelectorController,
     private fb: FormBuilder,
-    private clienteDataService: ClientesDataService
-  ) {}
+    private clienteDataService: ClientesDataService,
+    private productoDataService: ProductoService
+  ) {
+    this.subscribeToLiveProductos();
+  }
 
   setPedido(data: Partial<Pedido>) {
     console.log('Registrando datos iniciales del pedido: ', data);
@@ -153,6 +168,22 @@ export class PcreateFacade {
     const item = await this.itemController.addItem(this.tipo, this.sucursal);
     if (item) {
       this._currentPartidas = [...this._currentPartidas, item];
+      this._partidas.next(this._currentPartidas);
+      this.recalcular();
+    }
+    return this;
+  }
+
+  async editItem(index: number, item: Partial<PedidoDet>) {
+    const newItem = await this.itemController.editItem(
+      item,
+      this.tipo,
+      this.sucursal
+    );
+    if (newItem) {
+      const clone = [...this._currentPartidas];
+      clone[index] = newItem;
+      this._currentPartidas = [...clone];
       this._partidas.next(this._currentPartidas);
       this.recalcular();
     }
@@ -250,14 +281,53 @@ export class PcreateFacade {
     };
   }
 
+  private subscribeToLiveCliente() {
+    // console.log('Subscribing to Live CLIENTE changes');
+    // this.closeClienteSubs();
+    // this.liveClienteSub = this.clienteDataService
+    //   .fetchLiveCliente(id)
+    //   // .pipe(take(1))
+    //   .subscribe((cte) => {
+    //     console.log('Live cliente: ', cte);
+    //     const { cfdiMail, nombre } = cte;
+    //     this.controls.cliente.setValue(cte);
+    //     this.form.get('cfdiMail').setValue(cfdiMail, { emitEvent: false });
+    //     this.form.get('nombre').setValue(nombre, { emitEvent: false });
+    //   });
+  }
+
+  private subscribeToLiveProductos() {
+    console.log('Subscribing to Live Productos changes');
+    this.liveProductosSub = this.liveProducts$.subscribe((rows) => {
+      rows.forEach((p) => {
+        console.log('Actualizando existencia %s ', p.clave);
+        console.log('Existencias: ', p.existencia);
+        this._currentPartidas.forEach((r) => {
+          r.clave === p.clave;
+          r.producto = p;
+        });
+      });
+    });
+  }
+
   closeLiveSubscriptions() {
+    console.log('Closing live subscriptions....');
     this.closeClienteSubs();
+    this.unsubscribeToLiveProductos();
   }
 
   private closeClienteSubs() {
     if (this.liveClienteSub) {
-      console.log('Closing live subscription...');
+      console.log('Closing live cliente subscription...');
       this.liveClienteSub.unsubscribe();
+    }
+  }
+
+  private unsubscribeToLiveProductos() {
+    if (this.liveProductosSub) {
+      this.liveProductosSub.unsubscribe();
+      // this.liveProductosSub = null;
+      console.log('Unsibscribed to Live productos changes');
     }
   }
 }

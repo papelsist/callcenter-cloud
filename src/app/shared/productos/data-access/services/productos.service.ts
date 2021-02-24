@@ -40,4 +40,13 @@ export class ProductoService {
   );
 
   constructor(private firestore: AngularFirestore) {}
+
+  findByClave(clave: string) {
+    return this.productosMap$.pipe(map((repository) => repository[clave]));
+  }
+  findByClaves(claves: string[]) {
+    return this.productosMap$.pipe(
+      map((repository) => claves.map((c) => repository[c]))
+    );
+  }
 }

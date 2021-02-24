@@ -14,7 +14,7 @@ import { PedidoDet, TipoDePedido } from '@papx/models';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ItemModalComponent implements OnInit {
-  @Input() data: Partial<PedidoDet>;
+  @Input() item: Partial<PedidoDet>;
   @Input() tipo: TipoDePedido;
   @Input() sucursal: string;
   constructor(private controller: ModalController) {}

@@ -48,15 +48,7 @@ export class PedidoValidationComponent extends BaseComponent implements OnInit {
     this.errors$ = this.parent.statusChanges.pipe(
       startWith('VALID'),
       // distinctUntilChanged(),
-      tap(() => {
-        console.groupCollapsed('Análisis de validación síncrona');
-        console.log('Estatus de la forma: ', this.parent.status);
-        console.log(
-          'Errores existentes: ',
-          getFormValidationErrors(this.parent)
-        );
-        console.groupEnd();
-      }),
+      // tap(() => {this.debugValidation()}),
       map(() => this.parent.errors || {}),
       map((errors) => Object.keys(errors)),
       map((errors) => [...errors, ...this.getEnvioErrores()]),
@@ -64,6 +56,13 @@ export class PedidoValidationComponent extends BaseComponent implements OnInit {
       takeUntil(this.destroy$)
     );
     this.errors$.subscribe(() => {});
+  }
+
+  private debugValidation() {
+    console.groupCollapsed('Análisis de validación síncrona');
+    console.log('Estatus de la forma: ', this.parent.status);
+    console.log('Errores existentes: ', getFormValidationErrors(this.parent));
+    console.groupEnd();
   }
 
   getEnvioErrores() {

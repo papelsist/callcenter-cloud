@@ -1,4 +1,4 @@
-<ion-item button>
+<ion-item button [disabled]="disabled" (click)="onSelection()">
   <ion-label class="ion-text-wrap">
     <h2>
       {{ getLabel() }}

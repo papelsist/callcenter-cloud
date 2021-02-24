@@ -32,10 +32,10 @@ import { buildForm, buildPedidoItem, calcularImportes } from './item-factory';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ItemFormComponent extends BaseComponent implements OnInit {
-  @Input() data: Partial<PedidoDet> = { cantidad: 0 };
-  // @Input() params: PedidoItemParams;
+  @Input() item: Partial<PedidoDet>;
   @Input() tipo: TipoDePedido;
   @Input() sucursal: string;
+  @Input() data = {};
   @Output() save = new EventEmitter<Partial<PedidoDet>>();
   existencia = {};
 
@@ -74,8 +74,16 @@ export class ItemFormComponent extends BaseComponent implements OnInit {
   }
 
   ngOnInit() {
+    if (this.item) {
+      console.log('Item: ', this.item);
+      const { producto, cantidad, precio, corte } = this.item;
+      this.form.patchValue({ producto, cantidad, precio });
+      if (corte) {
+        this.form.get('corte').patchValue(corte);
+      }
+      this.updateExistenciasPanel();
+    }
     this.addListeners();
-    this.totales$.subscribe((res) => console.log('Totales: ', res));
   }
 
   ngAfterViewInit() {
@@ -108,6 +116,10 @@ export class ItemFormComponent extends BaseComponent implements OnInit {
     producto.setValue(prod);
     descripcion.setValue(prod.descripcion);
     precio.setValue(this.isCredito ? precioCredito : precioContado);
+    this.updateExistenciasPanel();
+  }
+
+  updateExistenciasPanel() {
     this.existencia = this.producto.existencia;
     this.cd.markForCheck();
   }

@@ -7,6 +7,7 @@ import {
   Output,
 } from '@angular/core';
 import { PedidoDet } from '@papx/models';
+import { PcreateFacade } from '../create-form/pcreate.facade';
 
 @Component({
   selector: 'papx-pedido-item-list',
@@ -19,7 +20,11 @@ export class PedidoItemListComponent implements OnInit {
   @Output() addItem = new EventEmitter();
   @Input() disabled = false;
   @Input() fabButton = false;
-  constructor() {}
+  constructor(private facade: PcreateFacade) {}
 
   ngOnInit() {}
+
+  onSelection(index: number, item: Partial<PedidoDet>) {
+    this.facade.editItem(index, item);
+  }
 }
