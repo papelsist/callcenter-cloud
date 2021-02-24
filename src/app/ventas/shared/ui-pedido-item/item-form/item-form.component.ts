@@ -15,6 +15,7 @@ import { BaseComponent } from '@papx/core';
 
 import { PedidoDet, Producto, TipoDePedido, PedidoSummary } from '@papx/models';
 import { ProductoController } from '@papx/shared/productos/producto-selector';
+import { isString } from 'lodash-es';
 import { combineLatest, Observable } from 'rxjs';
 import {
   debounceTime,
@@ -38,6 +39,7 @@ export class ItemFormComponent extends BaseComponent implements OnInit {
   @Input() data = {};
   @Output() save = new EventEmitter<Partial<PedidoDet>>();
   existencia = {};
+  warning: any;
 
   form: FormGroup = buildForm(this.fb);
   controls = {
@@ -127,6 +129,9 @@ export class ItemFormComponent extends BaseComponent implements OnInit {
   get producto(): Partial<Producto> {
     return this.form.get('producto').value;
   }
+  get cantidad(): number {
+    return this.controls.cantidad.value;
+  }
 
   get isCredito() {
     return this.tipo === TipoDePedido.CREDITO;
@@ -153,5 +158,46 @@ export class ItemFormComponent extends BaseComponent implements OnInit {
     this.totales$
       .pipe(takeUntil(this.destroy$))
       .subscribe((importes) => this.form.patchValue(importes));
+    this.disponibilidadListener();
   }
+
+  private disponibilidadListener() {
+    this.controls.cantidad.valueChanges
+      .pipe(debounceTime(600), distinctUntilChanged(), takeUntil(this.destroy$))
+      .subscribe((cantidad) => {
+        if (cantidad) {
+          const faltante = this.resolverFaltante();
+          this.form.get('faltante').setValue(faltante);
+        }
+      });
+  }
+
+  getDisponible(): number {
+    if (this.producto && this.producto.existencia) {
+      if (this.sucursal) {
+        let disp = this.producto.existencia[this.sucursal.toLowerCase()]
+          .cantidad;
+        if (isString(disp)) disp = parseFloat(disp);
+        return disp;
+      }
+    }
+    return 0;
+  }
+
+  private resolverFaltante() {
+    if (this.producto && this.producto.existencia) {
+      const can = this.cantidad;
+      const dis = this.getDisponible();
+      const faltante = dis > can ? 0 : can - dis;
+      return faltante;
+    }
+    return 0.0;
+  }
+
+  // getSucursalName(key: any) {
+  //   if (key === 'cf5febrero') return '5 FEBRERO';
+  //   if (key === 'vertiz176') return 'VERTIZ 176';
+  //   if (key === 'calle4') return 'CALLE 4';
+  //   return key.toLocaleUpperCase();
+  // }
 }

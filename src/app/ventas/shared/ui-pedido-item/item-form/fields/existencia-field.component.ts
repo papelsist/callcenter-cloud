@@ -13,14 +13,22 @@ import { Producto } from '@papx/models';
       <ion-row>
         <ion-col>
           <ion-item>
-            <ion-label class="ion-text-center">
-              Existencia:
+            <ion-label class="ion-text-start">
+              Disponible:
               <ion-text
                 [color]="getColor(producto.disponible)"
                 *ngIf="producto"
               >
                 {{ producto.disponible | number: '1.3-3' }}
               </ion-text>
+            </ion-label>
+          </ion-item>
+        </ion-col>
+        <ion-col *ngIf="faltante > 0">
+          <ion-item>
+            <ion-label color="warning" class="ion-text-wrap">
+              Faltante:
+              {{ faltante | number: '1.1-3' }}
             </ion-label>
           </ion-item>
         </ion-col>
@@ -58,6 +66,7 @@ export class ExistenciaFieldComponent implements OnInit {
   @Input() producto: Producto;
   @Input() existencias: any;
   @Input() sucursal;
+  @Input() faltante: number = 0;
   constructor() {}
 
   ngOnInit() {}

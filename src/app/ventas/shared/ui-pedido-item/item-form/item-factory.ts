@@ -23,6 +23,7 @@ export function buildForm(builder: FormBuilder): FormGroup {
       { value: 0.0, disabled: false },
       { validators: [Validators.required, Validators.min(1)] },
     ],
+    faltante: [0.0],
     precio: [
       { value: null, disabled: true },
       [Validators.required, Validators.min(1.0)],

@@ -98,5 +98,6 @@
   [producto]="controls.producto.valueChanges | async"
   [existencias]="existencia"
   [sucursal]="sucursal"
+  [faltante]="form.get('faltante').value"
 ></papx-existencia-field>
 <papx-pedido-item-validation [parent]="form"></papx-pedido-item-validation>
