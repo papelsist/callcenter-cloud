@@ -11,7 +11,7 @@ import { Pedido, User } from '@papx/models';
 import { VentasDataService } from '../@data-access';
 
 import { PedidoCreateFacade } from './pedido-create.facade';
-import { PedidoCreateFormComponent } from '../shared/ui-pedido/create-form/pcreate-form.component';
+import { PedidoCreateFormComponent } from '../shared/pedido-form';
 
 @Component({
   selector: 'app-pedido-create',
@@ -44,8 +44,15 @@ export class PedidoCreatePage implements OnInit {
     pedido.createUser = user.displayName;
     pedido.updateUser = user.displayName;
     pedido.status = 'COTIZACION';
-    // console.log('Salvando pedido: ', pedido);
-
+    console.log('Salvando pedido: ', pedido);
+    try {
+      const folio = await this.dataService.createPedido(pedido, user);
+      console.log('Pedido generado: ', folio);
+      // this.router.navigate(['/', 'ventas', 'cotizaciones']);
+    } catch (error) {
+      this.handleHerror(error);
+    }
+    /*
     this.dataService.addPedido(pedido).subscribe(
       (res) => {
         console.log('Saved done, res: ', res);
@@ -54,6 +61,7 @@ export class PedidoCreatePage implements OnInit {
       async (err) => this.handleHerror(err),
       () => console.log('Terminated')
     );
+    */
   }
 
   onErrors(event: any) {

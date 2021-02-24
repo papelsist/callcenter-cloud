@@ -10,13 +10,14 @@ import {
   pluck,
   shareReplay,
   switchMap,
+  take,
   tap,
 } from 'rxjs/operators';
 
 import { AngularFirestore } from '@angular/fire/firestore';
 
 import { environment } from '@papx/environment/environment';
-import { User, UserInfo, UsuarioDto } from '../@models/user';
+import { User, UserInfo } from '../@models/user';
 import { mapUser } from './utils';
 
 @Injectable({ providedIn: 'root' })
@@ -38,6 +39,7 @@ export class AuthService {
     switchMap((user) => {
       return user ? this.getUserByEmail(user.email) : of(null);
     }),
+
     catchError((err) => throwError(err))
   );
 
@@ -148,6 +150,7 @@ export class AuthService {
       })
       .valueChanges()
       .pipe(
+        take(1),
         map((users) => (users.length > 0 ? users[0] : null)),
         catchError((err) => throwError(err))
       );

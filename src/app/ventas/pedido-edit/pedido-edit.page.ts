@@ -1,4 +1,7 @@
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
+import { Pedido, User } from '@papx/models';
+import { PedidosFacade } from '../@data-access/+state';
 
 @Component({
   selector: 'app-pedido-edit',
@@ -6,10 +9,24 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./pedido-edit.page.scss'],
 })
 export class PedidoEditPage implements OnInit {
+  errors: any;
+  vm$ = this.facade.vm$;
+  constructor(public facade: PedidosFacade, private router: Router) {}
 
-  constructor() { }
+  ngOnInit() {}
 
-  ngOnInit() {
+  async onSave(id: string, pedido: Partial<Pedido>, user: User) {
+    pedido.updateUser = user.displayName; // backward compatibility
+    pedido.status = 'COTIZACION';
+    await this.facade.updatePedido(id, pedido, user);
+    this.router.navigate(['/', 'ventas', 'cotizaciones']);
   }
 
+  onErrors(event: any) {
+    this.errors = event;
+  }
+
+  async showErrors(errors: any) {
+    console.log('Mostrar errores: ', errors);
+  }
 }

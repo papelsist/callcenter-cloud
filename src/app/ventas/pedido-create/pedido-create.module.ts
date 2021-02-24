@@ -6,14 +6,14 @@ import { CommonUiForms } from '@papx/common/ui-forms';
 import { PedidoCreatePageRoutingModule } from './pedido-create-routing.module';
 
 import { PedidoCreatePage } from './pedido-create.page';
-import { SharedUiPedidoModule } from '../shared/ui-pedido';
+import { SharedPedidoFormModule } from '../shared/pedido-form';
 import { SharedUiPedidoItemModule } from '../shared/ui-pedido-item';
 
 @NgModule({
   imports: [
     CommonUiCoreModule,
     CommonUiForms,
-    SharedUiPedidoModule,
+    SharedPedidoFormModule,
     SharedUiPedidoItemModule,
     PedidoCreatePageRoutingModule,
   ],

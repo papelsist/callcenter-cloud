@@ -6,7 +6,10 @@
   ></papx-ventas-header>
 
   <ion-content>
-    <papx-pedidos-list [pedidos]="state.cotizaciones"></papx-pedidos-list>
+    <papx-pedidos-list
+      [pedidos]="state.cotizaciones"
+      (selection)="onSelection($event)"
+    ></papx-pedidos-list>
   </ion-content>
 
   <!-- fab placed to the top end -->

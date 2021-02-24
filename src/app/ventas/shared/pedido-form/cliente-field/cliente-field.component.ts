@@ -47,9 +47,7 @@ export class ClienteFieldComponent implements OnInit {
   @Output() changeCliente = new EventEmitter();
   constructor() {}
 
-  ngOnInit() {
-    console.log('Cliente: ', this.cliente);
-  }
+  ngOnInit() {}
 
   getLabel() {
     return this.cliente ? `${this.cliente.nombre}` : 'Seleccione un cliente';

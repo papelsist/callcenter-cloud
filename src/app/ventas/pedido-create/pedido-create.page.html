@@ -17,12 +17,12 @@
   </ion-header>
 
   <ion-content>
-    <papx-pedido-create-form
+    <papx-pedido-form
       #form
       [data]="data"
       (save)="onSave($event, user)"
       (errors)="onErrors($event)"
-    ></papx-pedido-create-form>
+    ></papx-pedido-form>
   </ion-content>
 
   <ion-footer *ngIf="form.summary$ | async as summary">

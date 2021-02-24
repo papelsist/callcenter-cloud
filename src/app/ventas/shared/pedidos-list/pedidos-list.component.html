@@ -1,5 +1,9 @@
 <ion-list>
-  <ion-item *ngFor="let pedido of pedidos; index as idx">
+  <ion-item
+    *ngFor="let pedido of pedidos; index as idx"
+    button
+    (click)="selection.emit(pedido)"
+  >
     <ion-label class="ion-text-wrap">
       <h2>
         {{ pedido.nombre }}

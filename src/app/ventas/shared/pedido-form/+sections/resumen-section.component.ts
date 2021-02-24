@@ -9,7 +9,7 @@ import { PedidoSummary } from '@papx/models';
 
 import capitalize from 'lodash-es/capitalize';
 import words from 'lodash-es/words';
-import { PcreateFacade } from '../../pcreate.facade';
+import { PcreateFacade } from '../create-form/pcreate.facade';
 
 @Component({
   selector: 'papx-pedido-sumary-section',

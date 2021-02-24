@@ -1,8 +1,10 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  EventEmitter,
   Input,
   OnInit,
+  Output,
 } from '@angular/core';
 import { Pedido } from '@papx/models';
 import firebase from 'firebase/app';
@@ -15,6 +17,7 @@ import firebase from 'firebase/app';
 })
 export class PedidosListComponent implements OnInit {
   @Input() pedidos: Partial<Pedido>[] = [];
+  @Output() selection = new EventEmitter<Partial<Pedido>>();
   constructor() {}
 
   ngOnInit() {}

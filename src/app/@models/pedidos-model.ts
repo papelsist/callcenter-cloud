@@ -9,7 +9,7 @@ import firebase from 'firebase/app';
 export interface Pedido {
   id?: string;
   fecha: string;
-  sucursal: string | Partial<Sucursal>;
+  sucursal: string;
   sucursalId?: string;
   folio?: number;
   cliente: Partial<Cliente>;
@@ -46,8 +46,8 @@ export interface Pedido {
   status: 'COTIZACION' | 'CERRADO';
   // Log
   inicio?: string;
-  dateCreated?: string;
-  lastUpdated?: string;
+  dateCreated?: firebase.firestore.Timestamp;
+  lastUpdated?: firebase.firestore.Timestamp;
   createUser?: string;
   updateUser?: string;
   autorizacion?: PedidoAutorizacion;
@@ -59,6 +59,7 @@ export interface Pedido {
   createLog?: any;
   updateLog?: any;
   cerrado?: firebase.firestore.Timestamp;
+  appVersion?: number;
 }
 
 export interface PedidoDet {

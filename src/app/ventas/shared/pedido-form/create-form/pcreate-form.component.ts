@@ -13,11 +13,11 @@ import { startWith, takeUntil, tap, map } from 'rxjs/operators';
 import { merge, Observable } from 'rxjs';
 
 import { BaseComponent } from '@papx/core';
-import { Pedido, PedidoCreateDto, TipoDePedido } from '@papx/models';
+import { Pedido, TipoDePedido } from '@papx/models';
 import { PcreateFacade } from './pcreate.facade';
 
 @Component({
-  selector: 'papx-pedido-create-form',
+  selector: 'papx-pedido-form',
   templateUrl: './pcreate-form.component.html',
   styleUrls: ['./pcreate-form.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -42,20 +42,20 @@ export class PedidoCreateFormComponent extends BaseComponent implements OnInit {
 
   ngOnInit() {
     this.facade.setPedido(this.data);
-    this.cliente$ = this.controls.cliente.valueChanges.pipe(
-      startWith(this.cliente) /**Important!  Needs to start with*/
-    );
     this.addListeners();
-
-    this.facade.errors$
-      .pipe(takeUntil(this.destroy$))
-      .subscribe((errors) => this.errors.emit(errors));
+  }
+  ngOnDestroy() {
+    super.ngOnDestroy();
+    this.facade.closeLiveSubscriptions();
   }
 
   addListeners() {
+    this.cliente$ = this.controls.cliente.valueChanges.pipe(
+      startWith(this.cliente) /**Important!  Needs to start with*/
+    );
     this.recalculoListener();
-    this.errorsListener();
     this.sucursalListener();
+    this.errorsListener();
   }
 
   recalculoListener() {
@@ -93,12 +93,13 @@ export class PedidoCreateFormComponent extends BaseComponent implements OnInit {
   }
 
   get canSubmit() {
-    return this.form.valid;
+    return this.form.valid && this.form.dirty;
   }
 
   submit() {
     if (this.canSubmit) {
       const data = this.facade.resolvePedidoData();
+      this.facade.closeLiveSubscriptions();
       this.save.emit(data);
     }
   }

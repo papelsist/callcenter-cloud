@@ -1,9 +1,49 @@
-<ion-header>
-  <ion-toolbar>
-    <ion-title>pedido-edit</ion-title>
-  </ion-toolbar>
-</ion-header>
+<ng-container *ngIf="vm$ | async as vm">
+  <ion-header>
+    <ion-toolbar color="tertiary">
+      <ion-buttons slot="start">
+        <ion-back-button defaultHref="/ventas/cotizaciones"></ion-back-button>
+      </ion-buttons>
+      <ion-title> Pedido: {{vm.pedido.folio}} </ion-title>
+      <ion-buttons slot="end">
+        <ion-button>
+          <ion-icon name="cart" slot="icon-only"></ion-icon>
+        </ion-button>
+      </ion-buttons>
+    </ion-toolbar>
+  </ion-header>
 
-<ion-content>
-
-</ion-content>
+  <ion-content>
+    <papx-pedido-form
+      #form
+      [data]="vm.pedido"
+      (save)="onSave(vm.pedido.id, $event, vm.user)"
+      (errors)="onErrors($event)"
+    ></papx-pedido-form>
+  </ion-content>
+  <ion-footer *ngIf="form.summary$ | async as summary">
+    <ion-toolbar class="ion-no-padding">
+      <ion-buttons slot="start">
+        <ion-button (click)="form.addItem()" color="primary">
+          <ion-icon name="add" slot="icon-only"></ion-icon>
+        </ion-button>
+        <ion-button
+          *ngIf="errors && errors.length > 0"
+          (click)="showErrors(errors)"
+        >
+          <ion-icon name="warning-outline" color="warning" slot="icon-only">
+            <ion-badge slot="start">{{errors.length}}</ion-badge>
+          </ion-icon>
+        </ion-button>
+      </ion-buttons>
+      <ion-title class="ion-text-center" color="success">
+        Total: {{ summary['total'] | currency}}
+      </ion-title>
+      <ion-buttons slot="end">
+        <ion-button [disabled]="!form.canSubmit" (click)="form.submit()">
+          <ion-icon name="save" slot="icon-only"></ion-icon>
+        </ion-button>
+      </ion-buttons>
+    </ion-toolbar>
+  </ion-footer>
+</ng-container>

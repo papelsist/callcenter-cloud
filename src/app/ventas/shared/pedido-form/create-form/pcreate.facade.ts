@@ -1,12 +1,8 @@
 import { Injectable } from '@angular/core';
-import {
-  FormBuilder,
-  FormControl,
-  FormGroup,
-  Validators,
-} from '@angular/forms';
+import { FormBuilder, FormGroup } from '@angular/forms';
 
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject, Observable, Subscription } from 'rxjs';
+import { map, startWith } from 'rxjs/operators';
 
 import {
   Cliente,
@@ -15,15 +11,11 @@ import {
   PedidoSummary,
   TipoDePedido,
 } from '@papx/models';
+import { ClientesDataService } from '@papx/shared/clientes/@data-access/clientes-data.service';
+import { ClienteSelectorController } from '@papx/shared/clientes/cliente-selector';
 import { recalcularPartidas, buildSummary } from '../../../utils';
 import { ItemController } from '../../ui-pedido-item';
-
-import * as test from './test.data';
-import { ClienteSelectorController } from '@papx/shared/clientes/cliente-selector';
-import { distinctUntilChanged, map, startWith } from 'rxjs/operators';
-import { createEnvioForm } from './pedido-form-factory';
 import { PedidoForm } from '../pedido-form';
-import { getFormValidationErrors } from '@papx/utils';
 
 interface State {
   partidas: Partial<PedidoDet>[];
@@ -32,25 +24,6 @@ interface State {
 @Injectable()
 export class PcreateFacade {
   readonly form = new PedidoForm(this.fb);
-  /*
-  readonly form: FormGroup = new FormGroup({
-    cliente: new FormControl(null, Validators.required),
-    sucursal: new FormControl(null, Validators.required),
-    formaDePago: new FormControl(null, Validators.required),
-    tipo: new FormControl(null, Validators.required),
-    moneda: new FormControl(
-      { value: 'MXN', disabled: true },
-      Validators.required
-    ),
-    comprador: new FormControl(null, Validators.maxLength(50)),
-    comentario: new FormControl(null, Validators.maxLength(250)),
-    descuentoEspecial: new FormControl(null),
-    usoDeCfdi: new FormControl('G01', Validators.required),
-    cfdiMail: new FormControl(null, Validators.email),
-    envio: createEnvioForm(this.fb),
-    corteImporte: new FormControl(null),
-  });
-  */
 
   readonly controls = {
     cliente: this.form.get('cliente'),
@@ -74,6 +47,7 @@ export class PcreateFacade {
   });
 
   summary$: Observable<PedidoSummary> = this._summary.asObservable();
+  liveClienteSub: Subscription;
 
   private _store: State = {
     partidas: [],
@@ -95,16 +69,52 @@ export class PcreateFacade {
   constructor(
     private itemController: ItemController,
     private clienteController: ClienteSelectorController,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private clienteDataService: ClientesDataService
   ) {}
 
   setPedido(data: Partial<Pedido>) {
+    console.log('Registrando datos iniciales del pedido: ', data);
     let value: any = { ...data };
     if (data.sucursal && data.sucursalId) {
       const sucursalEntity = { id: data.sucursalId, nombre: data.sucursal };
       value = { ...value, sucursalEntity };
     }
-    this.form.patchValue(value);
+    this.form.patchValue(value, { emitEvent: false, onlySelf: true });
+    if (data.id) {
+      const {
+        importe,
+        descuento,
+        descuentoImporte,
+        subtotal,
+        impuesto,
+        total,
+      } = data;
+      this._summary.next({
+        importe,
+        descuento,
+        descuentoImporte,
+        subtotal,
+        impuesto,
+        total,
+      });
+      this.setPartidas(data.partidas);
+      this.registrarLiveClienteChanges(data.cliente.id);
+    }
+  }
+
+  registrarLiveClienteChanges(id: string) {
+    console.log('Registrando live changes....');
+    this.liveClienteSub = this.clienteDataService
+      .fetchLiveCliente(id)
+      // .pipe(take(1))
+      .subscribe((cte) => {
+        console.log('Live cliente: ', cte);
+        const { cfdiMail, nombre } = cte;
+        this.controls.cliente.setValue(cte);
+        this.form.get('cfdiMail').setValue(cfdiMail, { emitEvent: false });
+        this.form.get('nombre').setValue(nombre, { emitEvent: false });
+      });
   }
 
   recalcular() {
@@ -114,7 +124,7 @@ export class PcreateFacade {
     const descuentoEspecial = this.form.get('descuentoEspecial').value;
 
     const config = { tipo, formaDePago, cliente, descuentoEspecial };
-    console.log('Recalcular: ', config);
+    console.log('Recalculando pedido: ', config);
 
     const items = recalcularPartidas(
       this._currentPartidas,
@@ -129,7 +139,7 @@ export class PcreateFacade {
     const summary = buildSummary(this._currentPartidas);
     this._summary.next(summary);
     this.form.patchValue(summary);
-    // this.form.markAsDirty();
+    this.form.markAsDirty();
   }
 
   setPartidas(value: Partial<PedidoDet>[]) {
@@ -212,11 +222,11 @@ export class PcreateFacade {
   }
 
   resolvePedidoData(): Partial<Pedido> {
+    const { sucursalEntity, ...rest } = this.form.value;
     return {
-      ...this.form.value,
+      ...rest,
       cliente: this.cleanCliente(),
       partidas: [...this._currentPartidas],
-      appVersion: 2,
     };
   }
 
@@ -228,5 +238,12 @@ export class PcreateFacade {
       rfc,
       clave,
     };
+  }
+
+  closeLiveSubscriptions() {
+    if (this.liveClienteSub) {
+      console.log('Closing live subscription...');
+      this.liveClienteSub.unsubscribe();
+    }
   }
 }

@@ -5,12 +5,13 @@ import {
   QueryFn,
 } from '@angular/fire/firestore';
 
-import firebaes from 'firebase/app';
-
-import { Pedido } from '@papx/models';
+import { Pedido, User } from '@papx/models';
 import { Observable, throwError } from 'rxjs';
 import { AngularFireFunctions } from '@angular/fire/functions';
 import { catchError } from 'rxjs/operators';
+
+import firebase from 'firebase/app';
+import { omitBy } from 'lodash-es';
 
 type PedidoStatus =
   | 'COTIZACION'
@@ -24,7 +25,7 @@ type PedidoStatus =
  */
 const getFilter = (status: PedidoStatus): QueryFn => {
   return (ref: CollectionReference) =>
-    ref.where('status', '==', status).limit(5);
+    ref.where('status', '==', status).orderBy('folio', 'desc').limit(10);
 };
 
 export interface VentasQueryParams {
@@ -54,36 +55,72 @@ export class VentasDataService {
   private getPedidos(qf: QueryFn) {
     return this.afs
       .collection<Pedido>(this.PEDIDOS_COLLECTION, qf)
-      .valueChanges();
-  }
-
-  /*
-  fechVentas(params: VentasQueryParams) {
-    return this.afs
-      .collection<Pedido>(this.PEDIDOS_COLLECTION, (ref) => {
-        let query = ref.limitToLast(params.max).orderBy('fecha');
-        if (params.desde) query = ref.where('fecha', '>=', params.desde);
-        if (params.status) query = query.where('status', '==', params.status);
-        if (params.userId)
-          query = query.where('createUserId', '==', params.userId);
-        return query;
-      })
       .valueChanges({ idField: 'id' });
   }
-  */
 
-  /**
-   * Create a new entity of Pedido using  firebase callable funtion
-   *
-   * @param data The pedido data to be saved
-   */
-  addPedido(data: Partial<Pedido>): Observable<Pedido> {
-    const callable = this.functions.httpsCallable('addPedido');
-    return callable(data).pipe(
-      catchError((err) => {
-        console.log('ERR desde service: ', err);
-        return throwError(err);
-      })
-    );
+  findById(id: string) {
+    return this.afs
+      .collection<Pedido>(this.PEDIDOS_COLLECTION)
+      .doc(id)
+      .valueChanges()
+      .pipe(catchError((err) => throwError(err)));
+  }
+
+  async createPedido(pedido: Partial<Pedido>, user: User) {
+    try {
+      const payload = {
+        ...this.cleanPedidoPayload(pedido),
+        uid: user.uid,
+        dateCreated: firebase.firestore.FieldValue.serverTimestamp(),
+        createUser: user.displayName,
+        appVersion: 2,
+      };
+
+      const folioRef = this.afs.doc('folios/pedidos').ref;
+      let folio = 1;
+
+      const pedidoRef = this.afs.collection(this.PEDIDOS_COLLECTION).doc().ref;
+
+      return this.afs.firestore.runTransaction(async (transaction) => {
+        const folioDoc = await transaction.get<any>(folioRef);
+        if (!folioDoc.exists) {
+          throw 'No existe folios configurados  para CALLCENTER';
+        }
+        const pedidosFolios = folioDoc.data();
+        if (!pedidosFolios.CALLCENTER) {
+          pedidosFolios.CALLCENTER = 0; // Init value
+        }
+        folio = pedidosFolios.CALLCENTER + 1;
+        transaction
+          .update(folioRef, { CALLCENTER: folio })
+          .set(pedidoRef, { ...payload, folio });
+        return folio;
+      });
+    } catch (error: any) {
+      console.error('Error salvando pedido: ', error);
+      throw new Error('Error salvando pedido: ' + error.message);
+    }
+  }
+
+  async updatePedido(id: string, pedido: Object, user: User) {
+    try {
+      const payload = {
+        ...this.cleanPedidoPayload(pedido),
+        appVersion: 2,
+        version: firebase.firestore.FieldValue.increment(1),
+        lastUpdated: firebase.firestore.FieldValue.serverTimestamp(),
+      };
+      await this.afs
+        .collection(this.PEDIDOS_COLLECTION)
+        .doc(id)
+        .update(payload);
+    } catch (error: any) {
+      console.error('Error actualizando: ', error);
+      throw new Error('Error actualizando pedido: ' + error.message);
+    }
+  }
+
+  cleanPedidoPayload(data: Object) {
+    return omitBy(data, (value, _) => value == undefined || value === null);
   }
 }
