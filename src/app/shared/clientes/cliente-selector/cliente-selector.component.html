@@ -6,15 +6,18 @@
 <ion-content>
   <ion-list-header>
     <ion-searchbar
+      #search
       showCancelButton="focus"
       placeholder="Buscar cliente"
       color="tertiary"
       (ionChange)="onSearch($event)"
       (ionCancel)="close()"
+      (keyup.enter)="onEnter(search.value)"
       inputmode="search"
       enterkeyhint="search"
       debounce="400"
       tabindex="0"
+      class="ion-text-uppercase"
     ></ion-searchbar>
   </ion-list-header>
   <ion-list lines="full">

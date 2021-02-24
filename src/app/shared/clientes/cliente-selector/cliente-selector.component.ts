@@ -11,8 +11,16 @@ import { IonSearchbar, ModalController } from '@ionic/angular';
 
 import { Cliente } from '@papx/models';
 
-import { BehaviorSubject, combineLatest, from, Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { BehaviorSubject, combineLatest, from, Observable, of } from 'rxjs';
+import {
+  catchError,
+  debounceTime,
+  distinctUntilChanged,
+  filter,
+  map,
+  switchMap,
+  tap,
+} from 'rxjs/operators';
 import { ClientesDataService } from '../@data-access/clientes-data.service';
 
 @Component({
@@ -33,22 +41,17 @@ export class ClienteSelectorComponent implements OnInit, AfterViewInit {
   ) {}
 
   ngOnInit() {
-    if (this.tipo === 'CREDITO') {
-      this.clientes$ = this.service.clientesCredito$;
-      this.clientes$ = combineLatest([
-        this.filter$,
-        this.service.clientesCredito$,
-      ]).pipe(
-        map(([term, clientes]) =>
-          clientes.filter((item) =>
-            item.nombre.toLowerCase().includes(term.toLowerCase())
-          )
-        )
-      );
-    } else {
-      this.clientes$ = from([]);
-    }
+    this.clientes$ = this.filter$.pipe(
+      map((term) => term.toUpperCase()),
+      debounceTime(400),
+      distinctUntilChanged(),
+      filter((term) => term.length > 3),
+      tap((term) => console.log('Term: ', term)),
+      switchMap((term) => this.service.searchClientes(term)),
+      catchError((err) => this.handleError(err))
+    );
   }
+
   ngAfterViewInit() {
     setTimeout(() => {
       this.searchBar.setFocus();
@@ -64,6 +67,43 @@ export class ClienteSelectorComponent implements OnInit, AfterViewInit {
   }
 
   onSearch({ target: { value } }: any) {
-    this.filter$.next(value);
+    // if (this.tipo === 'CREDITO') this.filter$.next(value);
   }
+
+  onEnter(event: any) {
+    this.filter$.next(event);
+  }
+
+  handleError(err: any) {
+    console.error('Error buscando clientes, ', err);
+    return of([]);
+  }
+
+  /* OLD METHOD
+  ngOnInit() {
+    if (this.tipo === 'CREDITO') {
+      this.clientes$ = this.service.clientesCredito$;
+      this.clientes$ = combineLatest([
+        this.filter$,
+        this.service.clientesCredito$,
+      ]).pipe(
+        map(([term, clientes]) =>
+          clientes.filter((item) =>
+            item.nombre.toLowerCase().includes(term.toLowerCase())
+          )
+        )
+      );
+    } else {
+      this.clientes$ = this.filter$.pipe(
+        map((term) => term.toUpperCase()),
+        debounceTime(400),
+        distinctUntilChanged(),
+        filter((term) => term.length > 3),
+        tap((term) => console.log('Term: ', term)),
+        switchMap((term) => this.service.searchClientes(term)),
+        catchError((err) => this.handleError(err))
+      );
+    }
+  }
+  */
 }

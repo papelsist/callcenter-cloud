@@ -99,12 +99,13 @@ export class PcreateFacade {
         total,
       });
       this.setPartidas(data.partidas);
-      this.registrarLiveClienteChanges(data.cliente.id);
+      this.registrarLiveCliente(data.cliente.id);
     }
   }
 
-  registrarLiveClienteChanges(id: string) {
+  registrarLiveCliente(id: string) {
     console.log('Registrando live changes....');
+    this.closeClienteSubs();
     this.liveClienteSub = this.clienteDataService
       .fetchLiveCliente(id)
       // .pipe(take(1))
@@ -122,6 +123,7 @@ export class PcreateFacade {
     const cliente = this.cliente;
     const formaDePago = this.form.get('formaDePago').value;
     const descuentoEspecial = this.form.get('descuentoEspecial').value;
+    if (!cliente) return;
 
     const config = { tipo, formaDePago, cliente, descuentoEspecial };
     console.log('Recalculando pedido: ', config);
@@ -177,7 +179,7 @@ export class PcreateFacade {
 
   async cambiarCliente() {
     const props = {
-      tipo: this.isCredito ? 'CREDITO' : 'TODOS',
+      tipo: this.isCredito() ? 'CREDITO' : 'TODOS',
     };
     const selected = await this.clienteController.selectCliente(props);
     if (selected) {
@@ -189,11 +191,19 @@ export class PcreateFacade {
     this.controls.cliente.setValue(cliente);
     this.form.get('cfdiMail').setValue(cliente.cfdiMail, { emitEvent: false });
     this.form.get('nombre').setValue(cliente.nombre, { emitEvent: false });
+    this.registrarLiveCliente(cliente.id);
 
     // Side effect to update other controls
     if (cliente.credito) {
       if (this.tipo !== TipoDePedido.CREDITO) {
         this.controls.tipo.setValue(TipoDePedido.CREDITO, {
+          emitEvent: false,
+          onlySelf: true,
+        });
+      }
+    } else {
+      if (this.tipo === TipoDePedido.CREDITO) {
+        this.controls.tipo.setValue(TipoDePedido.CONTADO, {
           emitEvent: false,
           onlySelf: true,
         });
@@ -241,6 +251,10 @@ export class PcreateFacade {
   }
 
   closeLiveSubscriptions() {
+    this.closeClienteSubs();
+  }
+
+  private closeClienteSubs() {
     if (this.liveClienteSub) {
       console.log('Closing live subscription...');
       this.liveClienteSub.unsubscribe();

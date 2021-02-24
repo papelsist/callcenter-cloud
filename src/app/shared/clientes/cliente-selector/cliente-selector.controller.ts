@@ -8,6 +8,7 @@ export class ClienteSelectorController {
   constructor(private modalController: ModalController) {}
 
   async selectCliente(props?: {}) {
+    console.log('Lookup cliente: ', props);
     const modal = await this.modalController.create({
       component: ClienteSelectorComponent,
       componentProps: props,
@@ -18,9 +19,5 @@ export class ClienteSelectorController {
     await modal.present();
     const { data } = await modal.onWillDismiss<Cliente>();
     return data;
-  }
-
-  async selectClienteCredito() {
-    return this.selectCliente({ tipo: 'CREDITO' });
   }
 }
