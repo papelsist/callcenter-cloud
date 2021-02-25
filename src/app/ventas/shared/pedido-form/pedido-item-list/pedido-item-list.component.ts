@@ -61,4 +61,7 @@ export class PedidoItemListComponent implements OnInit {
   async onDeleteItem(index: number) {
     await this.facade.deleteItem(index);
   }
+  async onDuplicar(index: number) {
+    await this.facade.copiarItem(index);
+  }
 }

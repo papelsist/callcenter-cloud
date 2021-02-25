@@ -182,6 +182,16 @@ export class PcreateFacade {
     this.recalcular();
   }
 
+  async copiarItem(index: number) {
+    const partidas = [...this._currentPartidas];
+    const item = partidas[index];
+    const { id, ...duplicado } = item;
+    partidas.splice(index, 0, duplicado);
+    this._currentPartidas = partidas;
+    this._partidas.next(this._currentPartidas);
+    this.recalcular();
+  }
+
   removeItem(index: number) {
     this._currentPartidas.splice(index, 1);
     this._partidas.next(this._currentPartidas);
