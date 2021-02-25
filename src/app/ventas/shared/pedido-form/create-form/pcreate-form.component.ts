@@ -9,11 +9,17 @@ import {
 
 import { AlertController } from '@ionic/angular';
 
-import { startWith, takeUntil, tap, map } from 'rxjs/operators';
+import {
+  startWith,
+  takeUntil,
+  tap,
+  map,
+  distinctUntilChanged,
+} from 'rxjs/operators';
 import { merge, Observable } from 'rxjs';
 
 import { BaseComponent } from '@papx/core';
-import { Pedido, TipoDePedido } from '@papx/models';
+import { Cliente, Pedido, TipoDePedido } from '@papx/models';
 import { PcreateFacade } from './pcreate.facade';
 
 @Component({
@@ -62,6 +68,7 @@ export class PedidoCreateFormComponent extends BaseComponent implements OnInit {
     this.recalculoListener();
     this.sucursalListener();
     this.errorsListener();
+    this.clienteListener();
   }
 
   recalculoListener() {
@@ -98,6 +105,14 @@ export class PedidoCreateFormComponent extends BaseComponent implements OnInit {
       });
   }
 
+  private clienteListener() {
+    this.controls.cliente.valueChanges.pipe(
+      takeUntil(this.destroy$),
+      distinctUntilChanged(),
+      tap((cte) => this.ajustarTipo(cte))
+    );
+  }
+
   get canSubmit() {
     return this.form.valid && this.form.dirty;
   }
@@ -131,9 +146,10 @@ export class PedidoCreateFormComponent extends BaseComponent implements OnInit {
     // this.cd.markForCheck();
   }
 
-  ajustarTipo() {
+  ajustarTipo(cliente: Partial<Cliente>) {
     // Side effect to update other controls
-    if (this.cliente.credito) {
+    if (this.form.get('total').value > 0) return;
+    if (cliente.credito) {
       if (this.facade.tipo !== TipoDePedido.CREDITO) {
         this.controls.tipo.setValue(TipoDePedido.CREDITO, {
           emitEvent: false,

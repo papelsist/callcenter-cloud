@@ -23,7 +23,6 @@ export class PedidoItemListComponent implements OnInit {
   // @Input() items: Partial<PedidoDet>[] = [];
   _items: Partial<PedidoDet>[] = [];
   @Output() addItem = new EventEmitter();
-  @Input() disabled = false;
   @Input() fabButton = false;
 
   @ViewChildren(PedidoItemComponent) children: QueryList<PedidoItemComponent>;
@@ -53,5 +52,13 @@ export class PedidoItemListComponent implements OnInit {
 
   get items() {
     return this._items;
+  }
+
+  get disabled() {
+    return this.facade.form.disabled;
+  }
+
+  async onDeleteItem(index: number) {
+    await this.facade.deleteItem(index);
   }
 }

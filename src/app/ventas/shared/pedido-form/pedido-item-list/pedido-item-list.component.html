@@ -5,6 +5,7 @@
     [index]="idx"
     [disabled]="disabled"
     (selection)="onSelection(idx, $event)"
+    (eliminar)="onDeleteItem(idx)"
   ></papx-pedido-item>
 </ion-list>
 <ion-fab vertical="bottom" horizontal="start" slot="fixed" *ngIf="fabButton">

@@ -174,6 +174,13 @@ export class PcreateFacade {
     }
     return this;
   }
+  async deleteItem(index: number) {
+    const partidas = [...this._currentPartidas];
+    partidas.splice(index, 1);
+    this._currentPartidas = partidas;
+    this._partidas.next(this._currentPartidas);
+    this.recalcular();
+  }
 
   removeItem(index: number) {
     this._currentPartidas.splice(index, 1);
