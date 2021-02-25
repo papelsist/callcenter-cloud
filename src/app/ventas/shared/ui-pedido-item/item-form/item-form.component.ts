@@ -15,7 +15,9 @@ import { BaseComponent } from '@papx/core';
 
 import { PedidoDet, Producto, TipoDePedido, PedidoSummary } from '@papx/models';
 import { ProductoController } from '@papx/shared/productos/producto-selector';
-import { isString } from 'lodash-es';
+
+// import { isString } from 'lodash-es';
+import toNumber from 'lodash-es/toNumber';
 import { combineLatest, Observable } from 'rxjs';
 import {
   debounceTime,
@@ -36,7 +38,6 @@ export class ItemFormComponent extends BaseComponent implements OnInit {
   @Input() item: Partial<PedidoDet>;
   @Input() tipo: TipoDePedido;
   @Input() sucursal: string;
-  @Input() data = {};
   @Output() save = new EventEmitter<Partial<PedidoDet>>();
   existencia = {};
   warning: any;
@@ -77,9 +78,8 @@ export class ItemFormComponent extends BaseComponent implements OnInit {
 
   ngOnInit() {
     if (this.item) {
-      console.log('Item: ', this.item);
-      const { producto, cantidad, precio, corte } = this.item;
-      this.form.patchValue({ producto, cantidad, precio });
+      const { producto, cantidad, precio, importe, corte } = this.item;
+      this.form.patchValue({ producto, cantidad, precio, importe });
       if (corte) {
         this.form.get('corte').patchValue(corte);
       }
@@ -174,12 +174,17 @@ export class ItemFormComponent extends BaseComponent implements OnInit {
 
   getDisponible(): number {
     if (this.producto && this.producto.existencia) {
-      if (this.sucursal) {
-        let disp = this.producto.existencia[this.sucursal.toLowerCase()]
-          .cantidad;
-        if (isString(disp)) disp = parseFloat(disp);
-        return disp;
-      }
+      // if (this.sucursal) {
+      //   let disp = this.producto.existencia[this.sucursal.toLowerCase()]
+      //     .cantidad;
+      //   if (isString(disp)) disp = parseFloat(disp);
+      //   return disp;
+      // }
+      const disponible = Object.keys(this.producto.existencia).reduce(
+        (p, c) => p + toNumber(this.producto.existencia[c].cantidad),
+        0.0
+      );
+      return disponible;
     }
     return 0;
   }

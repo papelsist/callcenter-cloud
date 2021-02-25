@@ -1,10 +1,26 @@
 import { Injectable } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 
-import { BehaviorSubject, Observable, Subscription } from 'rxjs';
-import { map, startWith, switchMap } from 'rxjs/operators';
+import {
+  BehaviorSubject,
+  combineLatest,
+  Observable,
+  Subject,
+  Subscription,
+} from 'rxjs';
+import {
+  distinctUntilChanged,
+  map,
+  skip,
+  startWith,
+  switchMap,
+  take,
+  takeUntil,
+  tap,
+} from 'rxjs/operators';
 
 import unique from 'lodash-es/uniq';
+import toNumber from 'lodash-es/toNumber';
 
 import {
   Cliente,
@@ -53,11 +69,6 @@ export class PcreateFacade {
   summary$: Observable<PedidoSummary> = this._summary.asObservable();
   liveClienteSub: Subscription;
 
-  private _store: State = {
-    partidas: [],
-  };
-  private store = new BehaviorSubject<State>(this._store);
-
   errors$ = this.form.statusChanges.pipe(
     startWith('VALID'),
     map(() => {
@@ -71,12 +82,14 @@ export class PcreateFacade {
     })
   );
 
-  liveProducts$: Observable<Producto[]> = this.partidas$.pipe(
-    map((partidas) => partidas.map((i) => i.clave)),
+  productos$ = this.partidas$.pipe(
+    map((items) => items.map((item) => item.clave)),
     map((claves) => unique(claves)),
-    switchMap((claves) => this.productoDataService.findByClaves(claves))
+    distinctUntilChanged()
   );
+
   liveProductosSub: Subscription;
+  destroy$ = new Subject<boolean>();
 
   constructor(
     private itemController: ItemController,
@@ -84,9 +97,7 @@ export class PcreateFacade {
     private fb: FormBuilder,
     private clienteDataService: ClientesDataService,
     private productoDataService: ProductoService
-  ) {
-    this.subscribeToLiveProductos();
-  }
+  ) {}
 
   setPedido(data: Partial<Pedido>) {
     console.log('Registrando datos iniciales del pedido: ', data);
@@ -119,7 +130,7 @@ export class PcreateFacade {
   }
 
   registrarLiveCliente(id: string) {
-    console.log('Registrando live changes....');
+    console.log('Registrando Live CLIENTE ');
     this.closeClienteSubs();
     this.liveClienteSub = this.clienteDataService
       .fetchLiveCliente(id)
@@ -140,9 +151,6 @@ export class PcreateFacade {
     const descuentoEspecial = this.form.get('descuentoEspecial').value;
     if (!cliente) return;
 
-    const config = { tipo, formaDePago, cliente, descuentoEspecial };
-    console.log('Recalculando pedido: ', config);
-
     const items = recalcularPartidas(
       this._currentPartidas,
       tipo,
@@ -159,7 +167,7 @@ export class PcreateFacade {
     this.form.markAsDirty();
   }
 
-  setPartidas(value: Partial<PedidoDet>[]) {
+  private setPartidas(value: Partial<PedidoDet>[]) {
     this._currentPartidas = value;
     this._partidas.next(this._currentPartidas);
   }
@@ -218,28 +226,11 @@ export class PcreateFacade {
     }
   }
 
-  setCliente(cliente: Partial<Cliente>) {
+  private setCliente(cliente: Partial<Cliente>) {
     this.controls.cliente.setValue(cliente);
     this.form.get('cfdiMail').setValue(cliente.cfdiMail, { emitEvent: false });
     this.form.get('nombre').setValue(cliente.nombre, { emitEvent: false });
     this.registrarLiveCliente(cliente.id);
-
-    // Side effect to update other controls
-    if (cliente.credito) {
-      if (this.tipo !== TipoDePedido.CREDITO) {
-        this.controls.tipo.setValue(TipoDePedido.CREDITO, {
-          emitEvent: false,
-          onlySelf: true,
-        });
-      }
-    } else {
-      if (this.tipo === TipoDePedido.CREDITO) {
-        this.controls.tipo.setValue(TipoDePedido.CONTADO, {
-          emitEvent: false,
-          onlySelf: true,
-        });
-      }
-    }
     this.recalcular();
   }
 
@@ -254,7 +245,7 @@ export class PcreateFacade {
   get descuentoEspecial() {
     return this.form.get('descuentoEspecial').value;
   }
-  get sucursal() {
+  get sucursal(): string {
     return this.form.get('sucursal').value;
   }
 
@@ -264,6 +255,12 @@ export class PcreateFacade {
 
   resolvePedidoData(): Partial<Pedido> {
     const { sucursalEntity, ...rest } = this.form.value;
+    this._currentPartidas = this._currentPartidas.map((item) => {
+      return {
+        ...item,
+        producto: this.reduceProducto(item.producto),
+      };
+    });
     return {
       ...rest,
       cliente: this.cleanCliente(),
@@ -281,39 +278,50 @@ export class PcreateFacade {
     };
   }
 
-  private subscribeToLiveCliente() {
-    // console.log('Subscribing to Live CLIENTE changes');
-    // this.closeClienteSubs();
-    // this.liveClienteSub = this.clienteDataService
-    //   .fetchLiveCliente(id)
-    //   // .pipe(take(1))
-    //   .subscribe((cte) => {
-    //     console.log('Live cliente: ', cte);
-    //     const { cfdiMail, nombre } = cte;
-    //     this.controls.cliente.setValue(cte);
-    //     this.form.get('cfdiMail').setValue(cfdiMail, { emitEvent: false });
-    //     this.form.get('nombre').setValue(nombre, { emitEvent: false });
-    //   });
+  actualizarProductos() {
+    console.log('Actualizando productos.....');
+    const current: Partial<PedidoDet>[] = [...this._currentPartidas];
+    const claves = unique(current.map((item) => item.clave));
+    claves.forEach((clave) => {
+      this.productoDataService
+        .findByClave(clave)
+        .pipe(
+          // tap((p) => console.log('Change event: %s ', p.clave, p)),
+          takeUntil(this.destroy$) // Esta es la clave para LiveUpdate the Firebase
+        )
+        .subscribe((prod) => this.actualizarProducto(prod, current));
+    });
   }
 
-  private subscribeToLiveProductos() {
-    console.log('Subscribing to Live Productos changes');
-    this.liveProductosSub = this.liveProducts$.subscribe((rows) => {
-      rows.forEach((p) => {
-        console.log('Actualizando existencia %s ', p.clave);
-        console.log('Existencias: ', p.existencia);
-        this._currentPartidas.forEach((r) => {
-          r.clave === p.clave;
-          r.producto = p;
-        });
-      });
+  actualizarProducto(prod: Producto, current: Partial<PedidoDet>[]) {
+    current.forEach((item) => {
+      if (item.producto.clave === prod.clave) {
+        item.producto = prod;
+        item.descripcion = prod.descripcion;
+        this.actualizarDisponible(item);
+      }
     });
+    this._currentPartidas = current;
+    this._partidas.next(this._currentPartidas);
+  }
+
+  private actualizarDisponible(item: Partial<PedidoDet>): Partial<PedidoDet> {
+    const exis = item.producto.existencia;
+    const cant = item.cantidad;
+    const disp = Object.keys(exis).reduce(
+      (p, c) => p + toNumber(exis[c].cantidad),
+      0.0
+    );
+    item.faltante = disp > cant ? 0 : cant - disp;
+    return item;
   }
 
   closeLiveSubscriptions() {
     console.log('Closing live subscriptions....');
     this.closeClienteSubs();
     this.unsubscribeToLiveProductos();
+    this.destroy$.next(true);
+    this.destroy$.complete();
   }
 
   private closeClienteSubs() {
@@ -329,5 +337,32 @@ export class PcreateFacade {
       // this.liveProductosSub = null;
       console.log('Unsibscribed to Live productos changes');
     }
+  }
+
+  reduceProducto(producto: Producto) {
+    const {
+      id,
+      clave,
+      descripcion,
+      precioCredito,
+      precioContado,
+      unidad,
+      kilos,
+      gramos,
+      modoVenta,
+      presentacion,
+    } = producto;
+    return {
+      id,
+      clave,
+      descripcion,
+      precioCredito,
+      precioContado,
+      unidad,
+      kilos,
+      gramos,
+      modoVenta,
+      presentacion,
+    };
   }
 }

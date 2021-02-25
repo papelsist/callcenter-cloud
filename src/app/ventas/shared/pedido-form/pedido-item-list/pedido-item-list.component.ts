@@ -1,13 +1,17 @@
 import {
   ChangeDetectionStrategy,
+  ChangeDetectorRef,
   Component,
   EventEmitter,
   Input,
   OnInit,
   Output,
+  QueryList,
+  ViewChildren,
 } from '@angular/core';
 import { PedidoDet } from '@papx/models';
 import { PcreateFacade } from '../create-form/pcreate.facade';
+import { PedidoItemComponent } from '../pedido-item/pedido-item.component';
 
 @Component({
   selector: 'papx-pedido-item-list',
@@ -16,15 +20,38 @@ import { PcreateFacade } from '../create-form/pcreate.facade';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PedidoItemListComponent implements OnInit {
-  @Input() items: Partial<PedidoDet>[] = [];
+  // @Input() items: Partial<PedidoDet>[] = [];
+  _items: Partial<PedidoDet>[] = [];
   @Output() addItem = new EventEmitter();
   @Input() disabled = false;
   @Input() fabButton = false;
-  constructor(private facade: PcreateFacade) {}
+
+  @ViewChildren(PedidoItemComponent) children: QueryList<PedidoItemComponent>;
+
+  constructor(private facade: PcreateFacade, private cd: ChangeDetectorRef) {}
 
   ngOnInit() {}
 
   onSelection(index: number, item: Partial<PedidoDet>) {
     this.facade.editItem(index, item);
+  }
+
+  refresh() {
+    if (this.children) {
+      this.children.forEach((el) => {
+        el.refresh();
+      });
+    }
+    this.cd.markForCheck();
+  }
+
+  @Input()
+  set items(value: Partial<PedidoDet>[]) {
+    this._items = value;
+    this.refresh();
+  }
+
+  get items() {
+    return this._items;
   }
 }

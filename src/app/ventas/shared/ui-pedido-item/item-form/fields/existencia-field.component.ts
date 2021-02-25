@@ -4,6 +4,9 @@ import {
   Input,
   OnInit,
 } from '@angular/core';
+
+import toNumber from 'lodash-es/toNumber';
+
 import { Producto } from '@papx/models';
 
 @Component({
@@ -14,12 +17,11 @@ import { Producto } from '@papx/models';
         <ion-col>
           <ion-item>
             <ion-label class="ion-text-start">
-              Disponible:
-              <ion-text
-                [color]="getColor(producto.disponible)"
-                *ngIf="producto"
-              >
-                {{ producto.disponible | number: '1.3-3' }}
+              <span class="ion-padding-end"> Disponible: </span>
+              <ion-text color="success">
+                <span>
+                  {{ getDisponible() | number: '1.0-0' }}
+                </span>
               </ion-text>
             </ion-label>
           </ion-item>
@@ -28,7 +30,7 @@ import { Producto } from '@papx/models';
           <ion-item>
             <ion-label color="warning" class="ion-text-wrap">
               Faltante:
-              {{ faltante | number: '1.1-3' }}
+              {{ faltante | number: '1.0-0' }}
             </ion-label>
           </ion-item>
         </ion-col>
@@ -43,7 +45,7 @@ import { Producto } from '@papx/models';
           <ion-item [ngClass]="{ active: getLabel(item.key) === sucursal }">
             <ion-label position="floating">{{ getLabel(item.key) }}</ion-label>
             <ion-input
-              value="{{ item.value['cantidad'] | number: '1.3-3' }}"
+              value="{{ item.value['cantidad'] | number: '1.0-0' }}"
               readonly
               tabindex="-99"
               [color]="getColor(item.value['cantidad'])"
@@ -63,8 +65,8 @@ import { Producto } from '@papx/models';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ExistenciaFieldComponent implements OnInit {
-  @Input() producto: Producto;
-  @Input() existencias: any;
+  @Input() producto: Partial<Producto>;
+  @Input() existencias;
   @Input() sucursal;
   @Input() faltante: number = 0;
   constructor() {}
@@ -80,5 +82,13 @@ export class ExistenciaFieldComponent implements OnInit {
 
   getColor(cantidad: number) {
     return cantidad > 0 ? 'success' : cantidad < 0 ? 'danger' : '';
+  }
+
+  getDisponible() {
+    const disponible = Object.keys(this.existencias).reduce(
+      (p, c) => p + toNumber(this.existencias[c].cantidad),
+      0.0
+    );
+    return disponible;
   }
 }

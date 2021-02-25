@@ -60,6 +60,7 @@ export interface Pedido {
   updateLog?: any;
   cerrado?: firebase.firestore.Timestamp;
   appVersion?: number;
+  vigencia?: string;
 }
 
 export interface PedidoDet {

@@ -1,5 +1,6 @@
 import {
   ChangeDetectionStrategy,
+  ChangeDetectorRef,
   Component,
   EventEmitter,
   Input,
@@ -12,7 +13,7 @@ import { PedidoDet } from '@papx/models';
   selector: 'papx-pedido-item',
   templateUrl: 'pedido-item.component.html',
   styleUrls: ['pedido-item.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
+  // changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PedidoItemComponent implements OnInit {
   @Input() item: Partial<PedidoDet>;
@@ -20,16 +21,21 @@ export class PedidoItemComponent implements OnInit {
   @Input() detalle = true;
   @Input() disabled = false;
   @Output() selection = new EventEmitter<Partial<PedidoDet>>();
-  constructor() {}
+  constructor(private cd: ChangeDetectorRef) {}
 
   ngOnInit() {}
 
   getLabel() {
     return `${this.item.clave} - ${this.item.descripcion} (${this.item.unidad})`;
   }
+
   onSelection() {
     if (!this.disabled) {
       this.selection.emit(this.item);
     }
+  }
+
+  refresh() {
+    this.cd.markForCheck();
   }
 }

@@ -43,7 +43,13 @@ export class PedidoCreateFormComponent extends BaseComponent implements OnInit {
   ngOnInit() {
     this.facade.setPedido(this.data);
     this.addListeners();
+    this.facade.actualizarProductos();
   }
+
+  actualizar() {
+    this.facade.actualizarProductos();
+  }
+
   ngOnDestroy() {
     super.ngOnDestroy();
     this.facade.closeLiveSubscriptions();
@@ -123,6 +129,25 @@ export class PedidoCreateFormComponent extends BaseComponent implements OnInit {
   segmentChanged({ detail: { value } }: any) {
     this.segment = value;
     // this.cd.markForCheck();
+  }
+
+  ajustarTipo() {
+    // Side effect to update other controls
+    if (this.cliente.credito) {
+      if (this.facade.tipo !== TipoDePedido.CREDITO) {
+        this.controls.tipo.setValue(TipoDePedido.CREDITO, {
+          emitEvent: false,
+          onlySelf: true,
+        });
+      }
+    } else {
+      if (this.facade.tipo === TipoDePedido.CREDITO) {
+        this.controls.tipo.setValue(TipoDePedido.CONTADO, {
+          emitEvent: false,
+          onlySelf: true,
+        });
+      }
+    }
   }
 
   /**
