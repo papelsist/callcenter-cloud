@@ -5,6 +5,7 @@ import {
   Cliente,
   Producto,
   FormaDePago,
+  PedidoSummary,
 } from '@papx/models';
 
 import { generarCargoPorCorte, generarCargoPorTarjeta } from './cargos';
@@ -203,7 +204,7 @@ export function actualizarImportes(
  *
  * @param items PedidoDet array
  */
-export function buildSummary(items: PedidoDet[]) {
+export function buildSummary(items: PedidoDet[]): PedidoSummary {
   const importe = round(sumBy(items, 'importe'), 2);
   const descuentoImporte = round(sumBy(items, 'descuentoImporte'), 2);
   const subtotal = round(sumBy(items, 'subtotal'), 2);
@@ -215,6 +216,7 @@ export function buildSummary(items: PedidoDet[]) {
   const descuentoOriginal = maxDesOriginal
     ? maxDesOriginal.descuentoOriginal
     : 0.0;
+  const kilos = sumBy(items, 'kilos');
   return {
     importe,
     descuentoImporte,
@@ -223,6 +225,7 @@ export function buildSummary(items: PedidoDet[]) {
     total,
     descuento,
     descuentoOriginal,
+    kilos,
   };
 }
 

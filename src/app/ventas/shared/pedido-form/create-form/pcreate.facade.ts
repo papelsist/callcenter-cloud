@@ -37,9 +37,7 @@ import { ItemController } from '../../ui-pedido-item';
 import { PedidoForm } from '../pedido-form';
 import { ProductoService } from '@papx/shared/productos/data-access';
 
-interface State {
-  partidas: Partial<PedidoDet>[];
-}
+import * as utils from '../pedido-form.utils';
 
 @Injectable()
 export class PcreateFacade {
@@ -57,16 +55,9 @@ export class PcreateFacade {
   partidas$ = this._partidas.asObservable();
   cortes$ = this.partidas$.pipe(map((items) => items.filter((it) => it.corte)));
 
-  _summary = new BehaviorSubject<PedidoSummary>({
-    importe: 0.0,
-    descuento: 0.0,
-    descuentoImporte: 0.0,
-    subtotal: 0.0,
-    impuesto: 0.0,
-    total: 0.0,
-  });
-
+  _summary = new BehaviorSubject<PedidoSummary>(utils.zeroSummary());
   summary$: Observable<PedidoSummary> = this._summary.asObservable();
+
   liveClienteSub: Subscription;
 
   errors$ = this.form.statusChanges.pipe(
@@ -108,22 +99,8 @@ export class PcreateFacade {
     }
     this.form.patchValue(value, { emitEvent: false, onlySelf: true });
     if (data.id) {
-      const {
-        importe,
-        descuento,
-        descuentoImporte,
-        subtotal,
-        impuesto,
-        total,
-      } = data;
-      this._summary.next({
-        importe,
-        descuento,
-        descuentoImporte,
-        subtotal,
-        impuesto,
-        total,
-      });
+      const summ = utils.getPedidoSummary(data);
+      this._summary.next(summ);
       this.setPartidas(data.partidas);
       this.registrarLiveCliente(data.cliente.id);
     }
@@ -258,23 +235,13 @@ export class PcreateFacade {
     this._currentPartidas = this._currentPartidas.map((item) => {
       return {
         ...item,
-        producto: this.reduceProducto(item.producto),
+        producto: utils.reduceProducto(item.producto),
       };
     });
     return {
       ...rest,
-      cliente: this.cleanCliente(),
+      cliente: utils.reduceCliente(this.cliente),
       partidas: [...this._currentPartidas],
-    };
-  }
-
-  private cleanCliente() {
-    const { id, nombre, rfc, clave } = this.cliente;
-    return {
-      id,
-      nombre,
-      rfc,
-      clave,
     };
   }
 
@@ -337,32 +304,5 @@ export class PcreateFacade {
       // this.liveProductosSub = null;
       console.log('Unsibscribed to Live productos changes');
     }
-  }
-
-  reduceProducto(producto: Producto) {
-    const {
-      id,
-      clave,
-      descripcion,
-      precioCredito,
-      precioContado,
-      unidad,
-      kilos,
-      gramos,
-      modoVenta,
-      presentacion,
-    } = producto;
-    return {
-      id,
-      clave,
-      descripcion,
-      precioCredito,
-      precioContado,
-      unidad,
-      kilos,
-      gramos,
-      modoVenta,
-      presentacion,
-    };
   }
 }

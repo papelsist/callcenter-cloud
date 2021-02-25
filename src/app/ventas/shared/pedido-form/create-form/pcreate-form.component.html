@@ -61,7 +61,7 @@
     [disabled]="form.disabled"
     [fabButton]="false"
   ></papx-pedido-item-list>
-  <ion-button (click)="actualizar()"> Actualizar </ion-button>
+  <!-- <ion-button (click)="actualizar()"> Actualizar </ion-button> -->
 </div>
 <!-- Cortes -->
 <div [style.display]="segment === 'cortes' ? 'block' : 'none'">
@@ -90,5 +90,5 @@
 </div>
 <papx-pedido-validation
   [parent]="form"
-  *ngIf="hasErrors$ | async"
+  *ngIf="(hasErrors$ | async) && form.dirty"
 ></papx-pedido-validation>

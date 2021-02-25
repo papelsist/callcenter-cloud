@@ -36,7 +36,7 @@ import { getFormValidationErrors } from '@papx/utils';
 })
 export class PedidoValidationComponent extends BaseComponent implements OnInit {
   @Input() parent: FormGroup;
-  visible$ = new BehaviorSubject<boolean>(true); // Required to use OnPush detection esasy
+  visible$ = new BehaviorSubject<boolean>(false); // Required to use OnPush detection esasy
   errors$: Observable<string[]>;
   // envioErrors$: Observable<string[]>;
 

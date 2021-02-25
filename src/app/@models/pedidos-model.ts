@@ -225,6 +225,7 @@ export interface PedidoSummary {
   total: number;
   kilos?: number;
   descuentoPorVolumen?: number;
+  descuentoOriginal?: number;
 }
 
 /**
