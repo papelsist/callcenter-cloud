@@ -47,6 +47,7 @@ export class PedidoCreateFormComponent extends BaseComponent implements OnInit {
   }
 
   ngOnInit() {
+    // this.form.disable({ onlySelf: true, emitEvent: true });
     this.facade.setPedido(this.data);
     this.addListeners();
     this.facade.actualizarProductos();
@@ -199,5 +200,9 @@ export class PedidoCreateFormComponent extends BaseComponent implements OnInit {
       ],
     });
     await alert.present();
+  }
+
+  toogleReordenar() {
+    this.facade.toggleReorer();
   }
 }

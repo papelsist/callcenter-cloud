@@ -1,5 +1,5 @@
 <ion-item-sliding>
-  <ion-item button [disabled]="disabled" (click)="onSelection()">
+  <ion-item button [disabled]="disabled" (click)="onSelection()" detail="false">
     <ion-label class="ion-text-wrap">
       <div class="descripcion">
         <h2>
@@ -48,9 +48,9 @@
     <ion-chip slot="end" color="primary">
       {{ item.subtotal | currency }}
     </ion-chip>
+    <ion-reorder slot="start"></ion-reorder>
   </ion-item>
 
-  <!-- Options -->
   <ion-item-options>
     <ion-item-options side="end">
       <ion-item-option

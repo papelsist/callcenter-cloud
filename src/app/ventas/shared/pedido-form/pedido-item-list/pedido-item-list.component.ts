@@ -9,6 +9,10 @@ import {
   QueryList,
   ViewChildren,
 } from '@angular/core';
+
+import { IonReorderGroup } from '@ionic/angular';
+import { ItemReorderEventDetail } from '@ionic/core';
+
 import { PedidoDet } from '@papx/models';
 import { PcreateFacade } from '../create-form/pcreate.facade';
 import { PedidoItemComponent } from '../pedido-item/pedido-item.component';
@@ -26,7 +30,7 @@ export class PedidoItemListComponent implements OnInit {
   @Input() fabButton = false;
 
   @ViewChildren(PedidoItemComponent) children: QueryList<PedidoItemComponent>;
-
+  reorder$ = this.facade.reorderItems$;
   constructor(private facade: PcreateFacade, private cd: ChangeDetectorRef) {}
 
   ngOnInit() {}
@@ -63,5 +67,13 @@ export class PedidoItemListComponent implements OnInit {
   }
   async onDuplicar(index: number) {
     await this.facade.copiarItem(index);
+  }
+
+  doReorder(ev: CustomEvent<ItemReorderEventDetail>) {
+    console.log('Dragged from index', ev.detail.from, 'to', ev.detail.to);
+    console.log('Before complete', this.items.map((i) => i.clave).join(','));
+    this.items = ev.detail.complete(this.items);
+    console.log('After complete', this.items.map((i) => i.clave).join(','));
+    this.facade.reordenarPartidas(this.items);
   }
 }

@@ -82,6 +82,9 @@ export class PcreateFacade {
   liveProductosSub: Subscription;
   destroy$ = new Subject<boolean>();
 
+  private _reorderItems = false;
+  reorderItems$ = new BehaviorSubject(this._reorderItems);
+
   constructor(
     private itemController: ItemController,
     private clienteController: ClienteSelectorController,
@@ -192,6 +195,14 @@ export class PcreateFacade {
     this.recalcular();
   }
 
+  async reordenarPartidas(items: Partial<PedidoDet>[]) {
+    if (this.form.enabled) {
+      this._currentPartidas = [...items];
+      this._partidas.next(this._currentPartidas);
+      this.form.markAsDirty();
+    }
+  }
+
   removeItem(index: number) {
     this._currentPartidas.splice(index, 1);
     this._partidas.next(this._currentPartidas);
@@ -245,6 +256,13 @@ export class PcreateFacade {
 
   isCredito() {
     return this.tipo === TipoDePedido.CREDITO;
+  }
+
+  toggleReorer() {
+    if (this.form.enabled) {
+      this._reorderItems = !this._reorderItems;
+      this.reorderItems$.next(this._reorderItems);
+    }
   }
 
   resolvePedidoData(): Partial<Pedido> {

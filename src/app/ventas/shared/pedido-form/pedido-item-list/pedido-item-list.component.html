@@ -1,13 +1,18 @@
-<ion-list class="ion-no-padding">
-  <papx-pedido-item
-    *ngFor="let it of items; index as idx"
-    [item]="it"
-    [index]="idx"
-    [disabled]="disabled"
-    (selection)="onSelection(idx, $event)"
-    (eliminar)="onDeleteItem(idx)"
-    (duplicar)="onDuplicar(idx)"
-  ></papx-pedido-item>
+<ion-list class="ion-no-padding" mode="ios">
+  <ion-reorder-group
+    (ionItemReorder)="doReorder($event)"
+    [disabled]="!(reorder$ | async)"
+  >
+    <papx-pedido-item
+      *ngFor="let it of items; index as idx"
+      [item]="it"
+      [index]="idx"
+      [disabled]="disabled"
+      (selection)="onSelection(idx, $event)"
+      (eliminar)="onDeleteItem(idx)"
+      (duplicar)="onDuplicar(idx)"
+    ></papx-pedido-item>
+  </ion-reorder-group>
 </ion-list>
 <ion-fab vertical="bottom" horizontal="start" slot="fixed" *ngIf="fabButton">
   <ion-fab-button (click)="addItem.emit()" size="small" [disabled]="disabled">
