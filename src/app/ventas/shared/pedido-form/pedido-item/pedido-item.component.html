@@ -42,10 +42,11 @@
         {{ item.cantidad | number: "1.0" }}
       </ion-text>
     </div>
-
-    <ion-chip color="warning"> Falta: {{ item.faltante }} </ion-chip>
-
-    <ion-chip slot="end" color="primary">
+    <ion-chip color="warning" *ngIf="item.faltante > 0">
+      <ion-icon name="navigate-circle"></ion-icon>
+      <ion-label> Falta material </ion-label>
+    </ion-chip>
+    <ion-chip color="primary" slot="end">
       {{ item.subtotal | currency }}
     </ion-chip>
     <ion-reorder slot="start"></ion-reorder>

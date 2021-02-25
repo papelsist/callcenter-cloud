@@ -92,6 +92,7 @@ export interface PedidoDet {
   descuentoEspecial?: number;
   importeCortes?: number;
   faltante?: number;
+  faltanteSucursal?: number;
 
   corte?: Partial<Corte>;
   comentario?: string;

@@ -16,7 +16,7 @@
   grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
   // font-family: "Courier New";
   font-size: 0.8rem;
-  padding-top: 2px;
+  padding-top: 5px;
 
   span:nth-child(even) {
     color: var(--ion-color-primary);
@@ -33,4 +33,9 @@
   font-size: 0.9rem;
   // font-style: oblique;
   // font-weight: 500;
+}
+
+.warings-row {
+  display: flex;
+  justify-content: flex-end;
 }

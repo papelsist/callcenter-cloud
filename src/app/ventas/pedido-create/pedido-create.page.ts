@@ -1,10 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
-import {
-  ActionSheetController,
-  AlertController,
-  LoadingController,
-} from '@ionic/angular';
+import { AlertController, LoadingController } from '@ionic/angular';
 
 import { AuthService } from '@papx/auth';
 import { Pedido, User } from '@papx/models';
@@ -32,7 +28,6 @@ export class PedidoCreatePage implements OnInit {
     private authService: AuthService,
     private alertController: AlertController,
     private loadingController: LoadingController,
-    private actionSheet: ActionSheetController,
     private dataService: VentasDataService,
     private router: Router
   ) {}
@@ -47,21 +42,10 @@ export class PedidoCreatePage implements OnInit {
     console.log('Salvando pedido: ', pedido);
     try {
       const folio = await this.dataService.createPedido(pedido, user);
-      console.log('Pedido generado: ', folio);
-      // this.router.navigate(['/', 'ventas', 'cotizaciones']);
+      this.router.navigate(['/', 'ventas', 'cotizaciones']);
     } catch (error) {
       this.handleHerror(error);
     }
-    /*
-    this.dataService.addPedido(pedido).subscribe(
-      (res) => {
-        console.log('Saved done, res: ', res);
-        this.router.navigate(['/', 'ventas', 'cotizaciones']);
-      },
-      async (err) => this.handleHerror(err),
-      () => console.log('Terminated')
-    );
-    */
   }
 
   onErrors(event: any) {
@@ -87,26 +71,6 @@ export class PedidoCreatePage implements OnInit {
       message: err.message,
     });
     await alert.present();
-  }
-
-  async showOptions(ev: any) {
-    const actionSheet = await this.actionSheet.create({
-      header: 'Operaciones',
-      cssClass: 'create-options',
-      buttons: [
-        {
-          text: 'Descuento especial',
-          icon: 'barbell',
-          handler: async () => this.form.setDescuentoEspecial(),
-        },
-        {
-          text: 'Cerrar',
-          role: 'cancel',
-          icon: 'close',
-        },
-      ],
-    });
-    await actionSheet.present();
   }
 
   async showErrors(errors: any) {

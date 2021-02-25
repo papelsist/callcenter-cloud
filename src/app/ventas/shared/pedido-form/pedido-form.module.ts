@@ -8,10 +8,16 @@ import { ClienteFieldComponent } from './cliente-field/cliente-field.component';
 import { TipoDePedidoComponent } from './tipo-field/tipo-de-pedido-field.component';
 import { PedidoItemListComponent } from './pedido-item-list/pedido-item-list.component';
 import { PedidoItemComponent } from './pedido-item/pedido-item.component';
-import { ResumenSectionComponent, CorteItemsListComponent } from './+sections';
+import {
+  ResumenSectionComponent,
+  CorteItemsListComponent,
+  PedidoFormFooterComponent,
+} from './+sections';
 import { EnvioModule } from './envio';
 
 import { PedidoValidationComponent } from './validation/pedido-validation.component';
+import { PedidoOptionsComponent } from './options/pedido-options.component';
+import { PedidoOptionsButtonComponent } from './options/pedido-options-btn.component';
 
 const components = [
   PedidoCreateFormComponent,
@@ -22,6 +28,9 @@ const components = [
   ResumenSectionComponent,
   CorteItemsListComponent,
   PedidoValidationComponent,
+  PedidoOptionsComponent,
+  PedidoOptionsButtonComponent,
+  PedidoFormFooterComponent,
 ];
 
 @NgModule({

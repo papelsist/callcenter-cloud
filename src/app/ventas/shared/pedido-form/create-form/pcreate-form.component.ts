@@ -7,8 +7,6 @@ import {
   Input,
 } from '@angular/core';
 
-import { AlertController } from '@ionic/angular';
-
 import {
   startWith,
   takeUntil,
@@ -40,9 +38,10 @@ export class PedidoCreateFormComponent extends BaseComponent implements OnInit {
   summary$ = this.facade.summary$;
   cliente$: Observable<any>;
   segment = 'partidas';
+  errors$ = this.facade.errors$;
   hasErrors$ = this.facade.errors$.pipe(map((errors) => errors.length > 0));
 
-  constructor(private facade: PcreateFacade, private alert: AlertController) {
+  constructor(private facade: PcreateFacade) {
     super();
   }
 
@@ -107,11 +106,13 @@ export class PedidoCreateFormComponent extends BaseComponent implements OnInit {
   }
 
   private clienteListener() {
-    this.controls.cliente.valueChanges.pipe(
-      takeUntil(this.destroy$),
-      distinctUntilChanged(),
-      tap((cte) => this.ajustarTipo(cte))
-    );
+    this.controls.cliente.valueChanges
+      .pipe(
+        takeUntil(this.destroy$),
+        distinctUntilChanged(),
+        tap((cte) => this.ajustarTipo(cte))
+      )
+      .subscribe(() => {});
   }
 
   get canSubmit() {
@@ -132,6 +133,18 @@ export class PedidoCreateFormComponent extends BaseComponent implements OnInit {
 
   async addItem() {
     await this.facade.addItem();
+  }
+
+  getId(): string {
+    return this.data.id;
+  }
+
+  getHeaderLabel() {
+    if (this.getId()) {
+      return `Pedido: ${this.data.folio}`;
+    } else {
+      return 'Alta de pedido';
+    }
   }
 
   get cliente() {
@@ -165,41 +178,6 @@ export class PedidoCreateFormComponent extends BaseComponent implements OnInit {
         });
       }
     }
-  }
-
-  /**
-   * TODO Mover a componente de opciones o al facade
-   */
-  async setDescuentoEspecial() {
-    if (this.facade.tipo === TipoDePedido.CREDITO) return; // No procede
-    const alert = await this.alert.create({
-      header: 'Descuento especial',
-      message: 'Registre el descuento',
-      inputs: [
-        {
-          type: 'number',
-          placeholder: 'Descuento',
-          tabindex: 99,
-          name: 'descuento',
-          max: 40,
-        },
-      ],
-      buttons: [
-        {
-          text: 'Cancelar',
-          role: 'cancel',
-        },
-        {
-          text: 'Aceptar',
-          role: '',
-
-          handler: (value: any) => {
-            this.facade.setDescuentoEspecial(value.descuento).recalcular();
-          },
-        },
-      ],
-    });
-    await alert.present();
   }
 
   toogleReordenar() {

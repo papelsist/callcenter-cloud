@@ -79,7 +79,7 @@ export class PcreateFacade {
     distinctUntilChanged()
   );
 
-  liveProductosSub: Subscription;
+  // liveProductosSub: Subscription;
   destroy$ = new Subject<boolean>();
 
   private _reorderItems = false;
@@ -321,7 +321,6 @@ export class PcreateFacade {
   closeLiveSubscriptions() {
     console.log('Closing live subscriptions....');
     this.closeClienteSubs();
-    this.unsubscribeToLiveProductos();
     this.destroy$.next(true);
     this.destroy$.complete();
   }
@@ -330,14 +329,6 @@ export class PcreateFacade {
     if (this.liveClienteSub) {
       console.log('Closing live cliente subscription...');
       this.liveClienteSub.unsubscribe();
-    }
-  }
-
-  private unsubscribeToLiveProductos() {
-    if (this.liveProductosSub) {
-      this.liveProductosSub.unsubscribe();
-      // this.liveProductosSub = null;
-      console.log('Unsibscribed to Live productos changes');
     }
   }
 }
