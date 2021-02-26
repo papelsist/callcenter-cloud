@@ -5,7 +5,7 @@ import {
   OnInit,
 } from '@angular/core';
 import { PopoverController } from '@ionic/angular';
-import { Warning } from '../pedido-form/validation/pedido-warning';
+import { Warning } from '@papx/models';
 
 @Component({
   selector: 'papx-warnings',

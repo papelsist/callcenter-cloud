@@ -5,7 +5,7 @@ import {
   QueryFn,
 } from '@angular/fire/firestore';
 
-import { Pedido, User } from '@papx/models';
+import { Pedido, Status, User } from '@papx/models';
 import { Observable, throwError } from 'rxjs';
 import { AngularFireFunctions } from '@angular/fire/functions';
 import { catchError } from 'rxjs/operators';
@@ -13,23 +13,17 @@ import { catchError } from 'rxjs/operators';
 import firebase from 'firebase/app';
 import { omitBy } from 'lodash-es';
 
-type PedidoStatus =
-  | 'COTIZACION'
-  | 'CERRADO'
-  | 'FACTURADO'
-  | 'FACTURADO_TIMBRADO';
-
 /**
  * Factory function than creates QueryFn instances specific of the status property
  * @param status Status del pedido
  */
-const getFilter = (status: PedidoStatus): QueryFn => {
+const getFilter = (status: Status): QueryFn => {
   return (ref: CollectionReference) =>
     ref.where('status', '==', status).orderBy('folio', 'desc').limit(10);
 };
 
 export interface VentasQueryParams {
-  status?: PedidoStatus;
+  status?: Status;
   userId?: string;
   desde?: string | Date;
   max: number;
@@ -39,7 +33,8 @@ export interface VentasQueryParams {
 export class VentasDataService {
   PEDIDOS_COLLECTION = 'pedidos';
   readonly cotizaciones$ = this.fetchVentas('COTIZACION');
-  readonly pendientes$ = this.fetchVentas('CERRADO');
+  readonly porautorizar$ = this.fetchVentas('POR_AUTORIZAR');
+  readonly pendientes$ = this.fetchVentas('PENDIENTE');
   readonly facturas$ = this.fetchVentas('FACTURADO_TIMBRADO');
 
   constructor(
@@ -47,7 +42,7 @@ export class VentasDataService {
     private functions: AngularFireFunctions
   ) {}
 
-  private fetchVentas(status: PedidoStatus) {
+  private fetchVentas(status: Status) {
     const filter = getFilter(status);
     return this.getPedidos(filter);
   }

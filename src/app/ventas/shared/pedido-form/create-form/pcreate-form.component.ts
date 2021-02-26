@@ -29,6 +29,7 @@ import { PcreateFacade } from './pcreate.facade';
 })
 export class PedidoCreateFormComponent extends BaseComponent implements OnInit {
   @Output() save = new EventEmitter<Partial<Pedido>>();
+  @Output() cerrarPedido = new EventEmitter<Partial<Pedido>>();
   @Input() data: Partial<Pedido> = {};
   @Output() errors = new EventEmitter();
   @Output() warnings = new EventEmitter();
@@ -137,6 +138,13 @@ export class PedidoCreateFormComponent extends BaseComponent implements OnInit {
       const data = this.facade.resolvePedidoData();
       this.facade.closeLiveSubscriptions();
       this.save.emit(data);
+    }
+  }
+
+  onCerrar() {
+    if (this.form.valid) {
+      const data = this.facade.resolvePedidoData();
+      this.cerrarPedido.emit(data);
     }
   }
 

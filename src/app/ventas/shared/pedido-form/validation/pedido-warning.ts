@@ -1,14 +1,30 @@
-import { TipoDePedido, Cliente, PedidoDet, Pedido } from '@papx/models';
+import {
+  TipoDePedido,
+  Cliente,
+  PedidoDet,
+  Pedido,
+  Warning,
+} from '@papx/models';
 
 import sumBy from 'lodash-es/sumBy';
 import round from 'lodash-es/round';
 
-export interface Warning {
-  error: string;
-  descripcion: string;
-}
-
 export class PedidoWarnings {
+  static runWarnings(
+    cliente: Partial<Cliente>,
+    tipo: TipoDePedido,
+    items: Partial<PedidoDet>[],
+    p: Pedido
+  ) {
+    const warnings = [];
+    this.ValidarClienteActivo(cliente, warnings);
+    this.ValidarCreditoVigente(cliente, tipo, warnings);
+    this.ValidarAtrasoMaximo(cliente, tipo, warnings);
+    this.ValidarCreditoDisponible(cliente, tipo, items, warnings);
+    this.ValidarAutorizacionPorDescuentoEspecial(p, warnings);
+    this.ValidarAutorizacionPorFaltaDeExistencia(p, items, warnings);
+    return warnings;
+  }
   static ValidarClienteActivo(cliente: Partial<Cliente>, errors: Warning[]) {
     if (!cliente.activo) {
       errors.push({
@@ -52,8 +68,8 @@ export class PedidoWarnings {
   }
 
   static ValidarCreditoDisponible(
-    tipo: TipoDePedido,
     cliente: Partial<Cliente>,
+    tipo: TipoDePedido,
     partidas: Partial<PedidoDet>[],
     errors: Warning[]
   ) {

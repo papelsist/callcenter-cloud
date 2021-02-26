@@ -8,7 +8,9 @@
     </ion-buttons>
     <ion-title>{{ getHeaderLabel() }}</ion-title>
     <ion-buttons slot="end">
-      <papx-pedido-options-button></papx-pedido-options-button>
+      <papx-pedido-options-button
+        (cerrar)="onCerrar()"
+      ></papx-pedido-options-button>
     </ion-buttons>
   </ion-toolbar>
 </ion-header>

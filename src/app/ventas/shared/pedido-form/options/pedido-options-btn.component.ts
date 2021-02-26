@@ -1,10 +1,18 @@
-import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  OnInit,
+  Output,
+  EventEmitter,
+  Input,
+} from '@angular/core';
 import {
   ActionSheetController,
   AlertController,
   PopoverController,
 } from '@ionic/angular';
 import { TipoDePedido } from '@papx/models';
+
 import { PcreateFacade } from '../create-form/pcreate.facade';
 import { PedidoOptionsComponent } from './pedido-options.component';
 
@@ -23,6 +31,8 @@ import { PedidoOptionsComponent } from './pedido-options.component';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PedidoOptionsButtonComponent implements OnInit {
+  @Output() cerrar = new EventEmitter();
+
   constructor(
     private popoverController: PopoverController,
     private facade: PcreateFacade,
@@ -49,26 +59,8 @@ export class PedidoOptionsButtonComponent implements OnInit {
       header: 'Operaciones con el pedido',
       animated: true,
       translucent: true,
-
       buttons: [
-        {
-          text: 'Descuento especial',
-          role: 'selected',
-          icon: 'archive',
-          handler: () => this.setDescuentoEspecial(),
-        },
-        {
-          text: 'Cerrar pedido',
-          role: 'selected',
-          icon: 'checkmark-done',
-          handler: () => console.log('Cerrando pedido'),
-        },
-        {
-          text: 'Eliminar pedido',
-          role: 'destructive',
-          icon: 'trash',
-          handler: () => console.log('Eliminar'),
-        },
+        ...this.buildOptionButtons(),
         {
           text: 'Cancelar',
           role: 'cancel',
@@ -76,6 +68,45 @@ export class PedidoOptionsButtonComponent implements OnInit {
       ],
     });
     await action.present();
+  }
+
+  private buildOptionButtons() {
+    if (this.facade.getPedido()) {
+      return this.editOptions();
+    } else return this.createOptions();
+  }
+  private createOptions() {
+    return [
+      {
+        text: 'Descuento especial',
+        role: 'selected',
+        icon: 'archive',
+        handler: () => this.setDescuentoEspecial(),
+      },
+    ];
+  }
+
+  private editOptions() {
+    return [
+      {
+        text: 'Descuento especial',
+        role: 'selected',
+        icon: 'archive',
+        handler: () => this.setDescuentoEspecial(),
+      },
+      {
+        text: 'Cerrar pedido',
+        role: 'selected',
+        icon: 'checkmark-done',
+        handler: () => this.cerrar.emit(),
+      },
+      {
+        text: 'Eliminar pedido',
+        role: 'destructive',
+        icon: 'trash',
+        handler: () => console.log('Eliminar'),
+      },
+    ];
   }
 
   /**

@@ -2,10 +2,10 @@ import { Cliente, ClienteCredito } from './cliente';
 import { Direccion } from './direccion';
 import { FormaDePago } from './formaDePago';
 import { Producto } from './producto';
-import { Sucursal } from './sucursal';
 import { Transporte } from './transporte';
-import firebase from 'firebase/app';
 import { Autorizacion } from './autorizacion';
+
+import firebase from 'firebase/app';
 
 export interface Pedido {
   id?: string;
@@ -44,7 +44,7 @@ export interface Pedido {
   usoDeCfdi: string;
   sinExistencia?: boolean;
   chequePostFechado?: boolean;
-  status: 'COTIZACION' | 'CERRADO';
+  status: Status;
   // Log
   inicio?: string;
   dateCreated?: firebase.firestore.Timestamp;
@@ -63,6 +63,7 @@ export interface Pedido {
   cerrado?: firebase.firestore.Timestamp;
   appVersion?: number;
   vigencia?: string;
+  warnings?: Warning[];
 }
 
 export interface PedidoDet {
@@ -123,6 +124,21 @@ export enum TipoDePedido {
   POST_FECHADO = 'PSF',
   INE = 'INE',
 }
+
+export enum STATUS_A {
+  COTIZACION = 'COTIZACION',
+  POR_AUTORIZAR = 'POR_AUTORIZAR',
+  PENDIENTE = 'PENDIENTE',
+}
+export type Status =
+  | 'COTIZACION'
+  | 'POR_AUTORIZAR'
+  | 'CERRADO'
+  | 'PENDIENTE'
+  | 'ATENDIDO'
+  | 'POR_FACTURAR'
+  | 'FACTURADO'
+  | 'FACTURADO_TIMBRADO';
 
 // export enum FormaDePago {
 //   EFECTIVO = 'EFECTIVO',
@@ -265,3 +281,7 @@ export interface PedidoItemParams {
   sucursal?: string;
 }
 */
+export interface Warning {
+  error: string;
+  descripcion: string;
+}

@@ -29,6 +29,7 @@ import {
   PedidoSummary,
   Producto,
   TipoDePedido,
+  Warning,
 } from '@papx/models';
 import { ClientesDataService } from '@papx/shared/clientes/@data-access/clientes-data.service';
 import { ClienteSelectorController } from '@papx/shared/clientes/cliente-selector';
@@ -38,7 +39,7 @@ import { PedidoForm } from '../pedido-form';
 import { ProductoService } from '@papx/shared/productos/data-access';
 
 import * as utils from '../pedido-form.utils';
-import { PedidoWarnings, Warning } from '../validation/pedido-warning';
+import { PedidoWarnings } from '../validation/pedido-warning';
 
 @Injectable()
 export class PcreateFacade {
@@ -74,7 +75,7 @@ export class PcreateFacade {
     })
   );
 
-  _warnings = new Subject<Warning[]>();
+  private _warnings = new Subject<Warning[]>();
   warnings$ = this._warnings.asObservable();
 
   productos$ = this.partidas$.pipe(
@@ -83,7 +84,6 @@ export class PcreateFacade {
     distinctUntilChanged()
   );
 
-  // liveProductosSub: Subscription;
   destroy$ = new Subject<boolean>();
 
   private _reorderItems = false;
@@ -99,6 +99,10 @@ export class PcreateFacade {
     private productoDataService: ProductoService
   ) {}
 
+  getPedido() {
+    return this.currentPedido;
+  }
+
   setPedido(data: Partial<Pedido>) {
     console.log('Registrando datos iniciales del pedido: ', data);
     if (data.id) {
@@ -113,7 +117,9 @@ export class PcreateFacade {
     if (data.id) {
       const summ = utils.getPedidoSummary(data);
       this._summary.next(summ);
-      this.setPartidas(data.partidas);
+      this._currentPartidas = value.partidas;
+      this._partidas.next(this._currentPartidas);
+      // this.setPartidas(data.partidas);
       this.registrarLiveCliente(data.cliente.id);
     }
   }
@@ -123,14 +129,13 @@ export class PcreateFacade {
     this.closeClienteSubs();
     this.liveClienteSub = this.clienteDataService
       .fetchLiveCliente(id)
-      // .pipe(take(1))
       .subscribe((cte) => {
         console.log('Live cliente: ', cte);
         const { cfdiMail, nombre } = cte;
         this.controls.cliente.setValue(cte);
         this.form.get('cfdiMail').setValue(cfdiMail, { emitEvent: false });
         this.form.get('nombre').setValue(nombre, { emitEvent: false });
-        this.runWarnings();
+        this.updateWarnings();
       });
   }
 
@@ -155,11 +160,6 @@ export class PcreateFacade {
     this._summary.next(summary);
     this.form.patchValue(summary);
     this.form.markAsDirty();
-  }
-
-  private setPartidas(value: Partial<PedidoDet>[]) {
-    this._currentPartidas = value;
-    this._partidas.next(this._currentPartidas);
   }
 
   async addItem() {
@@ -283,11 +283,15 @@ export class PcreateFacade {
         producto: utils.reduceProducto(item.producto),
       };
     });
-    return {
+    const res = {
       ...rest,
       cliente: utils.reduceCliente(this.cliente),
       partidas: [...this._currentPartidas],
     };
+    if (this.currentPedido && this.currentPedido.warnings) {
+      res.warnings = [...this.currentPedido.warnings];
+    }
+    return res;
   }
 
   actualizarProductos() {
@@ -342,19 +346,12 @@ export class PcreateFacade {
     }
   }
 
-  runWarnings() {
-    if (this.currentPedido.status === 'COTIZACION') {
-      const errors: Warning[] = [];
-      const { cliente, tipo } = this;
-      const p = this.currentPedido;
-      const items = this._currentPartidas;
-      PedidoWarnings.ValidarClienteActivo(cliente, errors);
-      PedidoWarnings.ValidarCreditoVigente(cliente, tipo, errors);
-      PedidoWarnings.ValidarAtrasoMaximo(cliente, tipo, errors);
-      PedidoWarnings.ValidarCreditoDisponible(cliente, tipo, items, errors);
-      PedidoWarnings.ValidarAutorizacionPorDescuentoEspecial(p, errors);
-      PedidoWarnings.ValidarAutorizacionPorFaltaDeExistencia(p, items, errors);
-      this._warnings.next(errors);
-    }
+  updateWarnings() {
+    const { cliente, tipo } = this;
+    const p = this.currentPedido;
+    const items = this._currentPartidas;
+    const warnings = PedidoWarnings.runWarnings(cliente, tipo, items, p);
+    this.currentPedido.warnings = warnings;
+    this._warnings.next(warnings);
   }
 }
