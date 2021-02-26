@@ -31,13 +31,15 @@ export class PedidoCreateFormComponent extends BaseComponent implements OnInit {
   @Output() save = new EventEmitter<Partial<Pedido>>();
   @Input() data: Partial<Pedido> = {};
   @Output() errors = new EventEmitter();
+  @Output() warnings = new EventEmitter();
 
   form = this.facade.form;
   partidas$ = this.facade.partidas$;
   cortes$ = this.facade.cortes$;
   summary$ = this.facade.summary$;
   cliente$: Observable<any>;
-  segment = 'partidas';
+  // segment = 'partidas';
+  segment = 'cortes';
   errors$ = this.facade.errors$;
   hasErrors$ = this.facade.errors$.pipe(map((errors) => errors.length > 0));
 
@@ -48,8 +50,8 @@ export class PedidoCreateFormComponent extends BaseComponent implements OnInit {
   ngOnInit() {
     // this.form.disable({ onlySelf: true, emitEvent: true });
     this.facade.setPedido(this.data);
-    this.addListeners();
     this.facade.actualizarProductos();
+    this.addListeners();
   }
 
   actualizar() {
@@ -57,8 +59,8 @@ export class PedidoCreateFormComponent extends BaseComponent implements OnInit {
   }
 
   ngOnDestroy() {
-    super.ngOnDestroy();
     this.facade.closeLiveSubscriptions();
+    super.ngOnDestroy();
   }
 
   addListeners() {
@@ -88,9 +90,20 @@ export class PedidoCreateFormComponent extends BaseComponent implements OnInit {
   }
 
   errorsListener() {
+    // this.form.statusChanges
+    //   .pipe(
+    //     distinctUntilChanged(),
+    //     tap(() => this.facade.runWarnings()), // Side effect to run warnings
+    //     takeUntil(this.destroy$)
+    //   )
+    //   .subscribe((status) => {});
+
     this.facade.errors$
       .pipe(takeUntil(this.destroy$))
       .subscribe((errors) => this.errors.emit(errors));
+    this.facade.warnings$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((errors) => this.warnings.emit(errors));
   }
 
   private sucursalListener() {

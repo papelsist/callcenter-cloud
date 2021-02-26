@@ -5,6 +5,7 @@
       [data]="vm.pedido"
       (save)="onSave(vm.pedido.id, $event, vm.user)"
       (errors)="onErrors($event)"
+      (warnings)="onWarnings($event)"
     ></papx-pedido-form>
   </ion-content>
 
@@ -22,6 +23,7 @@
             <ion-badge slot="start">{{errors.length}}</ion-badge>
           </ion-icon>
         </ion-button>
+        <papx-warnigs-btn [warnings]="warnings"></papx-warnigs-btn>
       </ion-buttons>
       <ion-title class="ion-text-center" color="success">
         Total: {{ summary['total'] | currency}}

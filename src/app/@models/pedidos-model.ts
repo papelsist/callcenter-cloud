@@ -5,6 +5,7 @@ import { Producto } from './producto';
 import { Sucursal } from './sucursal';
 import { Transporte } from './transporte';
 import firebase from 'firebase/app';
+import { Autorizacion } from './autorizacion';
 
 export interface Pedido {
   id?: string;
@@ -51,6 +52,7 @@ export interface Pedido {
   createUser?: string;
   updateUser?: string;
   autorizacion?: PedidoAutorizacion;
+  autorizaciones?: Autorizacion[];
   autorizacionesRequeridas?: string;
   facturaSerie?: string;
   facturaFolio?: string;

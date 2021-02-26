@@ -1,0 +1,37 @@
+.main-row {
+  display: grid;
+  // grid-template-columns: repeat(auto-fill, minmax(200px, fr));
+  align-items: center;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  padding: 0px;
+  font-size: 0.9rem;
+  // Labels
+  span:nth-child(odd) {
+    margin-right: 8px;
+    margin-left: 0px;
+    max-width: 130px;
+  }
+  // Values
+  span:nth-child(even) {
+    // color: var(--ion-color-primary);
+    text-align: start;
+  }
+}
+
+.main-row:nth-child(even) {
+  padding-top: 6px;
+}
+
+.clave {
+  font-size: 1.1rem;
+}
+.limpio-refinado {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding-left: 5px;
+  span {
+    font-size: 0.8rem;
+    color: var(--ion-color-tertiary-tint);
+  }
+}

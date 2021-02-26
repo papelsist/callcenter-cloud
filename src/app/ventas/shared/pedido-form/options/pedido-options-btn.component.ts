@@ -1,5 +1,10 @@
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
-import { PopoverController } from '@ionic/angular';
+import {
+  ActionSheetController,
+  AlertController,
+  PopoverController,
+} from '@ionic/angular';
+import { TipoDePedido } from '@papx/models';
 import { PcreateFacade } from '../create-form/pcreate.facade';
 import { PedidoOptionsComponent } from './pedido-options.component';
 
@@ -20,12 +25,14 @@ import { PedidoOptionsComponent } from './pedido-options.component';
 export class PedidoOptionsButtonComponent implements OnInit {
   constructor(
     private popoverController: PopoverController,
-    private facade: PcreateFacade
+    private facade: PcreateFacade,
+    private actionSheet: ActionSheetController,
+    private alert: AlertController
   ) {}
 
   ngOnInit() {}
 
-  async showOptions(ev: any) {
+  async showOptions2(ev: any) {
     console.log('Facadde: ', this.facade);
     const popover = await this.popoverController.create({
       component: PedidoOptionsComponent,
@@ -35,5 +42,74 @@ export class PedidoOptionsButtonComponent implements OnInit {
       translucent: true,
     });
     return await popover.present();
+  }
+
+  async showOptions(ev: any) {
+    const action = await this.actionSheet.create({
+      header: 'Operaciones con el pedido',
+      animated: true,
+      translucent: true,
+
+      buttons: [
+        {
+          text: 'Descuento especial',
+          role: 'selected',
+          icon: 'archive',
+          handler: () => this.setDescuentoEspecial(),
+        },
+        {
+          text: 'Cerrar pedido',
+          role: 'selected',
+          icon: 'checkmark-done',
+          handler: () => console.log('Cerrando pedido'),
+        },
+        {
+          text: 'Eliminar pedido',
+          role: 'destructive',
+          icon: 'trash',
+          handler: () => console.log('Eliminar'),
+        },
+        {
+          text: 'Cancelar',
+          role: 'cancel',
+        },
+      ],
+    });
+    await action.present();
+  }
+
+  /**
+   * TODO Mover a componente
+   */
+  async setDescuentoEspecial() {
+    if (this.facade.tipo === TipoDePedido.CREDITO) return; // No procede
+    const alert = await this.alert.create({
+      header: 'Descuento especial',
+      message: 'Registre el descuento',
+      inputs: [
+        {
+          type: 'number',
+          placeholder: 'Descuento',
+          tabindex: 99,
+          name: 'descuento',
+          max: 40,
+        },
+      ],
+      buttons: [
+        {
+          text: 'Cancelar',
+          role: 'cancel',
+        },
+        {
+          text: 'Aceptar',
+          role: '',
+
+          handler: (value: any) => {
+            this.facade.setDescuentoEspecial(value.descuento).recalcular();
+          },
+        },
+      ],
+    });
+    await alert.present();
   }
 }

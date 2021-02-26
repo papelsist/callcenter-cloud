@@ -10,6 +10,7 @@ import { PedidosFacade } from '../@data-access/+state';
 })
 export class PedidoEditPage implements OnInit {
   errors: any;
+  warnings: any[];
   vm$ = this.facade.vm$;
   constructor(public facade: PedidosFacade, private router: Router) {}
 
@@ -24,6 +25,10 @@ export class PedidoEditPage implements OnInit {
 
   onErrors(event: any) {
     this.errors = event;
+  }
+
+  onWarnings(warnings: any[]) {
+    this.warnings = warnings;
   }
 
   async showErrors(errors: any) {

@@ -1,29 +1,47 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  Input,
-  Output,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 
-import { ItemReorderEventDetail } from '@ionic/core';
 import { PedidoDet } from '@papx/models';
 
 @Component({
   selector: 'papx-cortes-list',
   template: `
-    <ion-list lines="full">
+    <ion-list lines="full" class="ion-no-padding">
       <ion-reorder-group disabled="false" (ionItemReorder)="doReorder($event)">
         <ion-reorder *ngFor="let item of partidas; index as idx; odd as odd">
           <ion-item>
-            <ion-label>
-              {{ item.descripcion }}
+            <ion-label class="ion-text-wrap" *ngIf="item.corte as corte">
+              {{ corte.tantos }} tantos
+              <span *ngIf="corte.instruccion !== 'ESPECIAL'">
+                {{ corte.instruccion }}
+              </span>
+              <span *ngIf="corte.instruccion === 'ESPECIAL'">
+                {{ corte.instruccionEspecial }}
+              </span>
+              <small class="ion-padding-start">
+                ({{ corte.limpio ? 'Limpio' : '' }}) ({{
+                  corte.refinado ? 'Refinado' : ''
+                }})
+              </small>
+              <p>
+                <span> Cantidad: {{ corte.cantidad | number: '1.0' }} </span>
+                <span class="ion-padding-start">
+                  Precio: {{ corte.precio | currency }}
+                </span>
+              </p>
             </ion-label>
+            <ion-chip slot="start" color="primary" class="clave">
+              {{ item.clave }}
+            </ion-chip>
+            <ion-chip slot="end" color="warning">
+              {{ item.corte.precio * item.corte.cantidad | currency }}
+            </ion-chip>
           </ion-item>
         </ion-reorder>
       </ion-reorder-group>
     </ion-list>
   `,
+  styleUrls: ['corte-items-list.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CorteItemsListComponent {
@@ -33,13 +51,7 @@ export class CorteItemsListComponent {
   constructor() {}
 
   doReorder(ev: any) {
-    // The `from` and `to` properties contain the index of the item
-    // when the drag started and ended, respectively
-    console.log('Dragged from index', ev.detail.from, 'to', ev.detail.to);
-
-    // Finish the reorder and position the item in the DOM based on
-    // where the gesture ended. This method can also be called directly
-    // by the reorder group
-    ev.detail.complete(this.partidas);
+    // console.log('Dragged from index', ev.detail.from, 'to', ev.detail.to);
+    // ev.detail.complete(this.partidas);
   }
 }

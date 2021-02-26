@@ -1,10 +1,16 @@
 import { NgModule } from '@angular/core';
 
 import { CommonUiCoreModule } from '@papx/common/ui-core';
-import { FilterVentasButtonComponent } from './filter-ventas/filter-button.component';
+import { WarningsButtonComponent, WarningsComponent } from './buttons';
+import { FilterVentasButtonComponent } from './buttons';
 import { VentasHeaderComponent } from './ventas-header/ventas-header.component';
 
-const COMPONENTS = [VentasHeaderComponent, FilterVentasButtonComponent];
+const COMPONENTS = [
+  VentasHeaderComponent,
+  FilterVentasButtonComponent,
+  WarningsButtonComponent,
+  WarningsComponent,
+];
 
 @NgModule({
   imports: [CommonUiCoreModule],

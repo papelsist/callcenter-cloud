@@ -38,6 +38,7 @@ import { PedidoForm } from '../pedido-form';
 import { ProductoService } from '@papx/shared/productos/data-access';
 
 import * as utils from '../pedido-form.utils';
+import { PedidoWarnings, Warning } from '../validation/pedido-warning';
 
 @Injectable()
 export class PcreateFacade {
@@ -73,6 +74,9 @@ export class PcreateFacade {
     })
   );
 
+  _warnings = new Subject<Warning[]>();
+  warnings$ = this._warnings.asObservable();
+
   productos$ = this.partidas$.pipe(
     map((items) => items.map((item) => item.clave)),
     map((claves) => unique(claves)),
@@ -85,6 +89,8 @@ export class PcreateFacade {
   private _reorderItems = false;
   reorderItems$ = new BehaviorSubject(this._reorderItems);
 
+  private currentPedido: Pedido;
+
   constructor(
     private itemController: ItemController,
     private clienteController: ClienteSelectorController,
@@ -95,6 +101,9 @@ export class PcreateFacade {
 
   setPedido(data: Partial<Pedido>) {
     console.log('Registrando datos iniciales del pedido: ', data);
+    if (data.id) {
+      this.currentPedido = data as Pedido;
+    }
     let value: any = { ...data };
     if (data.sucursal && data.sucursalId) {
       const sucursalEntity = { id: data.sucursalId, nombre: data.sucursal };
@@ -121,6 +130,7 @@ export class PcreateFacade {
         this.controls.cliente.setValue(cte);
         this.form.get('cfdiMail').setValue(cfdiMail, { emitEvent: false });
         this.form.get('nombre').setValue(nombre, { emitEvent: false });
+        this.runWarnings();
       });
   }
 
@@ -329,6 +339,22 @@ export class PcreateFacade {
     if (this.liveClienteSub) {
       console.log('Closing live cliente subscription...');
       this.liveClienteSub.unsubscribe();
+    }
+  }
+
+  runWarnings() {
+    if (this.currentPedido.status === 'COTIZACION') {
+      const errors: Warning[] = [];
+      const { cliente, tipo } = this;
+      const p = this.currentPedido;
+      const items = this._currentPartidas;
+      PedidoWarnings.ValidarClienteActivo(cliente, errors);
+      PedidoWarnings.ValidarCreditoVigente(cliente, tipo, errors);
+      PedidoWarnings.ValidarAtrasoMaximo(cliente, tipo, errors);
+      PedidoWarnings.ValidarCreditoDisponible(cliente, tipo, items, errors);
+      PedidoWarnings.ValidarAutorizacionPorDescuentoEspecial(p, errors);
+      PedidoWarnings.ValidarAutorizacionPorFaltaDeExistencia(p, items, errors);
+      this._warnings.next(errors);
     }
   }
 }

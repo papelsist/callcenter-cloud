@@ -45,7 +45,7 @@
 
 <ion-segment
   (ionChange)="segmentChanged($event)"
-  value="partidas"
+  [value]="segment"
   scrollable="true"
 >
   <ion-segment-button value="partidas" layout="icon-start">
