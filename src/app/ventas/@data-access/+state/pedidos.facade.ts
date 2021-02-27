@@ -41,4 +41,14 @@ export class PedidosFacade {
   async updatePedido(id: string, pedido: Partial<Pedido>, user: User) {
     await this.dataService.updatePedido(id, pedido, user);
   }
+
+  async cerrarPedido(id: string, pedido: Partial<Pedido>, user: User) {
+    pedido.status =
+      pedido.warnings && pedido.warnings.length > 0
+        ? 'POR_AUTORIZAR'
+        : 'COTIZACION';
+
+    pedido.cerrado = new Date().toISOString();
+    await this.updatePedido(id, pedido, user);
+  }
 }

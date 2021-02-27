@@ -11,7 +11,8 @@ import { AngularFireFunctions } from '@angular/fire/functions';
 import { catchError } from 'rxjs/operators';
 
 import firebase from 'firebase/app';
-import { omitBy } from 'lodash-es';
+import omitBy from 'lodash-es/omitBy';
+import { addDays } from 'date-fns';
 
 /**
  * Factory function than creates QueryFn instances specific of the status property
@@ -77,6 +78,7 @@ export class VentasDataService {
       const payload = {
         ...this.cleanPedidoPayload(pedido),
         uid: user.uid,
+        vigencia: addDays(new Date(), 10).toISOString(),
         dateCreated: firebase.firestore.FieldValue.serverTimestamp(),
         createUser: user.displayName,
         appVersion: 2,

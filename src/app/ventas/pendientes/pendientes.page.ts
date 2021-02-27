@@ -6,6 +6,7 @@ import firebase from 'firebase/app';
 import { formatDistanceToNow, parseISO, differenceInHours } from 'date-fns';
 import { es } from 'date-fns/locale';
 import isEmty from 'lodash-es/isEmpty';
+import isString from 'lodash-es/isString';
 
 import { Pedido, User } from '@papx/models';
 import { PendientesController } from './pendientes.controller';
@@ -67,7 +68,7 @@ export class PendientesPage implements OnInit {
     if (pedido.cerrado) {
       const retrasoHoras = differenceInHours(
         new Date(),
-        pedido.cerrado.toDate()
+        parseISO(pedido.cerrado)
       );
       if (retrasoHoras <= 1) {
         return 'success';

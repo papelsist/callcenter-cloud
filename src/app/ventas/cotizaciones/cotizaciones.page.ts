@@ -1,8 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { Pedido } from '@papx/models';
+import { Pedido, User } from '@papx/models';
 
 import { VentasFacade } from '../@data-access/+state/ventas.facade';
+import { VentasController } from '../shared/ventas.controller';
 import { Cotizaciones, CotizacionesFacade } from './cotizaciones-facade';
 
 @Component({
@@ -13,9 +14,15 @@ import { Cotizaciones, CotizacionesFacade } from './cotizaciones-facade';
 })
 export class CotizacionesPage implements OnInit {
   state$ = this.facade.state$;
-  constructor(private facade: CotizacionesFacade, private router: Router) {}
+  constructor(
+    private facade: CotizacionesFacade,
+    private router: Router,
+    private ventasController: VentasController
+  ) {}
 
-  ngOnInit() {}
+  ngOnInit() {
+    this.state$.subscribe((r) => console.log('State: ', r));
+  }
 
   onFilter() {
     this.facade.toggleFilter();
@@ -24,5 +31,9 @@ export class CotizacionesPage implements OnInit {
   onSelection(event: Partial<Pedido>) {
     // console.log('Drill: ', event);
     this.router.navigate(['', 'ventas', 'cotizaciones', event.id]);
+  }
+
+  async onCopiar(event: Pedido, user: User) {
+    await this.ventasController.generarCopiaPedido(event, user);
   }
 }

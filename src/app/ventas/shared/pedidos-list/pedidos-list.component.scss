@@ -1,0 +1,20 @@
+ion-item {
+  // padding-top: 2px;
+  --padding-top: 10px;
+}
+.row {
+  display: grid;
+  // grid-template-columns: repeat(auto-fill, minmax(min(20rem, 100%), 1fr));
+  // grid-template-columns: repeat(auto-fill, minmax(40%, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  align-items: center;
+  font-size: 0.9rem;
+  .nombre {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  span {
+    border: 1px solid blue;
+  }
+}

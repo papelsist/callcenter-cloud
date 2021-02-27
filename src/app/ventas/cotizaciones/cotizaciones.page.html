@@ -9,6 +9,7 @@
     <papx-pedidos-list
       [pedidos]="state.cotizaciones"
       (selection)="onSelection($event)"
+      (copiar)="onCopiar($event, state.usuario)"
     ></papx-pedidos-list>
   </ion-content>
 

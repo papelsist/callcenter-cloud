@@ -60,8 +60,8 @@ export class CotizacionesFacade {
       this.dataService.cotizaciones$,
     ])
       .pipe(
-        map(([user, filterByUser, cotizaciones]) => ({
-          user,
+        map(([usuario, filterByUser, cotizaciones]) => ({
+          usuario,
           filterByUser,
           cotizaciones,
         }))

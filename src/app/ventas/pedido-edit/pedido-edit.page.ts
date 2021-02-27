@@ -23,12 +23,7 @@ export class PedidoEditPage implements OnInit {
   }
 
   async onCerrar(id: string, pedido: Partial<Pedido>, user: User) {
-    pedido.status =
-      pedido.warnings && pedido.warnings.length > 0
-        ? 'POR_AUTORIZAR'
-        : 'COTIZACION';
-    pedido.updateUser = user.displayName; // backward compatibility
-    await this.facade.updatePedido(id, pedido, user);
+    await this.facade.cerrarPedido(id, pedido, user);
     this.router.navigate(['/', 'ventas', 'cotizaciones']);
   }
 

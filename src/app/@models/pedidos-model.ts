@@ -58,10 +58,9 @@ export interface Pedido {
   facturaSerie?: string;
   facturaFolio?: string;
   uuid?: string;
-  validoHasta?: string;
-  createLog?: any;
-  updateLog?: any;
-  cerrado?: firebase.firestore.Timestamp;
+  // createLog?: any;
+  // updateLog?: any;
+  cerrado?: string;
   appVersion?: number;
   vigencia?: string;
   warnings?: Warning[];

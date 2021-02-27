@@ -1,34 +1,64 @@
-<ion-list>
-  <ion-item
-    *ngFor="let pedido of pedidos; index as idx"
-    button
-    (click)="selection.emit(pedido)"
-  >
-    <ion-label class="ion-text-wrap">
-      <h2>
-        {{ pedido.nombre }}
-        <span class="ion-padding-start ion-hide-md-down">
-          F.Pago: {{ pedido.formaDePago }}
-        </span>
-      </h2>
-      <p>
-        <ion-text color="warning">
-          {{ pedido.sucursal }}
-        </ion-text>
+<ion-list class="ion-no-padding">
+  <ion-item-sliding *ngFor="let pedido of pedidos; index as idx">
+    <ion-item button (click)="selection.emit(pedido)">
+      <ion-label class="ion-text-nowrap">
+        <h4>
+          <ion-text color="warning">
+            {{ pedido.sucursal }}
+          </ion-text>
+          <span> FECHA </span>
+          {{ pedido.nombre }}
+          <span class="ion-hide-md-down ion-padding-left">
+            FP: {{ pedido.formaDePago }}
+          </span>
 
-        <span class="ion-padding-start">
-          {{ getDate(pedido.fecha) | date: "dd/MM/yyyy" }}
-        </span>
+          <small> {{ pedido.updateUser }} </small>
+          <!-- <ion-icon
+            name="alert-circle"
+            color="warning"
+            class="ion-hide-md-down"
+          ></ion-icon> -->
+        </h4>
 
-        <sub class="ion-padding-start"> ({{ pedido.updateUser }}) </sub>
-      </p>
-    </ion-label>
+        <p class="ion-hide-md-up">({{ pedido.updateUser }})</p>
+      </ion-label>
 
-    <ion-badge slot="start" color="tertiary">
-      {{ pedido.folio }}
-    </ion-badge>
-    <ion-chip slot="end">
-      {{ pedido.total | currency }}
-    </ion-chip>
-  </ion-item>
+      <ion-badge slot="start" color="tertiary">
+        {{ pedido.folio }}
+      </ion-badge>
+      <ion-chip slot="end">
+        <ion-label>
+          {{ pedido.total | currency }}
+        </ion-label>
+        <ion-icon
+          name="alert-circle"
+          color="warning"
+          *ngIf="pedido.warnings"
+        ></ion-icon>
+        <ion-icon
+          name="checkmark-done"
+          color="success"
+          *ngIf="!pedido.warnings"
+        ></ion-icon>
+      </ion-chip>
+    </ion-item>
+    <ion-item-options side="end">
+      <ion-item-option color="danger">
+        Eliminar
+        <ion-icon name="trash" slot="bottom"></ion-icon>
+      </ion-item-option>
+      <ion-item-option color="medium" (click)="copiar.emit(pedido)">
+        <ion-icon name="copy" slot="bottom"></ion-icon>
+        Copiar
+      </ion-item-option>
+      <ion-item-option color="secondary"
+        >Envío
+        <ion-icon name="airplane" slot="bottom"></ion-icon>
+      </ion-item-option>
+      <ion-item-option color="secondary"
+        >Depósito
+        <ion-icon name="cash" slot="bottom"></ion-icon>
+      </ion-item-option>
+    </ion-item-options>
+  </ion-item-sliding>
 </ion-list>
