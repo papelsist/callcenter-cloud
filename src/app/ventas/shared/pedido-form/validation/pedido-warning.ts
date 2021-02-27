@@ -14,7 +14,7 @@ export class PedidoWarnings {
     cliente: Partial<Cliente>,
     tipo: TipoDePedido,
     items: Partial<PedidoDet>[],
-    p: Pedido
+    p?: Pedido
   ) {
     const warnings = [];
     this.ValidarClienteActivo(cliente, warnings);
@@ -94,14 +94,17 @@ export class PedidoWarnings {
     errors: Warning[]
   ) {
     if (pedido.descuentoEspecial <= 0) return;
-    const existentes = pedido.autorizaciones ?? [];
-    const found = existentes.find((item) => item.tipo === 'DESCUENTO_ESPECIAL');
-    if (!found) {
-      errors.push({
-        error: 'DESCUENTO_ESPECIAL',
-        descripcion: 'DESCUENTO ESPECIAL REQUIERE AUTORIZACION',
-      });
+    if (pedido) {
+      const existentes = pedido.autorizaciones ?? [];
+      const found = existentes.find(
+        (item) => item.tipo === 'DESCUENTO_ESPECIAL'
+      );
+      if (found) return null; // OK ya está autorizado
     }
+    errors.push({
+      error: 'DESCUENTO_ESPECIAL',
+      descripcion: 'DESCUENTO ESPECIAL REQUIERE AUTORIZACION',
+    });
   }
 
   static ValidarAutorizacionPorFaltaDeExistencia(
@@ -116,15 +119,16 @@ export class PedidoWarnings {
       .reduce((prev, curr) => prev + curr);
     if (pendientes <= 0) return;
 
-    const existentes = pedido.autorizaciones ?? [];
-    const found = existentes.find(
-      (item) => item.tipo === 'EXISTENCIA_FALTANTE'
-    );
-    if (!found) {
-      errors.push({
-        error: 'EXISTENCIA_FALTANTE',
-        descripcion: 'FALTA EXISTENCIA REQUIERE AUTORIZACION',
-      });
+    if (pedido) {
+      const existentes = pedido.autorizaciones ?? [];
+      const found = existentes.find(
+        (item) => item.tipo === 'EXISTENCIA_FALTANTE'
+      );
+      if (found) return null;
     }
+    errors.push({
+      error: 'EXISTENCIA_FALTANTE',
+      descripcion: 'FALTA EXISTENCIA REQUIERE AUTORIZACION',
+    });
   }
 }

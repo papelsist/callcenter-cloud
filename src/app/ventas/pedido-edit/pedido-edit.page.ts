@@ -17,7 +17,6 @@ export class PedidoEditPage implements OnInit {
   ngOnInit() {}
 
   async onSave(id: string, pedido: Partial<Pedido>, user: User) {
-    pedido.updateUser = user.displayName; // backward compatibility
     pedido.status = 'COTIZACION';
     await this.facade.updatePedido(id, pedido, user);
     this.router.navigate(['/', 'ventas', 'cotizaciones']);

@@ -351,7 +351,9 @@ export class PcreateFacade {
     const p = this.currentPedido;
     const items = this._currentPartidas;
     const warnings = PedidoWarnings.runWarnings(cliente, tipo, items, p);
-    this.currentPedido.warnings = warnings;
+    if (this.currentPedido) {
+      this.currentPedido.warnings = warnings;
+    }
     this._warnings.next(warnings);
   }
 }

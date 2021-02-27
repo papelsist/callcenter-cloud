@@ -51,6 +51,7 @@ export interface Pedido {
   lastUpdated?: firebase.firestore.Timestamp;
   createUser?: string;
   updateUser?: string;
+  updateUserId?: string;
   autorizacion?: PedidoAutorizacion;
   autorizaciones?: Autorizacion[];
   autorizacionesRequeridas?: string;
@@ -173,12 +174,13 @@ export interface InstruccionDeEnvio {
 // }
 
 export interface PedidoAutorizacion {
-  sucursal: string;
-  tags: string;
   comentario?: string;
   solicita: string;
   autoriza: string;
+  uid: string;
   dateCreated: string;
+  sucursal?: string;
+  tags?: string;
 }
 
 export class PedidoLog {

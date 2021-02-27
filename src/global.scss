@@ -43,3 +43,17 @@
 .warnings-popover-component {
   --width: 80%;
 }
+
+.autorizacion-de-pedido-alert .alert-wrapper {
+  --width: 70%;
+  --max-width: 70%;
+  .alert-message {
+    padding-bottom: 5px;
+  }
+  .alert-input-group {
+    padding: 10px;
+  }
+}
+.autorizacion-de-pedido-alert .alert-head {
+  padding: 10px;
+}

@@ -5,8 +5,11 @@ import firebase from 'firebase/app';
 
 import { formatDistanceToNow, parseISO, differenceInHours } from 'date-fns';
 import { es } from 'date-fns/locale';
+import isEmty from 'lodash-es/isEmpty';
 
-import { Pedido } from '@papx/models';
+import { Pedido, User } from '@papx/models';
+import { PendientesController } from './pendientes.controller';
+import { AuthService } from '@papx/auth';
 
 @Component({
   selector: 'app-pendientes',
@@ -14,8 +17,14 @@ import { Pedido } from '@papx/models';
   styleUrls: ['./pendientes.page.scss'],
 })
 export class PendientesPage implements OnInit {
-  pedidos$ = this.service.facturas$;
-  constructor(private service: VentasDataService) {}
+  pedidos$ = this.service.pendientes$;
+  user$ = this.auth.user$;
+
+  constructor(
+    private service: VentasDataService,
+    private auth: AuthService,
+    private controller: PendientesController
+  ) {}
 
   ngOnInit() {}
 
@@ -68,5 +77,34 @@ export class PendientesPage implements OnInit {
         return 'danger';
       }
     } else return '';
+  }
+
+  async autorizar(pedido: Pedido, user: User) {
+    const { autorizar, comentario } = await this.controller.autorizar(pedido);
+
+    if (autorizar && !isEmty(comentario)) {
+      await this.controller.starLoading();
+      try {
+        await this.service.autorizarPedido(pedido, comentario, user);
+        await this.controller.stopLoading();
+      } catch (error) {
+        await this.controller.stopLoading();
+        this.controller.handelError(error);
+      }
+    }
+  }
+
+  async regresar(pedido: Pedido, user: User) {
+    const res = await this.controller.regresar(pedido);
+    if (res) {
+      await this.controller.starLoading();
+      try {
+        await this.service.regresarPedido(pedido.id, user);
+        await this.controller.stopLoading();
+      } catch (error) {
+        await this.controller.stopLoading();
+        this.controller.handelError(error);
+      }
+    }
   }
 }

@@ -5,7 +5,7 @@ import {
   QueryFn,
 } from '@angular/fire/firestore';
 
-import { Pedido, Status, User } from '@papx/models';
+import { Pedido, PedidoDet, Status, User } from '@papx/models';
 import { Observable, throwError } from 'rxjs';
 import { AngularFireFunctions } from '@angular/fire/functions';
 import { catchError } from 'rxjs/operators';
@@ -34,7 +34,7 @@ export class VentasDataService {
   PEDIDOS_COLLECTION = 'pedidos';
   readonly cotizaciones$ = this.fetchVentas('COTIZACION');
   readonly porautorizar$ = this.fetchVentas('POR_AUTORIZAR');
-  readonly pendientes$ = this.fetchVentas('PENDIENTE');
+  readonly pendientes$ = this.fetchPendientes();
   readonly facturas$ = this.fetchVentas('FACTURADO_TIMBRADO');
 
   constructor(
@@ -50,6 +50,17 @@ export class VentasDataService {
   private getPedidos(qf: QueryFn) {
     return this.afs
       .collection<Pedido>(this.PEDIDOS_COLLECTION, qf)
+      .valueChanges({ idField: 'id' });
+  }
+
+  private fetchPendientes() {
+    return this.afs
+      .collection<Pedido>('pedidos', (ref) =>
+        ref
+          .where('status', 'in', ['POR_AUTORIZAR'])
+          .orderBy('folio', 'desc')
+          .limit(20)
+      )
       .valueChanges({ idField: 'id' });
   }
 
@@ -76,19 +87,27 @@ export class VentasDataService {
 
       const pedidoRef = this.afs.collection(this.PEDIDOS_COLLECTION).doc().ref;
 
+      // Stats Data
+      const statsRef = this.afs
+        .collection(this.PEDIDOS_COLLECTION)
+        .doc('--stats--').ref;
+
       return this.afs.firestore.runTransaction(async (transaction) => {
         const folioDoc = await transaction.get<any>(folioRef);
-        if (!folioDoc.exists) {
-          throw 'No existe folios configurados  para CALLCENTER';
-        }
-        const pedidosFolios = folioDoc.data();
+        const pedidosFolios = folioDoc.data() || { CALLCENTER: 0 };
         if (!pedidosFolios.CALLCENTER) {
           pedidosFolios.CALLCENTER = 0; // Init value
         }
         folio = pedidosFolios.CALLCENTER + 1;
+
         transaction
-          .update(folioRef, { CALLCENTER: folio })
-          .set(pedidoRef, { ...payload, folio });
+          .set(folioRef, { CALLCENTER: folio }, { merge: true })
+          .set(pedidoRef, { ...payload, folio })
+          .set(
+            statsRef,
+            { count: firebase.firestore.FieldValue.increment(1) },
+            { merge: true }
+          );
         return folio;
       });
     } catch (error: any) {
@@ -97,12 +116,13 @@ export class VentasDataService {
     }
   }
 
-  async updatePedido(id: string, pedido: Object, user: User) {
+  async updatePedido(id: string, data: Object, user: User) {
     try {
       const payload = {
-        ...this.cleanPedidoPayload(pedido),
-        appVersion: 2,
+        ...this.cleanPedidoPayload(data),
         version: firebase.firestore.FieldValue.increment(1),
+        updateUser: user.displayName,
+        updateUserId: user.uid,
         lastUpdated: firebase.firestore.FieldValue.serverTimestamp(),
       };
       await this.afs
@@ -113,6 +133,29 @@ export class VentasDataService {
       console.error('Error actualizando: ', error);
       throw new Error('Error actualizando pedido: ' + error.message);
     }
+  }
+
+  async regresarPedido(id: string, user: User) {
+    const data: Partial<Pedido> = { status: 'COTIZACION' };
+    return this.updatePedido(id, data, user);
+  }
+
+  async autorizarPedido(pedido: Pedido, comentario: string, user: User) {
+    const aut = {
+      comentario,
+      solicita: pedido.updateUser,
+      autoriza: user.displayName,
+      uid: user.uid,
+      dateCreated: new Date().toISOString(),
+      sucursal: pedido.sucursal,
+      tags: 'CALLCENTER, VENTAS',
+    };
+
+    const data: Partial<Pedido> = {
+      status: 'CERRADO',
+      autorizacion: aut,
+    };
+    return this.updatePedido(pedido.id, data, user);
   }
 
   cleanPedidoPayload(data: Object) {

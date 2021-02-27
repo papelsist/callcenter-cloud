@@ -6,32 +6,45 @@
 
 <ion-content>
   <ion-list *ngIf="pedidos$ | async as pedidos">
-    <ion-item *ngFor="let pedido of pedidos; index as idx">
-      <ion-label class="ion-text-wrap">
-        <div class="main-row">
-          <h2>{{ pedido.nombre }}</h2>
-          <!-- <span class="danger"
-            >{{getDate(pedido.lastUpdated) | date: 'dd/MM/yyyy: HHmm '}}</span
-          > -->
-          <ion-text [color]="getRetrasoColor(pedido)">
-            <span> {{fromNow(pedido.lastUpdated)}} </span>
-          </ion-text>
-        </div>
-        <p>
-          <ion-text color="warning"> {{ pedido.sucursal }} </ion-text>
+    <ion-item-sliding *ngFor="let pedido of pedidos; index as idx">
+      <ion-item button [routerLink]="[pedido.id]">
+        <ion-label class="ion-text-wrap ion-no-padding">
+          <h5>{{ pedido.nombre }}</h5>
+          <p>
+            <ion-text color="warning">
+              <span>{{ pedido.sucursal }} </span>
+            </ion-text>
+            <span class="ion-padding-start">{{pedido.status}}</span>
+            <ion-text [color]="getRetrasoColor(pedido)">
+              <span class="ion-padding-start">
+                {{fromNow(pedido.lastUpdated)}}
+              </span>
+            </ion-text>
+            <span class="ion-padding-start"> ({{ pedido.updateUser }}) </span>
+          </p>
+          <div></div>
+        </ion-label>
 
-          <span class="ion-padding-start">
-            {{ getDate(pedido.fecha) | date: "dd/MM/yyyy" }}
-          </span>
+        <ion-badge slot="start" color="warning"> {{ pedido.folio }} </ion-badge>
+        <ion-chip slot="end" color="primary">
+          {{ pedido.total | currency }}
+        </ion-chip>
+      </ion-item>
 
-          <sub class="ion-padding-start"> ({{ pedido.updateUser }}) </sub>
-        </p>
-      </ion-label>
-
-      <ion-badge slot="start" color="warning"> {{ pedido.folio }} </ion-badge>
-      <ion-chip slot="end" color="primary">
-        {{ pedido.total | currency }}
-      </ion-chip>
-    </ion-item>
+      <ion-item-options side="end" *ngIf="user$ | async as user">
+        <ion-item-option (click)="regresar(pedido, user)">
+          <ion-icon slot="start" name="arrow-undo"></ion-icon>
+          Regresar
+        </ion-item-option>
+        <ion-item-option
+          (click)="autorizar(pedido, user)"
+          color="success"
+          *ngIf="pedido.warnings"
+        >
+          <ion-icon slot="start" name="thumbs-up-outline"></ion-icon>
+          Autorizar
+        </ion-item-option>
+      </ion-item-options>
+    </ion-item-sliding>
   </ion-list>
 </ion-content>
