@@ -1,4 +1,4 @@
-import { Pedido, PedidoDet } from '@papx/models';
+import { Cliente, Pedido, PedidoDet } from '@papx/models';
 
 export function copiarPedido(source: Pedido): Pedido {
   const {
@@ -69,4 +69,14 @@ export function clonePartidas(partidas: Partial<PedidoDet>[]) {
     } = item;
     return res;
   });
+}
+
+export function getClienteMostrador(): Partial<Cliente> {
+  return {
+    id: '402880fc5e4ec411015e4ecc5dfc0554',
+    rfc: 'XAXX010101000',
+    nombre: 'MOSTRADOR',
+    permiteCheque: false,
+    activo: true,
+  };
 }

@@ -6,7 +6,13 @@ import {
 } from '@angular/core';
 import { AbstractControl, FormGroup, ValidationErrors } from '@angular/forms';
 
-import { takeUntil, map } from 'rxjs/operators';
+import {
+  takeUntil,
+  map,
+  distinctUntilChanged,
+  filter,
+  tap,
+} from 'rxjs/operators';
 import { Observable } from 'rxjs';
 
 import capitalize from 'lodash-es/capitalize';
@@ -14,7 +20,7 @@ import words from 'lodash-es/words';
 import { differenceInHours } from 'date-fns';
 
 import { BaseComponent } from '@papx/core';
-import { ClienteDireccion } from '@papx/models';
+import { Cliente, ClienteDireccion, buildDireccionKey } from '@papx/models';
 
 const hourToDate = (value: string): Date => {
   const [hours, minutes] = value.split(':').map((item) => parseFloat(item));
@@ -32,149 +38,26 @@ const HorarioValidator = (
   const horario = control.value;
   const horaInicial = hourToDate(horario.horaInicial);
   const horaFinal = hourToDate(horario.horaFinal);
-  const diff = differenceInHours(horaInicial, horaFinal);
+  const diff = differenceInHours(horaFinal, horaInicial);
   return diff < 1 ? { tooEarly: true } : null;
+};
+
+const findDirecciones = (cliente: Partial<Cliente>): ClienteDireccion[] => {
+  if (cliente.direcciones) return cliente.direcciones;
+  else {
+    return [
+      {
+        direccion: cliente.direccion,
+        nombre: buildDireccionKey(cliente.direccion),
+      },
+    ];
+  }
 };
 
 @Component({
   selector: 'papx-envio-form',
-  template: `
-    <ion-grid>
-      <ion-row class="ion-align-items-stretch">
-        <ion-col size="12" size-sm="4" push-sm="8">
-          <ion-item>
-            <ion-label position="stacked"> Habilitar</ion-label>
-            <ion-toggle (ionChange)="setEnvio($event)"></ion-toggle>
-          </ion-item>
-        </ion-col>
-        <ion-col size="12" size-sm="8" pull-sm="4">
-          <sxcc-envio-tipo [parent]="form" class="tipo"></sxcc-envio-tipo>
-        </ion-col>
-      </ion-row>
-      <ion-row>
-        <ion-col>
-          <papx-transporte-field [parent]="form"></papx-transporte-field>
-        </ion-col>
-      </ion-row>
-
-      <ion-row>
-        <ion-col [formGroup]="form">
-          <sxcc-envio-direccion
-            formControlName="direccion"
-            [direcciones]="direcciones$ | async"
-          ></sxcc-envio-direccion>
-        </ion-col>
-      </ion-row>
-      <ion-row [formGroup]="form">
-        <ion-col size="12" size-md="6">
-          <ion-item [disabled]="form.get('contacto').disabled">
-            <ion-icon name="person-circle" slot="start" color="dark"></ion-icon>
-
-            <ion-label position="floating">Contacto *</ion-label>
-            <ion-input
-              formControlName="contacto"
-              class="ion-text-capitalize"
-              autocapitalize="on"
-            ></ion-input>
-          </ion-item>
-          <ion-note
-            color="danger"
-            *ngIf="controls.contacto.hasError('required') && form.dirty"
-          >
-            Se requiere el nombre del contacto
-          </ion-note>
-          <ion-note
-            class="ion-padding-start ion-padding-top"
-            *ngIf="controls.contacto.hasError('minlength')"
-          >
-            Mínimo 5 caracteres
-          </ion-note>
-          <ion-note
-            class="ion-padding-start ion-padding-top"
-            *ngIf="controls.contacto.hasError('maxlength')"
-          >
-            Máximo 50 caracteres
-          </ion-note>
-        </ion-col>
-        <ion-col size="12" size-md="6">
-          <ion-item [disabled]="controls.telefono.disabled">
-            <ion-icon name="call" color="dark" slot="start"></ion-icon>
-            <ion-label position="floating">Teléfono</ion-label>
-            <ion-input
-              type="tel"
-              formControlName="telefono"
-              inputmode="tel"
-            ></ion-input>
-            <ion-icon
-              name="checkmark"
-              color="success"
-              slot="end"
-              *ngIf="controls.telefono.valid && form.dirty"
-            ></ion-icon>
-          </ion-item>
-          <ion-note
-            class="ion-padding-start"
-            color="danger"
-            *ngIf="
-              (controls.telefono.hasError('minlength') ||
-                controls.telefono.hasError('maxlength') ||
-                controls.telefono.hasError('required')) &&
-              form.dirty
-            "
-          >
-            Se requiere número a 10 digitos
-          </ion-note>
-        </ion-col>
-      </ion-row>
-
-      <ion-row [formGroup]="form">
-        <ion-col size="12" size-md="6">
-          <papx-date-field
-            formControlName="fechaDeEntrega"
-            label="Entrega"
-          ></papx-date-field>
-        </ion-col>
-        <ion-col>
-          <sxcc-envio-horario-field
-            formControlName="horario"
-          ></sxcc-envio-horario-field>
-          <ion-note
-            color="danger"
-            class="ion-padding-start ion-padding-top"
-            *ngIf="controls.horario.hasError('tooEarly')"
-          >
-            Debe haber al menos 1 hora de intervalo
-          </ion-note>
-        </ion-col>
-      </ion-row>
-
-      <ion-row [formGroup]="form">
-        <ion-col>
-          <ion-item>
-            <ion-label position="floating">Comentario </ion-label>
-            <ion-textarea
-              formControlName="comentario"
-              class="ion-text-capitalize"
-            ></ion-textarea>
-          </ion-item>
-        </ion-col>
-      </ion-row>
-    </ion-grid>
-  `,
-  styles: [
-    `
-      .tipo-panel {
-        display: flex;
-        .tipo {
-          flex: 1;
-        }
-      }
-      .tipo {
-        width: 100%;
-        flex: 1;
-      }
-    `,
-  ],
+  templateUrl: 'envio.component.html',
+  styleUrls: ['envio.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class EnvioComponent extends BaseComponent implements OnInit {
@@ -184,6 +67,7 @@ export class EnvioComponent extends BaseComponent implements OnInit {
   controls: { [key: string]: AbstractControl };
 
   direcciones$: Observable<ClienteDireccion[]>;
+  direcciones: ClienteDireccion[] = [];
 
   constructor() {
     super();
@@ -195,6 +79,10 @@ export class EnvioComponent extends BaseComponent implements OnInit {
     this.setupHorarioControl();
     this.registerContactoListener();
     this.registerTipoListener();
+    // this.registerClienteListener();
+    this.direcciones$ = this.parent
+      .get('cliente')
+      .valueChanges.pipe(map((cte) => findDirecciones(cte)));
   }
 
   private initForm() {
@@ -244,8 +132,25 @@ export class EnvioComponent extends BaseComponent implements OnInit {
       );
   }
 
+  // private registerClienteListener() {
+  //   this.parent
+  //     .get('cliente')
+  //     .valueChanges.pipe(distinctUntilChanged(), takeUntil(this.destroy$))
+  //     .subscribe((cte: Cliente) => {
+  //       if (cte) {
+  //         console.log('Cliente detecado2: ', cte.nombre);
+  //         console.log('Direcciones: ', cte.direcciones);
+  //         if (!cte.direcciones) {
+  //           this.direcciones = findDirecciones(cte);
+  //           console.log('Direcciones found: ', this.direcciones);
+  //         }
+  //       }
+  //     });
+  // }
+
   setEnvio({ detail: { checked } }: any) {
     checked ? this.form.enable() : this.form.disable();
+    this.parent.valueChanges.subscribe((v) => console.log('Form value:', v));
   }
 
   get tipo(): AbstractControl {
@@ -256,5 +161,8 @@ export class EnvioComponent extends BaseComponent implements OnInit {
   }
   get contacto(): AbstractControl {
     return this.controls.contacto;
+  }
+  get cliente(): Partial<Cliente> {
+    return this.parent.get('cliente').value;
   }
 }

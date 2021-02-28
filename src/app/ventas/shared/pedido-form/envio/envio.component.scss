@@ -1,0 +1,10 @@
+.tipo-panel {
+  display: flex;
+  .tipo {
+    flex: 1;
+  }
+}
+.tipo {
+  width: 100%;
+  flex: 1;
+}

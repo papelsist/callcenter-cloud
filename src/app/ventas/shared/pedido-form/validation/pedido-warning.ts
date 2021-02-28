@@ -21,8 +21,10 @@ export class PedidoWarnings {
     this.ValidarCreditoVigente(cliente, tipo, warnings);
     this.ValidarAtrasoMaximo(cliente, tipo, warnings);
     this.ValidarCreditoDisponible(cliente, tipo, items, warnings);
-    this.ValidarAutorizacionPorDescuentoEspecial(p, warnings);
-    this.ValidarAutorizacionPorFaltaDeExistencia(p, items, warnings);
+    if (p) {
+      this.ValidarAutorizacionPorDescuentoEspecial(p, warnings);
+      this.ValidarAutorizacionPorFaltaDeExistencia(p, items, warnings);
+    }
     return warnings;
   }
   static ValidarClienteActivo(cliente: Partial<Cliente>, errors: Warning[]) {
@@ -93,7 +95,8 @@ export class PedidoWarnings {
     pedido: Partial<Pedido>,
     errors: Warning[]
   ) {
-    if (pedido.descuentoEspecial <= 0) return;
+    if (!pedido.descuentoEspecial || pedido.descuentoEspecial <= 0) return null;
+
     if (pedido) {
       const existentes = pedido.autorizaciones ?? [];
       const found = existentes.find(

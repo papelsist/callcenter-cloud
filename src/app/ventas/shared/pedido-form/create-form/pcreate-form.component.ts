@@ -17,7 +17,7 @@ import {
 import { merge, Observable } from 'rxjs';
 
 import { BaseComponent } from '@papx/core';
-import { Cliente, Pedido, TipoDePedido } from '@papx/models';
+import { Cliente, FormaDePago, Pedido, TipoDePedido } from '@papx/models';
 import { PcreateFacade } from './pcreate.facade';
 
 @Component({
@@ -39,8 +39,8 @@ export class PedidoCreateFormComponent extends BaseComponent implements OnInit {
   cortes$ = this.facade.cortes$;
   summary$ = this.facade.summary$;
   cliente$: Observable<any>;
-  // segment = 'partidas';
-  segment = 'cortes';
+  segment = 'partidas';
+
   errors$ = this.facade.errors$;
   hasErrors$ = this.facade.errors$.pipe(map((errors) => errors.length > 0));
 
@@ -187,6 +187,10 @@ export class PedidoCreateFormComponent extends BaseComponent implements OnInit {
     if (cliente.credito) {
       if (this.facade.tipo !== TipoDePedido.CREDITO) {
         this.controls.tipo.setValue(TipoDePedido.CREDITO, {
+          emitEvent: false,
+          onlySelf: true,
+        });
+        this.controls.formaDePago.setValue(FormaDePago.NO_DEFINIDO, {
           emitEvent: false,
           onlySelf: true,
         });
