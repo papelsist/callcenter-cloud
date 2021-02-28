@@ -145,12 +145,13 @@ export class VentasDataService {
   async autorizarPedido(pedido: Pedido, comentario: string, user: User) {
     const aut = {
       comentario,
+      fecha: new Date().toISOString(),
       solicita: pedido.updateUser,
       autoriza: user.displayName,
       uid: user.uid,
-      dateCreated: new Date().toISOString(),
       sucursal: pedido.sucursal,
       tags: 'CALLCENTER, VENTAS',
+      dateCreated: new Date().toISOString(),
     };
 
     const data: Partial<Pedido> = {

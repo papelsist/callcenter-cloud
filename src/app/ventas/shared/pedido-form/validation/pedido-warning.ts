@@ -13,18 +13,17 @@ export class PedidoWarnings {
   static runWarnings(
     cliente: Partial<Cliente>,
     tipo: TipoDePedido,
-    items: Partial<PedidoDet>[],
-    p?: Pedido
+    descuentoEspecial = 0,
+    items: Partial<PedidoDet>[]
   ) {
     const warnings = [];
     this.ValidarClienteActivo(cliente, warnings);
     this.ValidarCreditoVigente(cliente, tipo, warnings);
     this.ValidarAtrasoMaximo(cliente, tipo, warnings);
     this.ValidarCreditoDisponible(cliente, tipo, items, warnings);
-    if (p) {
-      this.ValidarAutorizacionPorDescuentoEspecial(p, warnings);
-      this.ValidarAutorizacionPorFaltaDeExistencia(p, items, warnings);
-    }
+    this.ValidarAutorizacionPorDescuentoEspecial(descuentoEspecial, warnings);
+    this.ValidarAutorizacionPorFaltaDeExistencia(items, warnings);
+
     return warnings;
   }
   static ValidarClienteActivo(cliente: Partial<Cliente>, errors: Warning[]) {
@@ -92,18 +91,10 @@ export class PedidoWarnings {
   }
 
   static ValidarAutorizacionPorDescuentoEspecial(
-    pedido: Partial<Pedido>,
+    descuentoEspecial = 0,
     errors: Warning[]
   ) {
-    if (!pedido.descuentoEspecial || pedido.descuentoEspecial <= 0) return null;
-
-    if (pedido) {
-      const existentes = pedido.autorizaciones ?? [];
-      const found = existentes.find(
-        (item) => item.tipo === 'DESCUENTO_ESPECIAL'
-      );
-      if (found) return null; // OK ya está autorizado
-    }
+    if (!descuentoEspecial || descuentoEspecial <= 0) return null;
     errors.push({
       error: 'DESCUENTO_ESPECIAL',
       descripcion: 'DESCUENTO ESPECIAL REQUIERE AUTORIZACION',
@@ -111,24 +102,15 @@ export class PedidoWarnings {
   }
 
   static ValidarAutorizacionPorFaltaDeExistencia(
-    pedido: Partial<Pedido>,
     partidas: Partial<PedidoDet>[],
     errors: Warning[]
   ) {
     if (partidas.length <= 0) return;
-
     const pendientes = partidas
       .map((item) => (item.faltante ? item.faltante : 0))
       .reduce((prev, curr) => prev + curr);
     if (pendientes <= 0) return;
 
-    if (pedido) {
-      const existentes = pedido.autorizaciones ?? [];
-      const found = existentes.find(
-        (item) => item.tipo === 'EXISTENCIA_FALTANTE'
-      );
-      if (found) return null;
-    }
     errors.push({
       error: 'EXISTENCIA_FALTANTE',
       descripcion: 'FALTA EXISTENCIA REQUIERE AUTORIZACION',

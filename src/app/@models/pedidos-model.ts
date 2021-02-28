@@ -3,7 +3,6 @@ import { Direccion } from './direccion';
 import { FormaDePago } from './formaDePago';
 import { Producto } from './producto';
 import { Transporte } from './transporte';
-import { Autorizacion } from './autorizacion';
 
 import firebase from 'firebase/app';
 
@@ -45,25 +44,26 @@ export interface Pedido {
   sinExistencia?: boolean;
   chequePostFechado?: boolean;
   status: Status;
+  factura?: Factura;
+  autorizacion?: PedidoAutorizacion;
+  autorizacionesRequeridas?: string;
+  cerrado?: string;
+  appVersion?: number;
+  vigencia?: string;
+  warnings?: Warning[];
+  envioPorCorreo?: boolean;
+  solicitarConfirmacion?: boolean;
+  confirmacion?: {
+    emailDestino: string;
+    telefono: string;
+    confirmacionLink?: string;
+  };
   // Log
-  inicio?: string;
   dateCreated?: firebase.firestore.Timestamp;
   lastUpdated?: firebase.firestore.Timestamp;
   createUser?: string;
   updateUser?: string;
   updateUserId?: string;
-  autorizacion?: PedidoAutorizacion;
-  autorizaciones?: Autorizacion[];
-  autorizacionesRequeridas?: string;
-  facturaSerie?: string;
-  facturaFolio?: string;
-  uuid?: string;
-  // createLog?: any;
-  // updateLog?: any;
-  cerrado?: string;
-  appVersion?: number;
-  vigencia?: string;
-  warnings?: Warning[];
 }
 
 export interface PedidoDet {
@@ -140,19 +140,6 @@ export type Status =
   | 'FACTURADO'
   | 'FACTURADO_TIMBRADO';
 
-// export enum FormaDePago {
-//   EFECTIVO = 'EFECTIVO',
-//   TRANSFERENCIA = 'TRANSFERENCIA',
-//   DEPOSITO_EFECTIVO = 'DEPOSITO_EFECTIVO',
-//   DEPOSITO_CHEQUE = 'DEPOSITO_CHEQUE',
-//   DEPOSITO_MIXTO = 'DEPOSITO_MIXTO',
-//   TARJETA_CRE = 'TARJETA_CREDITO',
-//   TARJETA_DEB = 'TARJETA_DEBITO',
-//   CHEQUE = 'CHEQUE',
-//   CHEQUE_PSTF = 'CHEQUE_PSTF',
-//   NO_DEFINIDO = 'NO_DEFINIDO',
-// }
-
 export interface InstruccionDeEnvio {
   tipo: 'ENVIO' | 'FORANEO' | 'OCURRE' | 'ENVIO_CARGO';
   direccion: Direccion;
@@ -165,21 +152,15 @@ export interface InstruccionDeEnvio {
   sucursal?: string;
 }
 
-// export enum TipoDeEnvio {
-//   Envio = 'ENVIO',
-//   Foraneo = 'FORANEO',
-//   Ocurre = 'OCURRE',
-//   EnvioCarto = 'ENVIO_CARGO'
-// }
-
 export interface PedidoAutorizacion {
-  comentario?: string;
   solicita: string;
   autoriza: string;
   uid: string;
-  dateCreated: string;
+  fecha: string;
   sucursal?: string;
   tags?: string;
+  comentario?: string;
+  dateCreated: string;
 }
 
 export class PedidoLog {
@@ -206,17 +187,19 @@ export class PedidoLog {
   //Atención en sucursal
   atiende?: string;
   facturable?: string;
-  facturacion?: FacturacionLog;
+  facturacion?: Factura;
 
   // Embarque
   embarqueLog?: EmbarqueLog;
 }
 
-export interface FacturacionLog {
+export interface Factura {
   serie: string;
   folio: string;
-
+  uuid: string;
   creado: string;
+  createUser: string;
+  updateUser: string;
   cancelado?: string;
   canceladoComentario?: string;
 }
@@ -272,16 +255,7 @@ export interface PedidoItemParams {
   descuento: number;
   descuentoEspecial?: number;
 }
-/*
-export interface PedidoItemParams {
-  tipo: TipoDePedido;
-  formaDePago: FormaDePago;
-  clienteCredito?: ClienteCredito; // Cuando hay descuento fijo
-  descuento: number;
-  descuentoEspecial?: number;
-  sucursal?: string;
-}
-*/
+
 export interface Warning {
   error: string;
   descripcion: string;

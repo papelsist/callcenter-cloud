@@ -8,7 +8,6 @@ export interface Cliente {
   rfc: string;
   formaDePago?: string | number | FormaDePago;
   cfdiMail?: string;
-  email?: string;
   credito?: ClienteCredito;
   permiteCheque: boolean;
   folioRFC: number;
@@ -16,12 +15,13 @@ export interface Cliente {
   activo: boolean;
   juridico: boolean;
   medios?: Partial<MedioDeContacto[]>;
+  contactos?: ClienteContactos[];
   direccion: Direccion;
   direcciones?: ClienteDireccion[];
-  direccionesEntrega?: ClienteDireccion[];
   dateCreated?: string;
   lastUpdated?: string;
   telefonos?: string[];
+  correos?: [];
   createUser?: string;
   updateUser?: string;
   socios?: Partial<Socio>[];
@@ -63,6 +63,14 @@ export interface ClienteDireccion {
   horario?: { horaInicial: '08:00'; horaFinal: '19:00' };
   cliente?: Partial<Cliente>;
   notificacion?: 'email' | 'sms';
+}
+export interface ClienteContactos {
+  id: string;
+  nombre: string;
+  email?: string;
+  cel?: string;
+  cargo: string;
+  clienteId: string;
 }
 
 export interface MedioDeContacto {

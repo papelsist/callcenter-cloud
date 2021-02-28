@@ -1,22 +1,12 @@
 import { Injectable } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 
-import {
-  BehaviorSubject,
-  combineLatest,
-  Observable,
-  Subject,
-  Subscription,
-} from 'rxjs';
+import { BehaviorSubject, Observable, Subject, Subscription } from 'rxjs';
 import {
   distinctUntilChanged,
   map,
-  skip,
   startWith,
-  switchMap,
-  take,
   takeUntil,
-  tap,
 } from 'rxjs/operators';
 
 import unique from 'lodash-es/uniq';
@@ -40,6 +30,7 @@ import { ProductoService } from '@papx/shared/productos/data-access';
 
 import * as utils from '../pedido-form.utils';
 import { PedidoWarnings } from '../validation/pedido-warning';
+import { AutorizacionesDePedido } from 'src/app/ventas/utils/autorizaciones-utils';
 
 @Injectable()
 export class PcreateFacade {
@@ -77,6 +68,9 @@ export class PcreateFacade {
 
   private _warnings = new Subject<Warning[]>();
   warnings$ = this._warnings.asObservable();
+
+  private _autorizaciones = null;
+  autorizaciones$ = new Subject<string>();
 
   productos$ = this.partidas$.pipe(
     map((items) => items.map((item) => item.clave)),
@@ -122,6 +116,7 @@ export class PcreateFacade {
       // this.setPartidas(data.partidas);
       this.registrarLiveCliente(data.cliente.id);
     }
+    this.updateAutorizaciones();
   }
 
   registrarLiveCliente(id: string) {
@@ -287,6 +282,7 @@ export class PcreateFacade {
       ...rest,
       cliente: utils.reduceCliente(this.cliente),
       partidas: [...this._currentPartidas],
+      autorizacionesRequeridas: this._autorizaciones,
     };
     if (this.currentPedido && this.currentPedido.warnings) {
       res.warnings = [...this.currentPedido.warnings];
@@ -350,10 +346,24 @@ export class PcreateFacade {
     const { cliente, tipo } = this;
     const p = this.currentPedido;
     const items = this._currentPartidas;
-    const warnings = PedidoWarnings.runWarnings(cliente, tipo, items, p);
+    const descuentoEspecial = this.descuentoEspecial ?? 0.0;
+    const warnings = PedidoWarnings.runWarnings(
+      cliente,
+      tipo,
+      descuentoEspecial,
+      items
+    );
     if (this.currentPedido) {
       this.currentPedido.warnings = warnings;
     }
     this._warnings.next(warnings);
+  }
+
+  updateAutorizaciones() {
+    this._autorizaciones = null;
+    const items = this._currentPartidas;
+    const descuentoEspecial = this.descuentoEspecial ?? 0.0;
+    const aut = AutorizacionesDePedido.Requeridas(items, descuentoEspecial);
+    this.autorizaciones$.next(aut);
   }
 }
