@@ -42,6 +42,13 @@ const routes2: Routes = [
         // ...canActivate(verified),
       },
       {
+        path: 'clientes',
+        loadChildren: () =>
+          import('./clientes/feature-shell.module').then(
+            (m) => m.ClientesFeatureShellModule
+          ),
+      },
+      {
         path: '',
         redirectTo: 'home',
         pathMatch: 'full',
