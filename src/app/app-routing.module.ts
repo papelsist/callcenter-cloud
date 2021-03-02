@@ -56,6 +56,13 @@ const routes2: Routes = [
           ),
       },
       {
+        path: 'promociones',
+        loadChildren: () =>
+          import('./promociones/promociones.module').then(
+            (m) => m.PromocionesPageModule
+          ),
+      },
+      {
         path: '',
         redirectTo: 'home',
         pathMatch: 'full',
