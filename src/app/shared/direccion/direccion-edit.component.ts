@@ -1,5 +1,6 @@
 import {
   ChangeDetectionStrategy,
+  ChangeDetectorRef,
   Component,
   Input,
   OnInit,
@@ -11,8 +12,10 @@ import {
   Validators,
 } from '@angular/forms';
 import { ModalController } from '@ionic/angular';
+import { BaseComponent } from '@papx/core';
 import { Direccion } from '@papx/models';
 import { BehaviorSubject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { CodigoPostalService } from './codigo-postal.service';
 
 @Component({
@@ -140,7 +143,7 @@ import { CodigoPostalService } from './codigo-postal.service';
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class DireccionEditComponent implements OnInit {
+export class DireccionEditComponent extends BaseComponent implements OnInit {
   @Input() direccion: Direccion;
   @Input() title = 'Dirección';
   form: FormGroup;
@@ -150,12 +153,14 @@ export class DireccionEditComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private modalCtrl: ModalController,
-    private service: CodigoPostalService
-  ) {}
+    private service: CodigoPostalService,
+    private cd: ChangeDetectorRef
+  ) {
+    super();
+  }
 
   ngOnInit() {
     this.form = this.buildForm();
-    if (this.direccion) this.form.setValue(this.direccion);
 
     this.controls = {
       codigoPostal: this.form.get('codigoPostal'),
@@ -163,6 +168,15 @@ export class DireccionEditComponent implements OnInit {
       calle: this.form.get('calle'),
       numeroExterior: this.form.get('numeroExterior'),
     };
+
+    this.controls.codigoPostal.valueChanges
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((zip) => this.buscar(zip));
+
+    if (this.direccion) {
+      this.form.setValue(this.direccion);
+      this.cd.markForCheck();
+    }
   }
 
   private buildForm(): FormGroup {

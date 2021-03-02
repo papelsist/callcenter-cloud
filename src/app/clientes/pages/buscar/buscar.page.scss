@@ -1,0 +1,8 @@
+.buttons {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  ion-button:first-child {
+    margin-left: auto;
+  }
+}

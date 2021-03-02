@@ -1,0 +1,96 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>{{ label }}</ion-title>
+  </ion-toolbar>
+  <ion-buttons slot="end">
+    <ion-button (click)="close()">Cerrar</ion-button>
+  </ion-buttons>
+</ion-header>
+
+<ion-content [formGroup]="form">
+  <ion-grid>
+    <ion-row>
+      <ion-col>
+        <ion-item>
+          <ion-label position="floating">Nombre:</ion-label>
+          <ion-input
+            color="primary"
+            class="ion-text-uppercase"
+            formControlName="nombre"
+            inputmode="text"
+            autocomplete="name"
+            autofocus="true"
+            clearOnEdit="true"
+            enterkeyhint="next"
+            placeholder="Digite el nombre del cliente"
+          ></ion-input>
+          <ion-icon name="person" slot="start"></ion-icon>
+        </ion-item>
+        <ion-note color="warning" *ngIf="nombre.dirty && nombre.errors">
+          {{ getNombreError() }}
+        </ion-note>
+      </ion-col>
+    </ion-row>
+    <ion-row>
+      <ion-col>
+        <ion-item>
+          <ion-label position="floating"> RFC: </ion-label>
+          <ion-input
+            color="primary"
+            class="ion-text-uppercase"
+            formControlName="rfc"
+            placeholder="Digite el RFC"
+          ></ion-input>
+          <ion-icon name="card" slot="start"></ion-icon>
+        </ion-item>
+        <ion-note color="warning" *ngIf="rfc.dirty && rfc.errors">
+          {{ getRfcError() }}
+        </ion-note>
+      </ion-col>
+    </ion-row>
+    <ion-row>
+      <ion-col>
+        <ion-item>
+          <ion-label position="floating">Email:</ion-label>
+          <ion-input
+            color="primary"
+            formControlName="cfdiMail"
+            inputmode="email"
+            enterkeyhint="next"
+            placeholder="Correo electrónico"
+            required="true"
+            type="email"
+          ></ion-input>
+          <ion-icon name="mail" slot="start"></ion-icon>
+          <ion-icon
+            name="checkmark-done"
+            slot="end"
+            color="success"
+            *ngIf="cfdiMail.valid"
+          ></ion-icon>
+        </ion-item>
+        <ion-note color="warning" *ngIf="cfdiMail.dirty && cfdiMail.errors">
+          {{ getEmailError() }}
+        </ion-note>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+  <ion-list-header>
+    <ion-label>Dirección</ion-label>
+  </ion-list-header>
+  <papx-direccion-form
+    [direccion]="cliente?.direccion"
+    #direccion
+  ></papx-direccion-form>
+</ion-content>
+
+<ion-footer>
+  <ion-toolbar>
+    <ion-buttons slot="end">
+      <ion-button [disabled]="!canSubmit()" (click)="submit()">
+        <ion-label> Salvar </ion-label>
+        <ion-icon name="save" slot="start"> </ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-footer>

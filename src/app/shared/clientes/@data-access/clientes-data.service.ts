@@ -4,8 +4,9 @@ import { HttpClient } from '@angular/common/http';
 import { combineLatest, Observable, throwError } from 'rxjs';
 import { catchError, map, shareReplay, take } from 'rxjs/operators';
 
-import { Cliente } from '@papx/models';
+import { Cliente, User } from '@papx/models';
 import { AngularFirestore } from '@angular/fire/firestore';
+import firebase from 'firebase/app';
 
 @Injectable({
   providedIn: 'root',
@@ -61,9 +62,9 @@ export class ClientesDataService {
       .orderBy('nombre', 'asc')
    * @param term
    */
-  searchClientes(term: string) {
+  searchClientes(term: string, limit = 5) {
     return combineLatest([
-      this.serachByRfc(term),
+      this.serachByRfc(term, limit),
       this.searchByNombre(term),
     ]).pipe(map(([b1, b2]) => [...b1, ...b2]));
   }
@@ -71,19 +72,56 @@ export class ClientesDataService {
   searchByNombre(term: string, limit = 5) {
     return this.afs
       .collection<Cliente>('clientes', (ref) =>
-        ref.where('nombre', '>=', term).orderBy('nombre', 'asc').limit(limit)
+        ref
+          .where('nombre', '>=', term.toUpperCase())
+          .orderBy('nombre', 'asc')
+          .limit(limit)
       )
       .valueChanges()
       .pipe(take(1));
   }
 
-  serachByRfc(rfc: string) {
+  serachByRfc(rfc: string, limit = 2) {
     // PBA0511077F9;
     return this.afs
       .collection<Cliente>('clientes', (ref) =>
-        ref.where('rfc', '==', rfc.toUpperCase()).limit(2)
+        ref.where('rfc', '==', rfc.toUpperCase()).limit(limit)
       )
       .valueChanges()
       .pipe(take(1));
+  }
+
+  async saveCliente(cliente: Partial<Cliente>, user: User): Promise<string> {
+    try {
+      const id = this.afs.createId();
+      const data = {
+        ...cliente,
+        dateCreated: new Date().toISOString(),
+        createUserId: user.uid,
+        createUser: user.displayName,
+        sucursal: 'CALLCENTER',
+        versionApp: 2,
+      };
+      await this.afs.collection('clientes').doc(id).set(data);
+      return id;
+    } catch (error) {
+      console.error('Error: ', error.message);
+      throw new Error('Error salvando cliente: ' + error.message);
+    }
+  }
+
+  async updateCliente(id: string, payload: any, user: User) {
+    try {
+      const data = {
+        ...payload,
+        lastUpdated: new Date().toISOString(),
+        updateUserId: user.uid,
+        updateUser: user.displayName,
+      };
+      await this.afs.collection('clientes').doc(id).update(data);
+    } catch (error) {
+      console.error('Error: ', error.message);
+      throw new Error('Error salvando cliente: ' + error.message);
+    }
   }
 }

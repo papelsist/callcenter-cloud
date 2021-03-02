@@ -1,0 +1,66 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Dirección de entrega</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="close()">
+        <ion-label>Cerrar</ion-label>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+<ion-content class="ion-padding">
+  <ion-list [formGroup]="form">
+    <ion-item>
+      <ion-label>
+        <span *ngIf="direccionEntrega">
+          Nombre: {{ direccionEntrega.nombre }}
+        </span>
+        <span *ngIf="!direccionEntrega"> Nueva dirección de entrega </span>
+      </ion-label>
+    </ion-item>
+    <ion-item>
+      <ion-label position="floating"> Contacto </ion-label>
+      <ion-input
+        formControlName="contacto"
+        type="text"
+        placeholder="Contacto para la entrega"
+        class="ion-text-uppercase"
+      ></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-label position="floating"> Teléfono </ion-label>
+      <ion-input
+        formControlName="telefono"
+        type="tel"
+        inputmode="tel"
+        placeholder="Teléfono para notificar"
+      ></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-label position="floating"> Email </ion-label>
+      <ion-input
+        formControlName="email"
+        type="email"
+        inputmode="email"
+        placeholder="Email para notificar"
+      ></ion-input>
+    </ion-item>
+  </ion-list>
+  <ion-list-header>
+    <ion-label> Dirección </ion-label>
+  </ion-list-header>
+  <papx-direccion-form
+    [direccion]="direccionEntrega?.direccion"
+    #direccionForm
+  ></papx-direccion-form>
+</ion-content>
+<ion-footer>
+  <ion-toolbar>
+    <ion-buttons slot="end">
+      <ion-button (click)="submit()" [disabled]="!canSave()">
+        <ion-label>Salvar</ion-label>
+        <ion-icon name="save" slot="start"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-footer>

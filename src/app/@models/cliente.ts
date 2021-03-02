@@ -52,14 +52,11 @@ export interface ClienteCredito {
 }
 
 export interface ClienteDireccion {
-  id?: string;
   nombre: string;
   direccion: Direccion;
-  contacto?: {
-    nombre: string;
-    telefono?: string;
-    email?: string;
-  };
+  contacto?: string;
+  telefono?: string;
+  email?: string;
   horario?: { horaInicial: '08:00'; horaFinal: '19:00' };
   cliente?: Partial<Cliente>;
   notificacion?: 'email' | 'sms';
