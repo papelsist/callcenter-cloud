@@ -1,34 +1,43 @@
 <ion-app>
-  <ion-menu side="start" menuId="first" contentId="main" #menu>
+  <ion-menu side="start" menuId="first" contentId="main" #mnu>
     <ion-header>
       <ion-toolbar color="primary">
-        <ion-title size="small">Operaciones</ion-title>
+        <ion-title>Callcenter APP</ion-title>
       </ion-toolbar>
     </ion-header>
     <ion-content>
       <ion-list>
-        <ion-item detail routerLink="/" (click)="menu.close()">
+        <ion-item detail routerLink="/" (click)="mnu.close()">
           <ion-label> Inicio </ion-label>
           <ion-icon name="home" slot="start"></ion-icon>
         </ion-item>
 
-        <ion-item detail routerLink="/pedidos" (click)="menu.close()"
-          >Pedidos</ion-item
-        >
-        <ion-item detail routerLink="/facturas" (click)="menu.close()"
-          >Facturas</ion-item
-        >
-        <ion-item detail routerLink="/tableros" (click)="menu.close()"
-          >Tableros</ion-item
-        >
-        <ion-item detail routerLink="/productos" (click)="menu.close()"
-          >Prductos</ion-item
-        >
-        <ion-item detail routerLink="/catalogos" (click)="menu.close()"
-          >Catalogos</ion-item
-        >
-        <ion-item button (click)="signOut(); menu.close()">
-          <ion-label> Salir </ion-label>
+        <ion-item routerLink="/pedidos" (click)="mnu.close()">
+          <ion-label>Pedidos</ion-label>
+          <ion-icon name="bag-handle" slot="start"></ion-icon>
+        </ion-item>
+
+        <ion-item detail routerLink="/tableros" (click)="mnu.close()">
+          <ion-label>Tableros</ion-label>
+          <ion-icon name="speedometer" slot="start"></ion-icon>
+        </ion-item>
+        <ion-item detail routerLink="/clientes" (click)="mnu.close()">
+          <ion-label>Clientes</ion-label>
+          <ion-icon name="people" slot="start"></ion-icon>
+        </ion-item>
+
+        <ion-item detail routerLink="/productos" (click)="mnu.close()">
+          <ion-label>Productos</ion-label>
+          <ion-icon name="layers" slot="start"></ion-icon>
+        </ion-item>
+
+        <ion-item detail routerLink="/settings" (click)="mnu.close()">
+          <ion-label> Cuenta </ion-label>
+          <ion-icon slot="start" name="settings"></ion-icon>
+        </ion-item>
+
+        <ion-item button (click)="signOut(); mnu.close()">
+          <ion-label> Cerrar sesión </ion-label>
           <ion-icon slot="end" name="log-out"></ion-icon>
         </ion-item>
       </ion-list>
