@@ -16,18 +16,18 @@ import { Producto } from '@papx/models';
 export class ProductoService {
   productos$ = this.firestore
     .collection<Producto>('productos', (ref) =>
-      ref.where('linea', '==', 'BOND').limit(10)
+      ref.where('activo', '==', true).limit(50)
     )
     .valueChanges()
     .pipe(
-      map((productos) =>
-        productos.map((item) => {
-          const values = Object.values(item.existencia);
-          const disponible = sumBy(values, (r) => toNumber(r.cantidad));
-          return { ...item, disponible };
-        })
-      ),
-      map((productos) => sortBy(productos, 'linea')),
+      // map((productos) =>
+      //   productos.map((item) => {
+      //     const values = Object.values(item.existencia);
+      //     const disponible = sumBy(values, (r) => toNumber(r.cantidad));
+      //     return { ...item, disponible };
+      //   })
+      // ),
+      map((productos) => sortBy(productos, ['linea', 'clave'])),
       shareReplay(),
       catchError((error: any) => throwError(error))
     );
@@ -36,7 +36,7 @@ export class ProductoService {
   );
 
   productosMap$: Observable<{ [key: string]: Producto }> = this.productos$.pipe(
-    map((productos) => keyBy(productos, 'clave'))
+    map((productos) => keyBy(productos, 'id'))
   );
 
   constructor(private firestore: AngularFirestore) {}

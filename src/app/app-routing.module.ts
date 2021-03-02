@@ -49,6 +49,13 @@ const routes2: Routes = [
           ),
       },
       {
+        path: 'productos',
+        loadChildren: () =>
+          import('./productos/feature-shell.module').then(
+            (m) => m.ProductosFeatureShellModule
+          ),
+      },
+      {
         path: '',
         redirectTo: 'home',
         pathMatch: 'full',
@@ -68,11 +75,6 @@ const routes: Routes = [
     loadChildren: () =>
       import('./intro/intro.module').then((m) => m.IntroPageModule),
     canActivate: [IntroductionGuard],
-  },
-  {
-    path: 'cart',
-    loadChildren: () =>
-      import('./cart/cart.module').then((m) => m.CartPageModule),
   },
   {
     path: '',

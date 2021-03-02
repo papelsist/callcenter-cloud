@@ -1,0 +1,53 @@
+<ion-header class="ion-no-padding">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title>Catálogo de productos</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-searchbar
+    class="ion-text-uppercase"
+    #search
+    inputmode="search"
+    animated
+    placeholder="Buscar por nombre o RFC"
+    debounce="600"
+    autocomplete="on"
+    enterkeyhint="search"
+    inputmode="search"
+    type="search"
+    mode="ios"
+    tabindex="1"
+    (ionChange)="onSearch($event)"
+  ></ion-searchbar>
+
+  <div class="productos-list" *ngIf="groupByLineas$ | async as grupos">
+    <ion-list>
+      <ng-container *ngFor="let item of grupos | keyvalue">
+        <ion-item-divider sticky="true" color="tertiary">
+          <ion-label>{{item.key}}</ion-label>
+        </ion-item-divider>
+        <ion-item
+          *ngFor="let p of item.value as productos"
+          [routerLink]="[p.id]"
+          detail="false"
+        >
+          <ion-label class="ion-text-wrap">
+            <h4>{{p.descripcion}}</h4>
+          </ion-label>
+          <div slot="start">
+            <ion-text color="secondary">
+              <small> {{p.clave}} </small>
+            </ion-text>
+          </div>
+          <ion-chip slot="end" color="primary" *ngIf="p.disponible > 0">
+            {{p.disponible | number: '1.0-0'}}
+          </ion-chip>
+        </ion-item>
+      </ng-container>
+    </ion-list>
+  </div>
+</ion-content>

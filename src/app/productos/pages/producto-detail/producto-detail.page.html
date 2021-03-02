@@ -1,0 +1,82 @@
+<ng-container *ngIf="vm$ | async as vm">
+  <ion-header>
+    <ion-toolbar color="primary">
+      <ion-buttons slot="start">
+        <ion-back-button
+          [defaultHref]="['/productos/buscar']"
+        ></ion-back-button>
+      </ion-buttons>
+      <ion-title>{{vm.producto.descripcion}}</ion-title>
+    </ion-toolbar>
+    <ion-buttons slot="end">
+      <ion-button>
+        <ion-icon name="tag" slot="icon-only"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-header>
+
+  <ion-content *ngIf="vm.producto as p">
+    <div class="container">
+      <ion-card>
+        <ion-card-header>
+          <ion-card-title color="secondary">Descripción</ion-card-title>
+        </ion-card-header>
+        <ion-card-content>
+          <ion-list>
+            <ion-item>
+              <ion-label>Clave: {{p.clave}}</ion-label>
+            </ion-item>
+            <ion-item>
+              <ion-label> Kilos: {{p.kilos}} / Gramos: {{p.gramos}} </ion-label>
+            </ion-item>
+            <ion-item>
+              <ion-label> {{p.presentacion}} </ion-label>
+            </ion-item>
+            <ion-item>
+              <ion-label>Linea: {{p.linea}}</ion-label>
+            </ion-item>
+            <ion-item>
+              <ion-label>Marca: {{p.marca}}</ion-label>
+            </ion-item>
+            <ion-item>
+              <ion-label>Marca: {{p.clase}}</ion-label>
+            </ion-item>
+            <ion-item>
+              <ion-label
+                >Origen: {{p.nacional ? 'Nacional' : 'Importado'}}</ion-label
+              >
+            </ion-item>
+            <ion-item>
+              <ion-label color="success"
+                >Contado: {{p.precioContado | currency}}</ion-label
+              >
+              <ion-label color="tertiary"
+                >Crédito: {{p.precioCredito | currency}}</ion-label
+              >
+            </ion-item>
+          </ion-list>
+        </ion-card-content>
+      </ion-card>
+      <!-- Existencias -->
+      <ion-card>
+        <ion-card-header>
+          <ion-card-title color="secondary">Existencias</ion-card-title>
+        </ion-card-header>
+        <ion-list>
+          <ion-item *ngFor="let e of p.existencia | keyvalue ">
+            <ion-label>{{e.key | uppercase}} :</ion-label>
+            <ion-label>{{e.value['cantidad'] | number: '1.0-0'}}</ion-label>
+          </ion-item>
+          <ion-item>
+            <ion-label>Total:</ion-label>
+            <ion-label>{{getTotal(p.existencia) | number:'1.0-0'}}</ion-label>
+          </ion-item>
+        </ion-list>
+      </ion-card>
+    </div>
+    <!-- <pre>
+          {{p | json}}
+        </pre
+    > -->
+  </ion-content>
+</ng-container>
