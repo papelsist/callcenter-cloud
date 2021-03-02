@@ -7,8 +7,8 @@ import {
   User,
 } from '@papx/models';
 
-import { Observable, Subject } from 'rxjs';
-import { take, takeUntil } from 'rxjs/operators';
+import { combineLatest, Observable, Subject } from 'rxjs';
+import { map, switchMap, take, takeUntil, tap } from 'rxjs/operators';
 
 import { ClientesFacade } from '@papx/shared/clientes/@data-access/+state/clientes.facade';
 import { ClientesDataService } from '@papx/shared/clientes/@data-access/clientes-data.service';
@@ -23,6 +23,8 @@ export class ClientePage implements OnInit {
   destroy$ = new Subject<boolean>();
   cliente$: Observable<Cliente>;
   user$ = this.auth.userInfo$;
+  favoritos$: Observable<any[]>;
+  isFavorito$: Observable<boolean>;
 
   constructor(
     private facade: ClientesFacade,
@@ -37,6 +39,20 @@ export class ClientePage implements OnInit {
         .fetchLiveCliente(id)
         .pipe(takeUntil(this.destroy$));
     });
+
+    this.favoritos$ = this.user$.pipe(
+      switchMap((user) => this.service.fetchFavoritos(user)),
+      tap((favs) => {}),
+      takeUntil(this.destroy$)
+    );
+
+    this.isFavorito$ = combineLatest([this.cliente$, this.favoritos$]).pipe(
+      map(
+        ([c, favoritos]) => !!favoritos.find((item) => item.clienteId === c.id)
+      )
+    );
+
+    // this.isFavorito$.subscribe((f) => console.log('Is favorito: ', f));
   }
 
   ionViewWillLeave() {
@@ -95,5 +111,15 @@ export class ClientePage implements OnInit {
     } catch (error) {
       console.error('Error al eliminar  telefono: ', error.message);
     }
+  }
+
+  async toggleFavorito(isFavorito: boolean, cte: Cliente, user: User) {
+    isFavorito
+      ? this.service.removeFromFavoritos(cte.id, user)
+      : this.service.addToFavoritos(cte, user);
+  }
+
+  async addToFavoritos(cte: Cliente, user: User) {
+    this.service.addToFavoritos(cte, user);
   }
 }

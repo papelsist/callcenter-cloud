@@ -124,4 +124,44 @@ export class ClientesDataService {
       throw new Error('Error salvando cliente: ' + error.message);
     }
   }
+
+  async addToFavoritos(cte: Cliente, user: User) {
+    const docPath = `usuarios/${user.uid}`;
+    try {
+      await this.afs
+        .doc(docPath)
+        .collection('clientes-favoritos')
+        .doc(cte.id)
+        .set({ clienteId: cte.id, nombre: cte.nombre });
+    } catch (error) {
+      console.error('Error agregando a favoritos: ', error.message);
+      throw new Error('Error agregando a favoritos' + error.message);
+    }
+  }
+  async removeFromFavoritos(favId: string, user: User) {
+    const docPath = `usuarios/${user.uid}`;
+    try {
+      await this.afs
+        .doc(docPath)
+        .collection('clientes-favoritos')
+        .doc(favId)
+        .delete();
+    } catch (error) {
+      console.error('Error agregando a favoritos: ', error.message);
+      throw new Error('Error agregando a favoritos' + error.message);
+    }
+  }
+
+  fetchFavoritos(user: User) {
+    const docPath = `usuarios/${user.uid}`;
+    return this.afs
+      .doc(docPath)
+      .collection('clientes-favoritos')
+      .valueChanges({ idField: '' });
+    // try {
+    // } catch (error) {
+    //   console.error('Error fetching favoritos: ', error.message);
+    //   throw new Error('Error fetching favoritos ' + error.message);
+    // }
+  }
 }

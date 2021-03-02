@@ -5,6 +5,17 @@
         <ion-back-button defaultHref="/clientes"></ion-back-button>
       </ion-buttons>
       <ion-title>{{cte.nombre}}</ion-title>
+      <ion-buttons slot="end" *ngIf="user$ | async as user">
+        <ng-container *ngIf="{value: isFavorito$ | async} as context">
+          <ion-button (click)="toggleFavorito(context.value, cte, user)">
+            <ion-icon
+              name="bookmark"
+              slot="icon-only"
+              [color]="context.value ? 'primary': ''"
+            ></ion-icon>
+          </ion-button>
+        </ng-container>
+      </ion-buttons>
     </ion-toolbar>
   </ion-header>
 
