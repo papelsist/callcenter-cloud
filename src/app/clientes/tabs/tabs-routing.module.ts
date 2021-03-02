@@ -10,17 +10,25 @@ const routes: Routes = [
     component: TabsPage,
     children: [
       {
-        path: 'favoritos',
-        loadChildren: () =>
-          import('../pages/favoritos/favoritos.module').then(
-            (m) => m.FavoritosPageModule
-          ),
-      },
-      {
         path: 'buscar',
         loadChildren: () =>
           import('../pages/buscar/buscar.module').then(
             (m) => m.BuscarPageModule
+          ),
+      },
+      {
+        path: 'edit/:clienteId',
+        loadChildren: () =>
+          import('../pages/cliente/cliente.module').then(
+            (m) => m.ClientePageModule
+          ),
+        canActivate: [ClienteExistsGuard],
+      },
+      {
+        path: 'favoritos',
+        loadChildren: () =>
+          import('../pages/favoritos/favoritos.module').then(
+            (m) => m.FavoritosPageModule
           ),
       },
       {
@@ -30,14 +38,7 @@ const routes: Routes = [
       },
     ],
   },
-  {
-    path: 'edit/:clienteId',
-    loadChildren: () =>
-      import('../pages/cliente/cliente.module').then(
-        (m) => m.ClientePageModule
-      ),
-    canActivate: [ClienteExistsGuard],
-  },
+
   {
     path: '',
     redirectTo: 'buscar',

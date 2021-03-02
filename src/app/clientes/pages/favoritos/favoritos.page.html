@@ -1,9 +1,34 @@
-<ion-header>
-  <ion-toolbar>
-    <ion-title>favoritos</ion-title>
-  </ion-toolbar>
-</ion-header>
+<ng-container *ngIf="vm$ | async as vm">
+  <ion-header>
+    <ion-toolbar>
+      <ion-buttons slot="start">
+        <ion-menu-button></ion-menu-button>
+      </ion-buttons>
+      <ion-title>Mis clientes</ion-title>
+    </ion-toolbar>
+  </ion-header>
 
-<ion-content>
-
-</ion-content>
+  <ion-content class="ion-padding">
+    <div class="container">
+      <ion-list>
+        <ion-item-sliding>
+          <ion-item *ngFor="let f of favoritos$ | async as favoritos">
+            <ion-label>{{f.nombre }}</ion-label>
+            <ion-icon name="person" slot="start"></ion-icon>
+            <ion-icon name="tag" slot="end"></ion-icon>
+          </ion-item>
+          <ion-item-options side="end">
+            <ion-item-option>
+              <ion-label>Quitar</ion-label>
+              <ion-icon name="tag"></ion-icon>
+            </ion-item-option>
+            <ion-item-option>
+              <ion-label>Notificar</ion-label>
+              <ion-icon name="notifcation"></ion-icon>
+            </ion-item-option>
+          </ion-item-options>
+        </ion-item-sliding>
+      </ion-list>
+    </div>
+  </ion-content>
+</ng-container>
