@@ -12,12 +12,15 @@ import {
   ResumenSectionComponent,
   CorteItemsListComponent,
   PedidoFormFooterComponent,
+  ClienteSectionComponent,
 } from './+sections';
 import { EnvioModule } from './envio';
 
 import { PedidoValidationComponent } from './validation/pedido-validation.component';
 import { PedidoOptionsComponent } from './options/pedido-options.component';
 import { PedidoOptionsButtonComponent } from './options/pedido-options-btn.component';
+import { SocioSelectorComponent } from './+sections/cliente/socio-selector.component';
+import { SharedClienteFormModule } from '@papx/shared/clientes/cliente-form/cliente-form.module';
 
 const components = [
   PedidoCreateFormComponent,
@@ -31,10 +34,17 @@ const components = [
   PedidoOptionsComponent,
   PedidoOptionsButtonComponent,
   PedidoFormFooterComponent,
+  ClienteSectionComponent,
+  SocioSelectorComponent,
 ];
 
 @NgModule({
-  imports: [CommonUiCoreModule, CommonUiForms, EnvioModule],
+  imports: [
+    CommonUiCoreModule,
+    CommonUiForms,
+    EnvioModule,
+    SharedClienteFormModule,
+  ],
   exports: [...components],
   declarations: [...components],
 })

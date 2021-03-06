@@ -1,12 +1,6 @@
-// .main-form {
-//   display: grid;
-//   grid-template-columns: 3f 1f;
-//   grid-template-rows: auto auto;
-//   align-items: center;
-// }
-// .rfc-row {
-//   display: flex;
-//   justify-content: center;
-//   align-items: center;
-//   gap: 5px;
-// }
+p.error {
+  padding: 8px 0 4px;
+  margin: 0;
+  color: var(--ion-color-warning);
+  font-size: 0.9rem;
+}

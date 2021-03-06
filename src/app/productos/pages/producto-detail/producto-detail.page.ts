@@ -15,9 +15,7 @@ import sumBy from 'lodash-es/sumBy';
 export class ProductoDetailPage implements OnInit {
   producto$ = this.route.paramMap.pipe(
     map((params) => params.get('productoId')),
-    switchMap((id) =>
-      this.service.productosMap$.pipe(map((directory) => directory[id]))
-    )
+    switchMap((id) => this.service.findById(id))
   );
   user$ = this.auth.user$;
 

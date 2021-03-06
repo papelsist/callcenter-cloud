@@ -5,75 +5,63 @@
 </ion-header>
 
 <ion-content class="ion-padding">
-  <ion-grid>
-    <ion-row class="ion-justify-content-center">
-      <ion-col
-        class="ion-align-self-center"
-        size-xs="12"
-        size-sm="12"
-        size-md="4"
-        size-lg="3"
-      >
-        <div class="ion-text-center">
-          <h3>Acceso al sistema</h3>
-        </div>
-        <div>
-          <form [formGroup]="form">
-            <ion-item>
-              <ion-label position="floating">Email</ion-label>
-              <ion-input
-                type="email"
-                name="email"
-                formControlName="email"
-                placeholder="Email"
-                autocomplete="on"
-                autofocus="true"
-                inputmode="email"
-              ></ion-input>
-            </ion-item>
+  <div class="container">
+    <div class="child">
+      <h3>Acceso al sistema</h3>
+      <form [formGroup]="form">
+        <ion-item>
+          <ion-label position="floating">Email</ion-label>
+          <ion-input
+            type="email"
+            name="email"
+            formControlName="email"
+            placeholder="Email"
+            autocomplete="on"
+            autofocus="true"
+            inputmode="email"
+          ></ion-input>
+        </ion-item>
 
-            <ion-item class="ion-margin-top">
-              <ion-label position="floating">Password</ion-label>
-              <ion-input
-                type="password"
-                name="password"
-                autocomplete="current-password"
-                placeholder="Digite su contraseña"
-                formControlName="password"
-                enterkeyhint="enter"
-                (keyup.enter)="doEnter($event)"
-              ></ion-input>
-            </ion-item>
-            <ion-button
-              expand="block"
-              [disabled]="form.invalid || ((loading$ | async))"
-              type="submit"
-              class="ion-margin-top"
-              (click)="login()"
-            >
-              <ion-icon name="log-in" slot="start"></ion-icon>
-              <ion-label>Accesar</ion-label>
-              <ion-spinner
-                slot="end"
-                name="lines"
-                *ngIf="loading$ | async"
-              ></ion-spinner>
-            </ion-button>
-          </form>
-        </div>
-        <div *ngIf="error$ | async as error" class="ion-padding">
-          <ion-note color="danger"> {{error}} </ion-note>
-        </div>
-        <div class="ion-padding">
-          Si no tienes cuenta y eres empleado autorizado de Papel S.A. de C.V.
-          para el uso de esta aplicación solicita tu
-          <a routerLink="/signup"> registro</a>
-          <p>
-            Olvidé mi
-            <a routerLink="/restorpassword"> contraseña</a>
-          </p>
-        </div>
-      </ion-col>
-    </ion-row>
-  </ion-grid>
+        <ion-item class="ion-margin-top">
+          <ion-label position="floating">Password</ion-label>
+          <ion-input
+            type="password"
+            name="password"
+            autocomplete="current-password"
+            placeholder="Digite su contraseña"
+            formControlName="password"
+            enterkeyhint="enter"
+            (keyup.enter)="doEnter($event)"
+          ></ion-input>
+        </ion-item>
+        <ion-button
+          expand="block"
+          [disabled]="form.invalid || ((loading$ | async))"
+          type="submit"
+          class="ion-margin-top"
+          (click)="login()"
+        >
+          <ion-icon name="log-in" slot="start"></ion-icon>
+          <ion-label>Accesar</ion-label>
+          <ion-spinner
+            slot="end"
+            name="lines"
+            *ngIf="loading$ | async"
+          ></ion-spinner>
+        </ion-button>
+      </form>
+      <div *ngIf="error$ | async as error" class="ion-padding">
+        <ion-note color="danger"> {{error}} </ion-note>
+      </div>
+      <p>
+        Si no tienes cuenta y eres empleado autorizado de Papel S.A. de C.V.
+        para el uso de esta aplicación solicita tu
+        <a routerLink="/signup"> registro</a>
+      </p>
+      <p>
+        Olvidé mi
+        <a routerLink="/restorpassword"> contraseña !</a>
+      </p>
+    </div>
+  </div>
 </ion-content>

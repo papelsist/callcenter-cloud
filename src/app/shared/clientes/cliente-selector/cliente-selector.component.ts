@@ -11,7 +11,7 @@ import { IonSearchbar, ModalController } from '@ionic/angular';
 
 import { Cliente } from '@papx/models';
 
-import { BehaviorSubject, combineLatest, from, Observable, of } from 'rxjs';
+import { BehaviorSubject, Observable, of } from 'rxjs';
 import {
   catchError,
   debounceTime,
@@ -19,7 +19,6 @@ import {
   filter,
   map,
   switchMap,
-  tap,
 } from 'rxjs/operators';
 import { ClientesDataService } from '../@data-access/clientes-data.service';
 
@@ -30,7 +29,6 @@ import { ClientesDataService } from '../@data-access/clientes-data.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ClienteSelectorComponent implements OnInit, AfterViewInit {
-  @Input() tipo: 'CREDITO' | 'CONTADO' | 'TODOS' = 'CREDITO';
   filter$ = new BehaviorSubject('');
   clientes$: Observable<Partial<Cliente>[]>;
   @ViewChild(IonSearchbar) searchBar: IonSearchbar;
@@ -46,7 +44,6 @@ export class ClienteSelectorComponent implements OnInit, AfterViewInit {
       debounceTime(400),
       distinctUntilChanged(),
       filter((term) => term.length > 3),
-      tap((term) => console.log('Term: ', term)),
       switchMap((term) => this.service.searchClientes(term)),
       catchError((err) => this.handleError(err))
     );
@@ -74,36 +71,12 @@ export class ClienteSelectorComponent implements OnInit, AfterViewInit {
     this.filter$.next(event);
   }
 
+  clienteNuevo() {
+    this.modalCtrl.dismiss('CLIENTE_NUEVO');
+  }
+
   handleError(err: any) {
     console.error('Error buscando clientes, ', err);
     return of([]);
   }
-
-  /* OLD METHOD
-  ngOnInit() {
-    if (this.tipo === 'CREDITO') {
-      this.clientes$ = this.service.clientesCredito$;
-      this.clientes$ = combineLatest([
-        this.filter$,
-        this.service.clientesCredito$,
-      ]).pipe(
-        map(([term, clientes]) =>
-          clientes.filter((item) =>
-            item.nombre.toLowerCase().includes(term.toLowerCase())
-          )
-        )
-      );
-    } else {
-      this.clientes$ = this.filter$.pipe(
-        map((term) => term.toUpperCase()),
-        debounceTime(400),
-        distinctUntilChanged(),
-        filter((term) => term.length > 3),
-        tap((term) => console.log('Term: ', term)),
-        switchMap((term) => this.service.searchClientes(term)),
-        catchError((err) => this.handleError(err))
-      );
-    }
-  }
-  */
 }

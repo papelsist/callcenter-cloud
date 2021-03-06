@@ -5,6 +5,7 @@ import { BehaviorSubject, Observable, Subject, Subscription } from 'rxjs';
 import {
   distinctUntilChanged,
   map,
+  take,
   startWith,
   takeUntil,
 } from 'rxjs/operators';
@@ -19,6 +20,7 @@ import {
   PedidoSummary,
   Producto,
   TipoDePedido,
+  User,
   Warning,
 } from '@papx/models';
 import { ClientesDataService } from '@papx/shared/clientes/@data-access/clientes-data.service';
@@ -31,6 +33,11 @@ import { ProductoService } from '@papx/shared/productos/data-access';
 import * as utils from '../pedido-form.utils';
 import { PedidoWarnings } from '../validation/pedido-warning';
 import { AutorizacionesDePedido } from 'src/app/ventas/utils/autorizaciones-utils';
+
+import { AuthService } from '@papx/auth';
+import { ModalController } from '@ionic/angular';
+import { ClienteFormComponent } from '@papx/shared/clientes/cliente-form/cliente-form.component';
+import { ClienteFormController } from '@papx/shared/clientes/cliente-form/cliente-form.controller';
 
 @Injectable()
 export class PcreateFacade {
@@ -84,14 +91,19 @@ export class PcreateFacade {
   reorderItems$ = new BehaviorSubject(this._reorderItems);
 
   private currentPedido: Pedido;
-
+  private user: User;
   constructor(
     private itemController: ItemController,
-    private clienteController: ClienteSelectorController,
-    private fb: FormBuilder,
+    private clienteSelector: ClienteSelectorController,
+    private clienteForm: ClienteFormController,
     private clienteDataService: ClientesDataService,
-    private productoDataService: ProductoService
-  ) {}
+    private productoDataService: ProductoService,
+    private auth: AuthService,
+    private fb: FormBuilder,
+    private modal: ModalController
+  ) {
+    auth.user$.pipe(take(1)).subscribe((user) => (this.user = user));
+  }
 
   getPedido() {
     return this.currentPedido;
@@ -107,16 +119,14 @@ export class PcreateFacade {
       const sucursalEntity = { id: data.sucursalId, nombre: data.sucursal };
       value = { ...value, sucursalEntity };
     }
-    this.form.patchValue(value, { emitEvent: false, onlySelf: true });
+    this.form.patchValue(value);
     if (data.id) {
       const summ = utils.getPedidoSummary(data);
       this._summary.next(summ);
       this._currentPartidas = value.partidas;
       this._partidas.next(this._currentPartidas);
-      // this.setPartidas(data.partidas);
-      this.registrarLiveCliente(data.cliente.id);
+      this.actualizarValidaciones();
     }
-    this.updateAutorizaciones();
   }
 
   registrarLiveCliente(id: string) {
@@ -128,9 +138,8 @@ export class PcreateFacade {
         console.log('Live cliente: ', cte);
         const { cfdiMail, nombre } = cte;
         this.controls.cliente.setValue(cte);
-        this.form.get('cfdiMail').setValue(cfdiMail, { emitEvent: false });
-        this.form.get('nombre').setValue(nombre, { emitEvent: false });
-        this.updateWarnings();
+        this.form.get('cfdiMail').setValue(cfdiMail, { emitEvent: true });
+        this.form.get('nombre').setValue(nombre, { emitEvent: true });
       });
   }
 
@@ -154,6 +163,7 @@ export class PcreateFacade {
     const summary = buildSummary(this._currentPartidas);
     this._summary.next(summary);
     this.form.patchValue(summary);
+    this.actualizarValidaciones();
     this.form.markAsDirty();
   }
 
@@ -230,17 +240,51 @@ export class PcreateFacade {
     const props = {
       tipo: this.isCredito() ? 'CREDITO' : 'TODOS',
     };
-    const selected = await this.clienteController.selectCliente(props);
-    if (selected) {
-      this.setCliente(selected);
+    const selected = await this.clienteSelector.selectCliente(props);
+    if (selected === 'CLIENTE_NUEVO') {
+      this.registrarClienteNuevo();
+    } else {
+      if (selected) {
+        this.setCliente(selected);
+      }
     }
+  }
+
+  async registrarClienteNuevo() {
+    const cliente = await this.clienteForm.clienteNuevo(this.user);
+    if (cliente) {
+      this.setCliente(cliente);
+    }
+    /*
+    const modal = await this.modal.create({
+      component: ClienteFormComponent,
+      componentProps: {},
+      cssClass: 'cliente-form-modal',
+      animated: true,
+      mode: 'ios',
+    });
+    await modal.present();
+    const { data } = await modal.onDidDismiss();
+    if (data) {
+      try {
+        // await this.starLoading('Salvando cliente');
+        // const id = await this.service.saveCliente(data, user);
+        // await this.stopLoading();
+        ///console.log('Cliente generado : ', id);
+        console.log('Cte: ', data);
+      } catch (error) {
+        // await this.stopLoading();
+        // this.handelError(error);
+      }
+    }
+    */
   }
 
   private setCliente(cliente: Partial<Cliente>) {
     this.controls.cliente.setValue(cliente);
-    this.form.get('cfdiMail').setValue(cliente.cfdiMail, { emitEvent: false });
-    this.form.get('nombre').setValue(cliente.nombre, { emitEvent: false });
-    this.registrarLiveCliente(cliente.id);
+    this.form.get('cfdiMail').setValue(cliente.cfdiMail);
+    this.form.get('nombre').setValue(cliente.nombre);
+    // this.registrarLiveCliente(cliente.id);
     this.recalcular();
   }
 
@@ -342,9 +386,14 @@ export class PcreateFacade {
     }
   }
 
-  updateWarnings() {
+  private actualizarValidaciones() {
+    console.groupCollapsed('---- Actualizando validaciones -------');
+    this.warnings();
+    this.autorizaciones();
+  }
+
+  private warnings() {
     const { cliente, tipo } = this;
-    const p = this.currentPedido;
     const items = this._currentPartidas;
     const descuentoEspecial = this.descuentoEspecial ?? 0.0;
     const warnings = PedidoWarnings.runWarnings(
@@ -356,14 +405,16 @@ export class PcreateFacade {
     if (this.currentPedido) {
       this.currentPedido.warnings = warnings;
     }
+    console.log('Warnings: ', warnings.map((i) => i.error).join(','));
     this._warnings.next(warnings);
   }
 
-  updateAutorizaciones() {
+  private autorizaciones() {
     this._autorizaciones = null;
     const items = this._currentPartidas;
     const descuentoEspecial = this.descuentoEspecial ?? 0.0;
     const aut = AutorizacionesDePedido.Requeridas(items, descuentoEspecial);
+    console.log('Autorizacion requerida: ', aut);
     this.autorizaciones$.next(aut);
   }
 }

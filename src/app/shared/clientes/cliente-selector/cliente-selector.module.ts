@@ -1,5 +1,6 @@
 import { ModuleWithProviders, NgModule } from '@angular/core';
 import { CommonUiCoreModule } from '@papx/common/ui-core';
+
 import { ClienteSelectorComponent } from './cliente-selector.component';
 import { ClienteSelectorController } from './cliente-selector.controller';
 

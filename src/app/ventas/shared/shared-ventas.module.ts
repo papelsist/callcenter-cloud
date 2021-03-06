@@ -1,7 +1,12 @@
 import { NgModule } from '@angular/core';
 
 import { CommonUiCoreModule } from '@papx/common/ui-core';
-import { WarningsButtonComponent, WarningsComponent } from './buttons';
+import {
+  ErrorsButtonComponent,
+  ErrorsComponent,
+  WarningsButtonComponent,
+  WarningsComponent,
+} from './buttons';
 import { FilterVentasButtonComponent } from './buttons';
 import { VentasHeaderComponent } from './ventas-header/ventas-header.component';
 
@@ -10,6 +15,8 @@ const COMPONENTS = [
   FilterVentasButtonComponent,
   WarningsButtonComponent,
   WarningsComponent,
+  ErrorsComponent,
+  ErrorsButtonComponent,
 ];
 
 @NgModule({

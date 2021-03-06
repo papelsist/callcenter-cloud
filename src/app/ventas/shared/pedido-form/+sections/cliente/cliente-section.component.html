@@ -1,0 +1,74 @@
+<ion-item-sliding *ngIf="cliente$ | async as cte">
+  <ion-item button [disabled]="disabled" (click)="changeCliente.emit()">
+    <ion-label class="ion-text-wrap" [color]="!this.cte ? 'warning' : ''">
+      <div class="main-row">
+        <h2 *ngIf="nombre$ | async as nombre">
+          {{ nombre }}
+          <ion-text color="danger" *ngIf="!cte.activo">
+            <sub>SUSPENDIDO</sub>
+          </ion-text>
+        </h2>
+      </div>
+      <div class="info-row">
+        <ion-text color="secondary">
+          <p>RFC: {{ cte?.rfc }}</p>
+        </ion-text>
+        <div class="credito" *ngIf="cte?.credito as cre">
+          <p>
+            <ion-text [color]="cre.creditoActivo ? 'success' : 'danger'">
+              {{ cre.creditoActivo ? "CREDITO" : "CREDITO SUPENDIDO" }}
+            </ion-text>
+          </p>
+        </div>
+      </div>
+      <div class="info-row" *ngIf="requiereSocio(cte)">
+        <p *ngIf="socio$ | async as socio">
+          Socio: {{ socio.nombre }} ({{ socio.clave }})
+        </p>
+      </div>
+    </ion-label>
+    <ion-icon slot="start" name="people"></ion-icon>
+
+    <ion-button
+      slot="end"
+      fill="clear"
+      color="dark"
+      [disabled]="disabled"
+      (click)="editarNombre($event, cte.nombre)"
+      *ngIf="isMostrador(cte)"
+    >
+      <ion-label>Editar</ion-label>
+      <ion-icon name="create" slot="start"></ion-icon>
+    </ion-button>
+    <ion-button
+      slot="end"
+      fill="clear"
+      color="dark"
+      [disabled]="disabled"
+      (click)="buscarSocio($event, cte)"
+      *ngIf="requiereSocio(cte)"
+    >
+      <ion-label>Socio</ion-label>
+      <ion-icon name="people-circle" slot="start" size="large"></ion-icon>
+    </ion-button>
+  </ion-item>
+  <ion-item-options side="end">
+    <ion-item-option (click)="clienteNuevo.emit()">
+      <ion-icon slot="bottom" name="person-add"></ion-icon>
+      Nuevo
+    </ion-item-option>
+    <ion-item-option
+      (click)="buscarSocio($event, cte)"
+      *ngIf="requiereSocio(cte)"
+    >
+      <ion-icon slot="bottom" name="people-circle"></ion-icon>
+      Socio
+    </ion-item-option>
+  </ion-item-options>
+</ion-item-sliding>
+<ion-note color="danger" *ngIf="nombreError() as err">
+  {{ err }}
+</ion-note>
+<ion-note color="danger" *ngIf="socioError() as err">
+  {{ err }}
+</ion-note>

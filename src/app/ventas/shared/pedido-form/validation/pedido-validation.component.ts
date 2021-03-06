@@ -16,22 +16,32 @@ import { getFormValidationErrors } from '@papx/utils';
   selector: 'papx-pedido-validation',
   template: `
     <ng-container *ngIf="errors$ | async as errors">
-      <ion-list class="ion-no-padding" *ngIf="visible$ | async">
-        <ion-list-header>
-          <ion-label>Errores</ion-label>
-          <ion-button color="tertiary" (click)="close()">
-            <ion-icon name="close"></ion-icon>
-            Cerrar
-          </ion-button>
-        </ion-list-header>
-        <ion-item *ngFor="let e of errors">
-          <ion-label color="danger">
-            {{ getDescripcion(e) }}
-          </ion-label>
-        </ion-item>
-      </ion-list>
+      <div class="validation-panel">
+        <ion-list class="ion-no-padding" *ngIf="visible$ | async">
+          <ion-list-header>
+            <ion-label>Errores</ion-label>
+            <ion-button color="tertiary" (click)="close()">
+              <ion-icon name="close"></ion-icon>
+              Cerrar
+            </ion-button>
+          </ion-list-header>
+          <ion-item *ngFor="let e of errors">
+            <ion-label color="danger">
+              {{ getDescripcion(e) }}
+            </ion-label>
+          </ion-item>
+        </ion-list>
+      </div>
     </ng-container>
   `,
+  styles: [
+    `
+      .validation-panel {
+        position: relative;
+        font-size: 1rem;
+      }
+    `,
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PedidoValidationComponent extends BaseComponent implements OnInit {

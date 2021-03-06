@@ -5,23 +5,49 @@ import {
   Input,
   ViewChild,
 } from '@angular/core';
-import { FormControl, FormGroup, Validators } from '@angular/forms';
+import {
+  AbstractControl,
+  AsyncValidatorFn,
+  FormControl,
+  FormGroup,
+  Validators,
+} from '@angular/forms';
 import { ModalController } from '@ionic/angular';
 import { Cliente } from '@papx/models';
 import { DireccionFormComponent } from '@papx/shared/direccion/direccion-form/direccion-form.component';
+import { EMPTY, of } from 'rxjs';
+import { catchError, map, tap } from 'rxjs/operators';
+import { ClientesDataService } from '../@data-access/clientes-data.service';
+
+const RfcValidation = (service: ClientesDataService): AsyncValidatorFn => {
+  return (control: AbstractControl) => {
+    const value = control.value as string;
+    return service.serachByRfc(value.toUpperCase()).pipe(
+      tap((val) => console.log('Valor_ ', val)),
+      map((val) => (val.length > 0 ? { rfcRepetido: true } : null)),
+      catchError((err) => {
+        console.error('Error: ', err);
+        return EMPTY;
+      })
+    );
+  };
+};
 
 @Component({
   selector: 'papx-cliente-form',
   templateUrl: 'cliente-form.component.html',
   styleUrls: ['cliente-form.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
+  // changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ClienteFormComponent implements OnInit {
   @Input() cliente: Cliente;
   form: FormGroup;
   @ViewChild(DireccionFormComponent) direccionForm: DireccionFormComponent;
 
-  constructor(private modalController: ModalController) {}
+  constructor(
+    private modalController: ModalController,
+    private service: ClientesDataService
+  ) {}
 
   ngOnInit() {
     this.form = this.buildForm(this.cliente || {});
@@ -34,11 +60,18 @@ export class ClienteFormComponent implements OnInit {
         { value: nombre, disabled: !!nombre },
         { validators: [Validators.required, Validators.minLength(5)] }
       ),
-      rfc: new FormControl({ value: rfc, disabled: !!rfc }, [
-        Validators.required,
-        Validators.minLength(12),
-        Validators.maxLength(13),
-      ]),
+      rfc: new FormControl(
+        { value: rfc, disabled: !!rfc },
+        {
+          validators: [
+            Validators.required,
+            Validators.minLength(12),
+            Validators.maxLength(13),
+          ],
+          asyncValidators: RfcValidation(this.service),
+          updateOn: 'blur',
+        }
+      ),
       cfdiMail: new FormControl(cfdiMail, [
         Validators.required,
         Validators.email,
@@ -76,11 +109,13 @@ export class ClienteFormComponent implements OnInit {
   }
 
   getEmailError() {
-    let res = this.form.get('cfdiMail').getError('email');
-    res ? res : null;
+    if (this.rfc.hasError('required')) return 'El email es requerido';
+    if (this.rfc.hasError('email')) return 'Email incorrecto';
+    return null;
   }
 
   getRfcError() {
+    if (this.rfc.hasError('rfcRepetido')) return 'RFC ya registrado';
     if (this.rfc.hasError('required')) return 'El RFC es requerido';
     if (this.rfc.hasError('minlength') || this.rfc.hasError('maxlength')) {
       return 'Debe ser de 12 a 13 posiciones';

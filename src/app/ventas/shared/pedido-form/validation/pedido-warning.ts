@@ -16,7 +16,7 @@ export class PedidoWarnings {
     descuentoEspecial = 0,
     items: Partial<PedidoDet>[]
   ) {
-    const warnings = [];
+    const warnings: Warning[] = [];
     this.ValidarClienteActivo(cliente, warnings);
     this.ValidarCreditoVigente(cliente, tipo, warnings);
     this.ValidarAtrasoMaximo(cliente, tipo, warnings);

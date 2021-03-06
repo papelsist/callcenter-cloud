@@ -8,6 +8,7 @@ import { VentasDataService } from '../@data-access';
 
 import { PedidoCreateFacade } from './pedido-create.facade';
 import { PedidoCreateFormComponent } from '../shared/pedido-form';
+import { getClienteMostrador } from '../utils';
 
 @Component({
   selector: 'app-pedido-create',
@@ -19,8 +20,11 @@ export class PedidoCreatePage implements OnInit {
   data = {
     sucursal: 'TACUBA',
     sucursalId: '402880fc5e4ec411015e4ec64e70012e',
+    cliente: getClienteMostrador(),
+    nombre: 'MOSTRADOR',
   };
   errors: any;
+  warnings: any[];
   user$ = this.authService.userInfo$;
 
   @ViewChild(PedidoCreateFormComponent) form: PedidoCreateFormComponent;
@@ -50,6 +54,10 @@ export class PedidoCreatePage implements OnInit {
 
   onErrors(event: any) {
     this.errors = event;
+  }
+
+  onWarnings(warnings: any[]) {
+    this.warnings = warnings;
   }
 
   async startLoading(message: string = 'Procesando') {

@@ -6,6 +6,9 @@
           {{ this.item.clave }} - {{ this.item.producto.descripcion }} ({{
             this.item.unidad
           }})
+          <strong class="ion-padding-left modo-venta">
+            {{ this.item.modoVenta === "B" ? "PB" : "PN" }}
+          </strong>
         </h2>
       </div>
 

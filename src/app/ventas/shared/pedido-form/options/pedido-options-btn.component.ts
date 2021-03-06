@@ -42,21 +42,9 @@ export class PedidoOptionsButtonComponent implements OnInit {
 
   ngOnInit() {}
 
-  async showOptions2(ev: any) {
-    console.log('Facadde: ', this.facade);
-    const popover = await this.popoverController.create({
-      component: PedidoOptionsComponent,
-      componentProps: { facade: this.facade },
-      cssClass: 'pedido-form-options',
-      event: ev,
-      translucent: true,
-    });
-    return await popover.present();
-  }
-
   async showOptions(ev: any) {
     const action = await this.actionSheet.create({
-      header: 'Operaciones con el pedido',
+      header: 'Operaciones con el pedido ..',
       animated: true,
       translucent: true,
       buttons: [
@@ -78,6 +66,12 @@ export class PedidoOptionsButtonComponent implements OnInit {
   private createOptions() {
     return [
       {
+        text: 'Cliente nuevo',
+        role: 'selected',
+        icon: 'person-add',
+        handler: () => this.facade.registrarClienteNuevo(),
+      },
+      {
         text: 'Descuento especial',
         role: 'selected',
         icon: 'archive',
@@ -88,6 +82,12 @@ export class PedidoOptionsButtonComponent implements OnInit {
 
   private editOptions() {
     return [
+      {
+        text: 'Cliente nuevo',
+        role: 'selected',
+        icon: 'person-add',
+        handler: () => this.facade.registrarClienteNuevo(),
+      },
       {
         text: 'Descuento especial',
         role: 'selected',

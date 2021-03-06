@@ -1,52 +1,70 @@
 import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 
-import { Observable, throwError } from 'rxjs';
-import { catchError, map, shareReplay } from 'rxjs/operators';
+import { Observable, of, throwError } from 'rxjs';
+import { catchError, map, shareReplay, switchMap, take } from 'rxjs/operators';
 
 import { AngularFirestore } from '@angular/fire/firestore';
+import { AngularFireStorage } from '@angular/fire/storage';
 
 import sortBy from 'lodash-es/sortBy';
 import keyBy from 'lodash-es/keyBy';
-import sumBy from 'lodash-es/sumBy';
-import toNumber from 'lodash-es/toNumber';
 
 import { Producto } from '@papx/models';
 
 @Injectable({ providedIn: 'root' })
 export class ProductoService {
-  productos$ = this.firestore
-    .collection<Producto>('productos', (ref) =>
-      ref.where('activo', '==', true).limit(50)
-    )
-    .valueChanges()
-    .pipe(
-      // map((productos) =>
-      //   productos.map((item) => {
-      //     const values = Object.values(item.existencia);
-      //     const disponible = sumBy(values, (r) => toNumber(r.cantidad));
-      //     return { ...item, disponible };
-      //   })
-      // ),
-      map((productos) => sortBy(productos, ['linea', 'clave'])),
-      shareReplay(),
-      catchError((error: any) => throwError(error))
-    );
-  activos$ = this.productos$.pipe(
-    map((productos) => productos.filter((item) => item.activo))
-  );
+  productos$ = this.fetchZipProducts().pipe(shareReplay());
 
   productosMap$: Observable<{ [key: string]: Producto }> = this.productos$.pipe(
     map((productos) => keyBy(productos, 'id'))
   );
 
-  constructor(private firestore: AngularFirestore) {}
+  constructor(
+    private firestore: AngularFirestore,
+    private http: HttpClient,
+    private fs: AngularFireStorage
+  ) {}
+
+  fetchZipProducts(): Observable<Producto[]> {
+    return this.fs
+      .ref('catalogos/productos-all.json')
+      .getDownloadURL()
+      .pipe(
+        switchMap((url) => this.http.get<Producto[]>(url)),
+        catchError((err) =>
+          throwError('Error descargando productos ' + err.message)
+        )
+      );
+  }
+
+  findById(id: string) {
+    return this.firestore
+      .collection<Producto>('productos', (ref) =>
+        ref.where('id', '==', id).limit(1)
+      )
+      .get()
+      .pipe(
+        map((snap) => (snap.empty ? null : snap.docs[0].data())),
+        take(1),
+        catchError((err) =>
+          throwError('Error buscando producto  id: ' + err.message)
+        )
+      );
+  }
 
   findByClave(clave: string) {
-    return this.productosMap$.pipe(map((repository) => repository[clave]));
-  }
-  findByClaves(claves: string[]) {
-    return this.productosMap$.pipe(
-      map((repository) => claves.map((c) => repository[c]))
-    );
+    return this.firestore
+      .collection<Producto>('productos', (ref) =>
+        ref.where('clave', '==', clave.toUpperCase()).limit(1)
+      )
+      .get()
+      .pipe(
+        map((snap) => (snap.empty ? null : snap.docs[0].data())),
+        take(1),
+        catchError((err) =>
+          throwError('Error buscando por calve: ' + err.message)
+        )
+      );
   }
 }

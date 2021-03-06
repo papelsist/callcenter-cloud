@@ -2,35 +2,28 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
 import { combineLatest, Observable, throwError } from 'rxjs';
-import { catchError, map, shareReplay, take } from 'rxjs/operators';
+import { catchError, map, shareReplay, switchMap, take } from 'rxjs/operators';
 
-import { Cliente, User } from '@papx/models';
+import { Cliente, ClienteDto, Socio, User } from '@papx/models';
 import { AngularFirestore } from '@angular/fire/firestore';
-import firebase from 'firebase/app';
+
+import { AngularFireStorage } from '@angular/fire/storage';
+import sortBy from 'lodash-es/sortBy';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ClientesDataService {
-  private clientesUrl = 'assets/data/clientes-credito.json';
+  socios$ = this.fetchSocios().pipe(
+    map((items) => sortBy(items, 'nombre')),
+    shareReplay()
+  );
 
-  clientesCredito$: Observable<Partial<Cliente>[]> = this.http
-    .get<Partial<Cliente>[]>(this.clientesUrl)
-    .pipe(
-      shareReplay(),
-      catchError((error: any) => throwError(error))
-    );
-
-  clientesCredito2$ = this.afs
-    .collection<Cliente>('clientes', (ref) => ref.where('credito', '!=', false))
-    .valueChanges({ idField: 'id' })
-    .pipe(
-      shareReplay(),
-      take(1),
-      catchError((error: any) => throwError(error))
-    );
-
-  constructor(private http: HttpClient, private afs: AngularFirestore) {}
+  constructor(
+    private http: HttpClient,
+    private afs: AngularFirestore,
+    private fs: AngularFireStorage
+  ) {}
 
   fetchCliente(id: string) {
     return this.afs
@@ -38,6 +31,43 @@ export class ClientesDataService {
       .doc(id)
       .valueChanges({ idField: 'id' })
       .pipe(take(1));
+  }
+
+  fetchClientesCache(): Observable<ClienteDto[]> {
+    const ref = this.fs.ref('catalogos/ctes.json');
+    return ref.getDownloadURL().pipe(
+      switchMap((url) =>
+        this.http.get<any[]>(url).pipe(
+          map((rows) =>
+            rows.map((i) => {
+              const res: ClienteDto = {
+                id: i.i,
+                nombre: i.n,
+                rfc: i.r,
+                clave: i.cv,
+                credito: !!i.cr,
+              };
+              return res;
+            })
+          ),
+          catchError((err) =>
+            throwError('Error descargando clientes ', err.message)
+          )
+        )
+      )
+    );
+  }
+
+  fetchSocios(): Observable<Socio[]> {
+    return this.fs
+      .ref('catalogos/socios.json')
+      .getDownloadURL()
+      .pipe(
+        switchMap((url) => this.http.get<Socio[]>(url)),
+        catchError((err) =>
+          throwError('Error descargando socios ' + err.message)
+        )
+      );
   }
 
   fetchLiveCliente(id: string): Observable<Cliente> {
@@ -81,7 +111,7 @@ export class ClientesDataService {
       .pipe(take(1));
   }
 
-  serachByRfc(rfc: string, limit = 2) {
+  serachByRfc(rfc: string, limit = 1) {
     // PBA0511077F9;
     return this.afs
       .collection<Cliente>('clientes', (ref) =>
@@ -91,19 +121,38 @@ export class ClientesDataService {
       .pipe(take(1));
   }
 
-  async saveCliente(cliente: Partial<Cliente>, user: User): Promise<string> {
+  findById(id: string) {
+    return this.afs
+      .doc<Cliente>(`clientes/${id}`)
+      .valueChanges()
+      .pipe(
+        take(1),
+        catchError((err) =>
+          throwError('Error fetching cliente from firestore ' + err.message)
+        )
+      );
+  }
+
+  async saveCliente(cliente: Partial<Cliente>, user: User) {
     try {
       const id = this.afs.createId();
       const data = {
         ...cliente,
+        activo: true,
+        id,
         dateCreated: new Date().toISOString(),
-        createUserId: user.uid,
+        uid: user.uid,
         createUser: user.displayName,
         sucursal: 'CALLCENTER',
         versionApp: 2,
       };
-      await this.afs.collection('clientes').doc(id).set(data);
-      return id;
+      const docRef = this.afs.collection<Partial<Cliente>>('clientes').doc(id)
+        .ref;
+      await docRef.set(data);
+      const snap = await docRef.get();
+      return snap.data();
+      // await this.afs.collection('clientes').doc(id).set(data);
+      // return id;
     } catch (error) {
       console.error('Error: ', error.message);
       throw new Error('Error salvando cliente: ' + error.message);

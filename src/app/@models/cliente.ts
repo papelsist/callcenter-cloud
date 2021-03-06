@@ -21,7 +21,10 @@ export interface Cliente {
   dateCreated?: string;
   lastUpdated?: string;
   telefonos?: string[];
+  sucursal?: string;
   correos?: [];
+  uid?: string;
+  versionApp?: number;
   createUser?: string;
   updateUser?: string;
   socios?: Partial<Socio>[];

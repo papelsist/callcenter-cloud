@@ -17,8 +17,7 @@ export class ProductoController {
     const modal = await this.modalController.create({
       component: ProductoSelectorComponent,
       componentProps: {
-        productos$: this.service.activos$,
-        tipo: 'CREDITO',
+        productos$: this.service.productos$,
       },
       swipeToClose: true,
       presentingElement: element ?? nativeEl,
@@ -29,10 +28,12 @@ export class ProductoController {
   }
 
   findByClave(clave: string) {
-    return this.service.productosMap$.pipe(
-      map((map) => map[clave.toUpperCase()]),
-      take(1)
-    );
+    // return this.service.productosMap$.pipe(
+    //   tap((map) => console.log('MAP: ', map)),
+    //   map((map) => map[clave.toUpperCase()]),
+    //   take(1)
+    // );
+    return this.service.findByClave(clave);
   }
 
   findById(id: string) {

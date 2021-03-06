@@ -13,6 +13,7 @@ import { AngularFireModule } from '@angular/fire';
 import { AngularFirestoreModule } from '@angular/fire/firestore';
 import { AngularFireFunctionsModule } from '@angular/fire/functions';
 import { AngularFireMessagingModule } from '@angular/fire/messaging';
+import { AngularFireStorageModule, BUCKET } from '@angular/fire/storage';
 import {
   AngularFireAuth,
   AngularFireAuthModule,
@@ -48,6 +49,7 @@ export function initializeApp1(afa: AngularFireAuth): any {
     AngularFirestoreModule,
     AngularFireFunctionsModule,
     AngularFireMessagingModule,
+    AngularFireStorageModule,
   ],
   providers: [
     {
@@ -74,6 +76,7 @@ export function initializeApp1(afa: AngularFireAuth): any {
       deps: [AngularFireAuth],
       multi: true,
     },
+    { provide: BUCKET, useValue: 'papx-ws-dev.appspot.com' },
   ],
 })
 export class DataAccessModule {

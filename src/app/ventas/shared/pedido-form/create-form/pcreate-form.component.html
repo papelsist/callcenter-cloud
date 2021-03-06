@@ -15,99 +15,97 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-grid [formGroup]="form">
-  <ion-row>
-    <ion-col class="ion-align-self-center">
-      <papx-cliente-field
-        [cliente]="cliente$ | async"
-        [disabled]="form.disabled"
-        (changeCliente)="onChangeCliente()"
-      ></papx-cliente-field>
-    </ion-col>
-  </ion-row>
-  <ion-row>
-    <ion-col>
-      <papx-sucursal-control
-        formControlName="sucursalEntity"
-      ></papx-sucursal-control>
-    </ion-col>
-    <ion-col>
-      <papx-tipo-pedido [parent]="form"></papx-tipo-pedido>
-    </ion-col>
-    <ion-col>
-      <papx-forma-pago-control
-        formControlName="formaDePago"
-      ></papx-forma-pago-control>
-    </ion-col>
-    <ion-col>
-      <papx-moneda-control formControlName="moneda"></papx-moneda-control>
-    </ion-col>
-  </ion-row>
-</ion-grid>
+<div class="wrapper">
+  <ion-grid [formGroup]="form">
+    <ion-row>
+      <ion-col>
+        <papx-pedido-form-cliente
+          [parent]="form"
+          (changeCliente)="onChangeCliente()"
+          (clienteNuevo)="onClienteNuevo()"
+        ></papx-pedido-form-cliente>
+      </ion-col>
+    </ion-row>
 
-<ion-segment
-  (ionChange)="segmentChanged($event)"
-  [value]="segment"
-  scrollable="true"
->
-  <ion-segment-button value="partidas" layout="icon-start">
-    <ion-icon name="list"></ion-icon>
-    <ion-label>Partidas</ion-label>
-  </ion-segment-button>
-  <ion-segment-button value="cortes" layout="icon-start">
-    <ion-icon name="cut"></ion-icon>
-    <ion-label>Cortes</ion-label>
-  </ion-segment-button>
-  <ion-segment-button value="envio" layout="icon-start">
-    <ion-icon name="airplane"></ion-icon>
-    <ion-label>Envío</ion-label>
-  </ion-segment-button>
-  <ion-segment-button value="resumen" layout="icon-start">
-    <ion-icon name="cart"></ion-icon>
-    <ion-label>Resumen</ion-label>
-  </ion-segment-button>
-</ion-segment>
+    <ion-row>
+      <ion-col>
+        <papx-sucursal-control
+          formControlName="sucursalEntity"
+        ></papx-sucursal-control>
+      </ion-col>
+      <ion-col>
+        <papx-tipo-pedido [parent]="form"></papx-tipo-pedido>
+      </ion-col>
+      <ion-col>
+        <papx-forma-pago-control
+          formControlName="formaDePago"
+        ></papx-forma-pago-control>
+      </ion-col>
+      <ion-col>
+        <papx-moneda-control formControlName="moneda"></papx-moneda-control>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
 
-<div [style.display]="segment === 'partidas' ? 'block' : 'none'">
-  <papx-pedido-item-list
-    [items]="partidas$ | async"
-    (addItem)="addItem()"
-    [fabButton]="false"
-  ></papx-pedido-item-list>
-  <!-- <ion-button (click)="actualizar()"> Actualizar </ion-button> -->
-</div>
-<!-- Cortes -->
-<div [style.display]="segment === 'cortes' ? 'block' : 'none'">
-  <papx-cortes-list
-    [partidas]="cortes$ | async"
+  <ion-segment
+    (ionChange)="segmentChanged($event)"
+    [value]="segment"
+    scrollable="true"
+  >
+    <ion-segment-button value="partidas" layout="icon-start">
+      <ion-icon name="list"></ion-icon>
+      <ion-label>Partidas</ion-label>
+    </ion-segment-button>
+    <ion-segment-button value="cortes" layout="icon-start">
+      <ion-icon name="cut"></ion-icon>
+      <ion-label>Cortes</ion-label>
+    </ion-segment-button>
+    <ion-segment-button value="envio" layout="icon-start">
+      <ion-icon name="airplane"></ion-icon>
+      <ion-label>Envío</ion-label>
+    </ion-segment-button>
+    <ion-segment-button value="resumen" layout="icon-start">
+      <ion-icon name="cart"></ion-icon>
+      <ion-label>Resumen</ion-label>
+    </ion-segment-button>
+  </ion-segment>
+
+  <div [style.display]="segment === 'partidas' ? 'block' : 'none'">
+    <papx-pedido-item-list
+      [items]="partidas$ | async"
+      (addItem)="addItem()"
+      [fabButton]="false"
+    ></papx-pedido-item-list>
+    <!-- <ion-button (click)="actualizar()"> Actualizar </ion-button> -->
+  </div>
+  <!-- Cortes -->
+  <div [style.display]="segment === 'cortes' ? 'block' : 'none'">
+    <papx-cortes-list
+      [partidas]="cortes$ | async"
+      [parent]="form"
+    ></papx-cortes-list>
+  </div>
+  <!-- Envio -->
+  <div
+    [style.display]="segment === 'envio' ? 'block' : 'none'"
+    class="ion-padding"
+  >
+    <papx-envio-form [parent]="form"></papx-envio-form>
+  </div>
+  <!-- Resumen -->
+  <div
+    [style.display]="segment === 'resumen' ? 'block' : 'none'"
+    *ngIf="summary$ | async as summary"
+  >
+    <papx-pedido-sumary-section
+      [parent]="form"
+      [disabled]="form.disabled"
+      [summary]="summary$ | async"
+    ></papx-pedido-sumary-section>
+  </div>
+
+  <papx-pedido-validation
     [parent]="form"
-  ></papx-cortes-list>
+    *ngIf="(hasErrors$ | async) && form.dirty"
+  ></papx-pedido-validation>
 </div>
-<!-- Envio -->
-<div
-  [style.display]="segment === 'envio' ? 'block' : 'none'"
-  class="ion-padding"
->
-  <papx-envio-form [parent]="form"></papx-envio-form>
-</div>
-<!-- Resumen -->
-<div
-  [style.display]="segment === 'resumen' ? 'block' : 'none'"
-  *ngIf="summary$ | async as summary"
->
-  <papx-pedido-sumary-section
-    [parent]="form"
-    [disabled]="form.disabled"
-    [summary]="summary$ | async"
-  ></papx-pedido-sumary-section>
-</div>
-<papx-pedido-validation
-  [parent]="form"
-  *ngIf="(hasErrors$ | async) && form.dirty"
-></papx-pedido-validation>
-
-<!-- <papx-pedido-form-footer
-  [errors]="errors$ | async"
-  [sumamry]="summary$ | async"
-  [canSave]="canSubmit"
-></papx-pedido-form-footer> -->

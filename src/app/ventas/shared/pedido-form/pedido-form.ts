@@ -13,9 +13,13 @@ export class PedidoForm extends FormGroup {
     super(
       {
         cliente: new FormControl(null, Validators.required),
-        nombre: new FormControl(null),
+        nombre: new FormControl(null, [
+          Validators.required,
+          Validators.minLength(5),
+        ]),
         sucursal: new FormControl(null, Validators.required),
         sucursalId: new FormControl(null),
+        socio: new FormControl(null),
         sucursalEntity: new FormControl(null, Validators.required),
         formaDePago: new FormControl(FormaDePago.EFECTIVO, Validators.required),
         tipo: new FormControl(TipoDePedido.CONTADO, Validators.required),

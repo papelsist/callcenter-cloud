@@ -95,7 +95,9 @@ export class ItemFormComponent extends BaseComponent implements OnInit {
   }
 
   findProductByClave(clave: any) {
+    console.log('Buscando por clave: ', clave);
     this.productoController.findByClave(clave).subscribe(async (p) => {
+      console.log('Found: ', p);
       if (p) {
         this.selectNewProduct(p);
         await this.cantidadEl.setFocus();

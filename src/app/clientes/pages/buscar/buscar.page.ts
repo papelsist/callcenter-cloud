@@ -41,7 +41,6 @@ export class BuscarPage implements OnInit, AfterViewInit {
   }
 
   onSearch(event: string) {
-    console.log(event);
     this.service
       .searchClientes(event, 1)
       .pipe(

@@ -4,15 +4,17 @@ import {
   LoadingController,
   ModalController,
 } from '@ionic/angular';
+
 import { User } from '@papx/models';
 import { ClientesDataService } from '@papx/shared/clientes/@data-access/clientes-data.service';
-import { ClienteFormComponent } from '@papx/shared/clientes/cliente-form/cliente-form.component';
+
+import { ClienteFormComponent } from './cliente-form.component';
 
 /**
  * Not working BUG!!!!
  */
 @Injectable()
-export class ClienteController {
+export class ClienteFormController {
   constructor(
     private alert: AlertController,
     private loading: LoadingController,
@@ -20,7 +22,7 @@ export class ClienteController {
     private service: ClientesDataService
   ) {}
 
-  async starLoading(message = 'Procesando') {
+  private async starLoading(message = 'Procesando') {
     const l = await this.loading.create({
       message,
       mode: 'ios',
@@ -32,11 +34,12 @@ export class ClienteController {
     await l.present();
   }
 
-  async stopLoading() {
+  private async stopLoading() {
     await this.loading.dismiss(null, null, 'cliente-loading');
   }
 
-  async onCreate(user: User) {
+  async clienteNuevo(user: User) {
+    // console.log('Registrando ciente nuevo: ', user);
     const modal = await this.modalController.create({
       component: ClienteFormComponent,
       componentProps: {},
@@ -46,21 +49,23 @@ export class ClienteController {
     });
     await modal.present();
     const { data } = await modal.onDidDismiss();
-
     if (data) {
       try {
         await this.starLoading('Salvando cliente');
         const id = await this.service.saveCliente(data, user);
         await this.stopLoading();
-        console.log('Cliente generado id: ', id);
+        console.log('Cliente generado : ', id);
+        return id;
       } catch (error) {
         await this.stopLoading();
         this.handelError(error);
       }
+    } else {
+      return null;
     }
   }
 
-  async handelError(error: any) {
+  private async handelError(error: any) {
     const al = await this.alert.create({
       header: 'Error al salvar cliente',
       message: error.message || 'Sin información',

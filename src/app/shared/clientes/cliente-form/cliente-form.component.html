@@ -12,6 +12,23 @@
     <ion-row>
       <ion-col>
         <ion-item>
+          <ion-label position="floating"> RFC: </ion-label>
+          <ion-input
+            color="primary"
+            class="ion-text-uppercase"
+            formControlName="rfc"
+            placeholder="Digite el RFC"
+          ></ion-input>
+          <ion-icon name="card" slot="start"></ion-icon>
+        </ion-item>
+        <p class="error" *ngIf="rfc.dirty && rfc.errors">
+          {{ getRfcError() }}
+        </p>
+      </ion-col>
+    </ion-row>
+    <ion-row>
+      <ion-col>
+        <ion-item>
           <ion-label position="floating">Nombre:</ion-label>
           <ion-input
             color="primary"
@@ -26,28 +43,12 @@
           ></ion-input>
           <ion-icon name="person" slot="start"></ion-icon>
         </ion-item>
-        <ion-note color="warning" *ngIf="nombre.dirty && nombre.errors">
+        <p class="error" *ngIf="nombre.dirty && nombre.errors">
           {{ getNombreError() }}
-        </ion-note>
+        </p>
       </ion-col>
     </ion-row>
-    <ion-row>
-      <ion-col>
-        <ion-item>
-          <ion-label position="floating"> RFC: </ion-label>
-          <ion-input
-            color="primary"
-            class="ion-text-uppercase"
-            formControlName="rfc"
-            placeholder="Digite el RFC"
-          ></ion-input>
-          <ion-icon name="card" slot="start"></ion-icon>
-        </ion-item>
-        <ion-note color="warning" *ngIf="rfc.dirty && rfc.errors">
-          {{ getRfcError() }}
-        </ion-note>
-      </ion-col>
-    </ion-row>
+
     <ion-row>
       <ion-col>
         <ion-item>
@@ -58,7 +59,6 @@
             inputmode="email"
             enterkeyhint="next"
             placeholder="Correo electrónico"
-            required="true"
             type="email"
           ></ion-input>
           <ion-icon name="mail" slot="start"></ion-icon>
@@ -69,9 +69,9 @@
             *ngIf="cfdiMail.valid"
           ></ion-icon>
         </ion-item>
-        <ion-note color="warning" *ngIf="cfdiMail.dirty && cfdiMail.errors">
+        <p class="error" *ngIf="cfdiMail.dirty && cfdiMail.errors">
           {{ getEmailError() }}
-        </ion-note>
+        </p>
       </ion-col>
     </ion-row>
   </ion-grid>

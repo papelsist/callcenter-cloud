@@ -13,7 +13,7 @@ import groupBy from 'lodash-es/groupBy';
 })
 export class BuscarPage implements OnInit {
   filter$ = new BehaviorSubject('');
-  productos$ = this.facade.activos$;
+  productos$ = this.service.productos$;
 
   filteredProducts$ = this.filter$.pipe(
     startWith(''),
@@ -32,7 +32,7 @@ export class BuscarPage implements OnInit {
   groupByLineas$ = this.filteredProducts$.pipe(
     map((productos) => groupBy(productos, 'linea'))
   );
-  constructor(private facade: ProductoService) {}
+  constructor(private service: ProductoService) {}
 
   ngOnInit() {}
 

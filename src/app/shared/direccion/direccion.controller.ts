@@ -11,7 +11,7 @@ import {
   Direccion,
   User,
 } from '@papx/models';
-import { ClientesDataService } from '../clientes/@data-access/clientes-data.service';
+import { ClientesDataService } from '@papx/shared/clientes/@data-access/clientes-data.service';
 import { DireccionEditComponent } from './direccion-edit.component';
 import { DireccionEntregaComponent } from './direccion-entrega/direccion-entrega.component';
 

@@ -2,25 +2,28 @@
   <ion-item-sliding *ngFor="let pedido of pedidos; index as idx">
     <ion-item button (click)="selection.emit(pedido)">
       <ion-label class="ion-text-nowrap">
-        <h4>
-          <ion-text color="warning">
+        <span>
+          {{ pedido.nombre }}
+        </span>
+
+        <span> {{ pedido.fecha | date: "dd/MM/yyyy" }} </span>
+
+        <span class="ion-hide-md-down ion-padding-left">
+          FP: {{ pedido.formaDePago }}
+        </span>
+
+        <span class="ion-hide-md-down ion-padding-left">
+          {{ pedido.updateUser }}
+        </span>
+
+        <p>
+          <ion-text color="secondary">
             {{ pedido.sucursal }}
           </ion-text>
-          <span> FECHA </span>
-          {{ pedido.nombre }}
-          <span class="ion-hide-md-down ion-padding-left">
-            FP: {{ pedido.formaDePago }}
+          <span class="ion-padding-left">
+            {{ pedido.updateUser }}
           </span>
-
-          <small> {{ pedido.updateUser }} </small>
-          <!-- <ion-icon
-            name="alert-circle"
-            color="warning"
-            class="ion-hide-md-down"
-          ></ion-icon> -->
-        </h4>
-
-        <p class="ion-hide-md-up">({{ pedido.updateUser }})</p>
+        </p>
       </ion-label>
 
       <ion-badge slot="start" color="tertiary">

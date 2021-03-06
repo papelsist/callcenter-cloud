@@ -43,6 +43,7 @@ const HorarioValidator = (
 };
 
 const findDirecciones = (cliente: Partial<Cliente>): ClienteDireccion[] => {
+  if (cliente.rfc === 'XAXX010101000') return [];
   if (cliente.direcciones) return cliente.direcciones;
   else {
     return [

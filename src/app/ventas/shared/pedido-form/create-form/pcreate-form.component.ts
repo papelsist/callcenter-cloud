@@ -5,6 +5,7 @@ import {
   Output,
   EventEmitter,
   Input,
+  ChangeDetectorRef,
 } from '@angular/core';
 
 import {
@@ -44,7 +45,7 @@ export class PedidoCreateFormComponent extends BaseComponent implements OnInit {
   errors$ = this.facade.errors$;
   hasErrors$ = this.facade.errors$.pipe(map((errors) => errors.length > 0));
 
-  constructor(private facade: PcreateFacade) {
+  constructor(private facade: PcreateFacade, private cd: ChangeDetectorRef) {
     super();
   }
 
@@ -174,6 +175,12 @@ export class PedidoCreateFormComponent extends BaseComponent implements OnInit {
 
   async onChangeCliente() {
     await this.facade.cambiarCliente();
+    this.cd.markForCheck();
+  }
+
+  async onClienteNuevo() {
+    await this.facade.registrarClienteNuevo();
+    this.cd.markForCheck();
   }
 
   segmentChanged({ detail: { value } }: any) {
