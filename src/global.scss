@@ -43,6 +43,9 @@
 .warnings-popover-component {
   --width: 80%;
 }
+.errors-popover-component {
+  --width: 80%;
+}
 
 .autorizacion-de-pedido-alert .alert-wrapper {
   --width: 70%;
@@ -56,4 +59,28 @@
 }
 .autorizacion-de-pedido-alert .alert-head {
   padding: 10px;
+}
+
+.pedido-nombre-modal .alert-wrapper {
+  --width: 70%;
+  --max-width: 70%;
+  .alert-message {
+    padding-bottom: 5px;
+  }
+  // .alert-input-group {
+  //   // padding: 10px;
+  //   height: 100%;
+  // }
+  // .alert-input-wrapper {
+  //   height: 46px;
+  // }
+}
+
+.pedido-nombre-modal .alert-input-wrapper {
+  --height: 46px;
+  input {
+    margin: 0;
+    font-size: 1rem;
+    text-transform: uppercase;
+  }
 }
