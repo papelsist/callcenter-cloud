@@ -1,6 +1,6 @@
 import { Cliente, Pedido, PedidoDet } from '@papx/models';
 
-export function copiarPedido(source: Pedido): Pedido {
+export function copiarPedido(source: Partial<Pedido>): Pedido {
   const {
     importe,
     descuento,

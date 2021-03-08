@@ -33,7 +33,7 @@ export class VentasController {
    * Generar un nuevo pedido a partir
    * @param pedido
    */
-  async generarCopiaPedido(pedido: Pedido, user: User) {
+  async generarCopiaPedido(pedido: Partial<Pedido>, user: User) {
     const alert = await this.alert.create({
       header: 'Generar cotización ',
       subHeader: 'A partir del pedido: ' + pedido.folio,

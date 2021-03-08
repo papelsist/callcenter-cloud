@@ -33,7 +33,7 @@ export class CotizacionesPage implements OnInit {
     this.router.navigate(['', 'ventas', 'cotizaciones', event.id]);
   }
 
-  async onCopiar(event: Pedido, user: User) {
+  async onCopiar(event: Partial<Pedido>, user: User) {
     await this.ventasController.generarCopiaPedido(event, user);
   }
 }

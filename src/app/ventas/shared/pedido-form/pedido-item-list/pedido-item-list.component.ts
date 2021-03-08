@@ -69,11 +69,8 @@ export class PedidoItemListComponent implements OnInit {
     await this.facade.copiarItem(index);
   }
 
-  doReorder(ev: CustomEvent<ItemReorderEventDetail>) {
-    console.log('Dragged from index', ev.detail.from, 'to', ev.detail.to);
-    console.log('Before complete', this.items.map((i) => i.clave).join(','));
+  doReorder(ev: any) {
     this.items = ev.detail.complete(this.items);
-    console.log('After complete', this.items.map((i) => i.clave).join(','));
     this.facade.reordenarPartidas(this.items);
   }
 }

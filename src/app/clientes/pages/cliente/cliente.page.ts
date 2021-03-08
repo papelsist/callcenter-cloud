@@ -74,7 +74,7 @@ export class ClientePage implements OnInit {
     this.direccionController.deleteDireccion(cte, cteDir, user);
   }
 
-  async addTelefono(cte: Cliente, tel: string, user: User) {
+  async addTelefono(cte: Cliente, tel: any, user: User) {
     try {
       const telefonos = [...(cte.telefonos || []), tel];
       const data = {
@@ -87,7 +87,7 @@ export class ClientePage implements OnInit {
     }
   }
 
-  async updateTelefono(cte: Cliente, idex: number, tel: string, user: User) {
+  async updateTelefono(cte: Cliente, idex: number, tel: any, user: User) {
     try {
       const telefonos = [...cte.telefonos].splice(idex, 1, tel);
       const data = {
