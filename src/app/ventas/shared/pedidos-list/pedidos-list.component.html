@@ -1,28 +1,23 @@
 <ion-list class="ion-no-padding">
   <ion-item-sliding *ngFor="let pedido of pedidos; index as idx">
     <ion-item button (click)="selection.emit(pedido)">
-      <ion-label class="ion-text-nowrap">
-        <span>
-          {{ pedido.nombre }}
-        </span>
+      <ion-label class="ion-text-wrap">
+        <ion-text color="primary">
+          <h2>
+            {{ pedido.nombre }}
+          </h2>
+        </ion-text>
 
-        <span> {{ pedido.fecha | date: "dd/MM/yyyy" }} </span>
-
-        <span class="ion-hide-md-down ion-padding-left">
-          FP: {{ pedido.formaDePago }}
-        </span>
-
-        <span class="ion-hide-md-down ion-padding-left">
-          {{ pedido.updateUser }}
-        </span>
-
-        <p>
-          <ion-text color="secondary">
-            {{ pedido.sucursal }}
-          </ion-text>
-          <span class="ion-padding-left">
+        <div class="row-2">
+          <span> {{ pedido.sucursal }} </span>
+          <span>{{ pedido.tipo }} </span>
+          <span> {{ pedido.dateCreated?.toDate() | date: "dd/MM/yyyy" }} </span>
+          <span vendedor class="ion-hide-sm-down">
             {{ pedido.updateUser }}
           </span>
+        </div>
+        <p class="ion-hide-sm-up">
+          <span vendedor> {{ pedido.updateUser }} </span>
         </p>
       </ion-label>
 
@@ -50,14 +45,19 @@
         Eliminar
         <ion-icon name="trash" slot="bottom"></ion-icon>
       </ion-item-option>
+      <ion-item-option (click)="cerrar.emit(pedido)">
+        Cerrar
+        <ion-icon
+          name="checkmark-done-outline"
+          slot="bottom"
+          color="success"
+        ></ion-icon>
+      </ion-item-option>
       <ion-item-option color="medium" (click)="copiar.emit(pedido)">
         <ion-icon name="copy" slot="bottom"></ion-icon>
         Copiar
       </ion-item-option>
-      <ion-item-option color="secondary"
-        >Envío
-        <ion-icon name="airplane" slot="bottom"></ion-icon>
-      </ion-item-option>
+
       <ion-item-option color="secondary"
         >Depósito
         <ion-icon name="cash" slot="bottom"></ion-icon>

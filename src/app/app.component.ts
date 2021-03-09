@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from './@auth';
+import { User } from './@models';
 
 @Component({
   selector: 'app-root',
@@ -8,6 +9,7 @@ import { AuthService } from './@auth';
   styleUrls: ['app.component.scss'],
 })
 export class AppComponent implements OnInit {
+  user$ = this.auth.user$;
   constructor(private auth: AuthService, private router: Router) {}
 
   ngOnInit() {

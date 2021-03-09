@@ -17,7 +17,7 @@ export namespace Cotizaciones {
 }
 let _state: Cotizaciones.State = {
   title: 'Cotizaciones',
-  filterByUser: false,
+  filterByUser: true,
   usuario: undefined,
   cotizaciones: [],
   selectedCotizacion: null,
@@ -29,12 +29,7 @@ export class CotizacionesFacade {
 
   private user$ = this.auth.userInfo$;
   public state$ = this.store.asObservable();
-  /*
-  public state$: Observable<Cotizaciones.State> = combineLatest([
-    this.store,
-    this.user$,
-  ]).pipe(map(([store, user]) => ({ ...store, user })));
-  */
+
   // Puglic properties
   filterByUser$ = this.state$.pipe(
     map((state) => state.filterByUser),

@@ -6,13 +6,7 @@ import {
 } from '@angular/core';
 import { AbstractControl, FormGroup, ValidationErrors } from '@angular/forms';
 
-import {
-  takeUntil,
-  map,
-  distinctUntilChanged,
-  filter,
-  tap,
-} from 'rxjs/operators';
+import { takeUntil, map } from 'rxjs/operators';
 import { Observable } from 'rxjs';
 
 import capitalize from 'lodash-es/capitalize';
@@ -81,9 +75,10 @@ export class EnvioComponent extends BaseComponent implements OnInit {
     this.registerContactoListener();
     this.registerTipoListener();
     // this.registerClienteListener();
-    this.direcciones$ = this.parent
-      .get('cliente')
-      .valueChanges.pipe(map((cte) => findDirecciones(cte)));
+    this.direcciones$ = this.parent.get('cliente').valueChanges.pipe(
+      map((cte) => findDirecciones(cte)),
+      takeUntil(this.destroy$)
+    );
   }
 
   private initForm() {
@@ -151,7 +146,6 @@ export class EnvioComponent extends BaseComponent implements OnInit {
 
   setEnvio({ detail: { checked } }: any) {
     checked ? this.form.enable() : this.form.disable();
-    this.parent.valueChanges.subscribe((v) => console.log('Form value:', v));
   }
 
   get tipo(): AbstractControl {

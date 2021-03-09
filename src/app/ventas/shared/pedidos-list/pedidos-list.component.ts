@@ -17,8 +17,10 @@ import firebase from 'firebase/app';
 })
 export class PedidosListComponent implements OnInit {
   @Input() pedidos: Partial<Pedido>[] = [];
+  @Input() uid: string;
   @Output() selection = new EventEmitter<Partial<Pedido>>();
   @Output() copiar = new EventEmitter<Partial<Pedido>>();
+  @Output() cerrar = new EventEmitter<Partial<Pedido>>();
   constructor() {}
 
   ngOnInit() {}

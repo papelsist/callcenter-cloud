@@ -42,6 +42,13 @@ export class PedidoItemComponent implements OnInit {
     this.cd.markForCheck();
   }
 
+  isCargo() {
+    const cve = this.item.producto.clave;
+    if (cve === 'CORTE') return true;
+    if (cve.includes('MANIOBRA')) return true;
+    return false;
+  }
+
   async eliminarItem() {
     const alert = await this.alert.create({
       message: `Partida: ${this.index + 1} Producto: ${this.item.clave}`,

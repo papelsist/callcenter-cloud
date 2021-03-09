@@ -95,9 +95,9 @@ export class ItemFormComponent extends BaseComponent implements OnInit {
   }
 
   findProductByClave(clave: any) {
-    console.log('Buscando por clave: ', clave);
+    // console.log('Buscando por clave: ', clave);
     this.productoController.findByClave(clave).subscribe(async (p) => {
-      console.log('Found: ', p);
+      // console.log('Found: ', p);
       if (p) {
         this.selectNewProduct(p);
         await this.cantidadEl.setFocus();
@@ -110,7 +110,8 @@ export class ItemFormComponent extends BaseComponent implements OnInit {
   async findProducto() {
     const producto = await this.productoController.findProducto();
     if (producto) {
-      this.selectNewProduct(producto);
+      this.findProductByClave(producto.clave);
+      // this.selectNewProduct(producto);
     }
   }
 

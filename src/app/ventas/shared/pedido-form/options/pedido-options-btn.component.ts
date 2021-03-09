@@ -136,7 +136,8 @@ export class PedidoOptionsButtonComponent implements OnInit {
           role: '',
 
           handler: (value: any) => {
-            this.facade.setDescuentoEspecial(value.descuento).recalcular();
+            console.log('Aplicando descuento especial: ', value);
+            this.facade.setDescuentoEspecial(value.descuento);
           },
         },
       ],

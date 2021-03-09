@@ -8,11 +8,13 @@ export class AutorizacionesDePedido {
     descuentoEspecial: number = 0,
     auth: PedidoAutorizacion = null
   ) {
-    const res =
-      '' + this.PorDescuentoEspecial(descuentoEspecial, auth) ??
-      '' + this.PorFaltaDeExistencia(items, auth) ??
-      '';
-    return isEmpty(res) ? null : res;
+    const descto = this.PorDescuentoEspecial(descuentoEspecial, auth);
+    const exis = this.PorFaltaDeExistencia(items, auth);
+    const res = [];
+    if (descto) res.push(descto);
+    if (exis) res.push(exis);
+    const auts = isEmpty(res) ? null : res.join(',');
+    return auts;
   }
 
   static PorDescuentoEspecial(
@@ -28,12 +30,12 @@ export class AutorizacionesDePedido {
     partidas: Partial<PedidoDet>[],
     autorizacion?: PedidoAutorizacion
   ) {
-    if (partidas.length <= 0) return '';
-    if (autorizacion) return '';
+    if (partidas.length <= 0) return null;
+    if (autorizacion) return null;
     const pendientes = partidas
       .map((item) => (item.faltante ? item.faltante : 0))
       .reduce((prev, curr) => prev + curr);
-    if (pendientes <= 0) return;
+    if (pendientes <= 0) return null;
     return 'EXISTENCIA_FALTANTE';
   }
 }

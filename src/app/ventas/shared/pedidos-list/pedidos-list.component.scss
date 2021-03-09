@@ -2,19 +2,25 @@ ion-item {
   // padding-top: 2px;
   --padding-top: 10px;
 }
+.row-2 {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  font-size: 1rem;
+  span:nth-child(n + 2) {
+    padding-left: 10px;
+  }
+}
+
 .row {
   display: grid;
-  // grid-template-columns: repeat(auto-fill, minmax(min(20rem, 100%), 1fr));
-  // grid-template-columns: repeat(auto-fill, minmax(40%, 1fr));
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
   align-items: center;
   font-size: 0.9rem;
-  .nombre {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-  span {
-    border: 1px solid blue;
-  }
+}
+
+span[vendedor] {
+  font-size: 0.9rem;
+  font-style: italic;
+  color: var(--ion-color-warning);
 }

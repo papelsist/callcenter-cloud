@@ -28,7 +28,6 @@ export class ItemController {
     tipo: TipoDePedido,
     sucursal?: string
   ): Promise<Partial<PedidoDet> | null> {
-    console.log('Editando: ', item);
     const modal = await this.modalController.create({
       component: ItemModalComponent,
       componentProps: {

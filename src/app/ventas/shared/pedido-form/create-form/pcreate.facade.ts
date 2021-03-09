@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 
+import { ModalController } from '@ionic/angular';
+
 import { BehaviorSubject, Observable, Subject, Subscription } from 'rxjs';
 import {
   distinctUntilChanged,
@@ -15,6 +17,7 @@ import toNumber from 'lodash-es/toNumber';
 
 import {
   Cliente,
+  FormaDePago,
   Pedido,
   PedidoDet,
   PedidoSummary,
@@ -23,21 +26,20 @@ import {
   User,
   Warning,
 } from '@papx/models';
+import { AuthService } from '@papx/auth';
 import { ClientesDataService } from '@papx/shared/clientes/@data-access/clientes-data.service';
+import { ProductoService } from '@papx/shared/productos/data-access';
 import { ClienteSelectorController } from '@papx/shared/clientes/cliente-selector';
+import { ClienteFormController } from '@papx/shared/clientes/cliente-form/cliente-form.controller';
+
+import * as cargosBuilder from '../../../utils/cargos';
 import { recalcularPartidas, buildSummary } from '../../../utils';
 import { ItemController } from '../../ui-pedido-item';
-import { PedidoForm } from '../pedido-form';
-import { ProductoService } from '@papx/shared/productos/data-access';
+import { AutorizacionesDePedido } from '../../../utils';
 
 import * as utils from '../pedido-form.utils';
+import { PedidoForm } from '../pedido-form';
 import { PedidoWarnings } from '../validation/pedido-warning';
-import { AutorizacionesDePedido } from 'src/app/ventas/utils/autorizaciones-utils';
-
-import { AuthService } from '@papx/auth';
-import { ModalController } from '@ionic/angular';
-import { ClienteFormComponent } from '@papx/shared/clientes/cliente-form/cliente-form.component';
-import { ClienteFormController } from '@papx/shared/clientes/cliente-form/cliente-form.controller';
 
 @Injectable()
 export class PcreateFacade {
@@ -125,21 +127,25 @@ export class PcreateFacade {
       this._summary.next(summ);
       this._currentPartidas = value.partidas;
       this._partidas.next(this._currentPartidas);
-      this.actualizarValidaciones();
+      this.refreshCliente(data.cliente.id);
     }
   }
 
-  registrarLiveCliente(id: string) {
+  private refreshCliente(id: string) {
     console.log('Registrando Live CLIENTE ');
     this.closeClienteSubs();
     this.liveClienteSub = this.clienteDataService
       .fetchLiveCliente(id)
       .subscribe((cte) => {
-        console.log('Live cliente: ', cte);
+        console.log('Actualizando cliente: ', cte);
         const { cfdiMail, nombre } = cte;
         this.controls.cliente.setValue(cte);
-        this.form.get('cfdiMail').setValue(cfdiMail, { emitEvent: true });
         this.form.get('nombre').setValue(nombre, { emitEvent: true });
+        if (cfdiMail)
+          this.form.get('cfdiMail').setValue(cfdiMail, { emitEvent: true });
+        if (cte.credito) {
+          this.recalcular();
+        }
       });
   }
 
@@ -158,6 +164,14 @@ export class PcreateFacade {
       descuentoEspecial
     );
     this._currentPartidas = items;
+
+    ///______ APLICAR CARGOS ______//
+    const cargos = this.aplicarCargos(items, tipo, formaDePago);
+    if (cargos.length > 0) {
+      const newItems = [...items, ...cargos];
+      this._currentPartidas = [...newItems];
+    }
+
     this._partidas.next(this._currentPartidas);
 
     const summary = buildSummary(this._currentPartidas);
@@ -165,6 +179,30 @@ export class PcreateFacade {
     this.form.patchValue(summary);
     this.actualizarValidaciones();
     this.form.markAsDirty();
+  }
+
+  private aplicarCargos(
+    items: Partial<PedidoDet>[],
+    tipo: TipoDePedido,
+    fp: FormaDePago
+  ) {
+    const res: Partial<PedidoDet>[] = [];
+    if (fp === FormaDePago.TARJETA_CRE || fp === FormaDePago.TARJETA_DEB) {
+      const cargoPorTarjeta = cargosBuilder.generarCargoPorTarjeta(
+        items,
+        tipo,
+        fp
+      );
+      if (cargoPorTarjeta) {
+        res.push(cargoPorTarjeta);
+      }
+    }
+    const cargoPorCorte = cargosBuilder.generarCargoPorCorte(items);
+    if (cargoPorCorte) {
+      res.push(cargoPorCorte);
+    }
+
+    return res;
   }
 
   async addItem() {
@@ -255,36 +293,15 @@ export class PcreateFacade {
     if (cliente) {
       this.setCliente(cliente);
     }
-    /*
-    const modal = await this.modal.create({
-      component: ClienteFormComponent,
-      componentProps: {},
-      cssClass: 'cliente-form-modal',
-      animated: true,
-      mode: 'ios',
-    });
-    await modal.present();
-    const { data } = await modal.onDidDismiss();
-    if (data) {
-      try {
-        // await this.starLoading('Salvando cliente');
-        // const id = await this.service.saveCliente(data, user);
-        // await this.stopLoading();
-        ///console.log('Cliente generado : ', id);
-        console.log('Cte: ', data);
-      } catch (error) {
-        // await this.stopLoading();
-        // this.handelError(error);
-      }
-    }
-    */
   }
 
   private setCliente(cliente: Partial<Cliente>) {
     this.controls.cliente.setValue(cliente);
     this.form.get('cfdiMail').setValue(cliente.cfdiMail);
     this.form.get('nombre').setValue(cliente.nombre);
-    // this.registrarLiveCliente(cliente.id);
+    if (cliente.credito)
+      // Solo para clientes de credito vale la pena
+      this.refreshCliente(cliente.id);
     this.recalcular();
   }
 
@@ -386,10 +403,12 @@ export class PcreateFacade {
     }
   }
 
-  private actualizarValidaciones() {
+  public actualizarValidaciones() {
     console.groupCollapsed('---- Actualizando validaciones -------');
+    console.log('Cliente: ', this.form.get('cliente').value);
     this.warnings();
     this.autorizaciones();
+    console.groupEnd();
   }
 
   private warnings() {
@@ -405,7 +424,6 @@ export class PcreateFacade {
     if (this.currentPedido) {
       this.currentPedido.warnings = warnings;
     }
-    console.log('Warnings: ', warnings.map((i) => i.error).join(','));
     this._warnings.next(warnings);
   }
 
@@ -414,7 +432,8 @@ export class PcreateFacade {
     const items = this._currentPartidas;
     const descuentoEspecial = this.descuentoEspecial ?? 0.0;
     const aut = AutorizacionesDePedido.Requeridas(items, descuentoEspecial);
-    console.log('Autorizacion requerida: ', aut);
-    this.autorizaciones$.next(aut);
+    // console.log('Autorizacion requerida: ', aut);
+    this._autorizaciones = aut;
+    this.autorizaciones$.next(this._autorizaciones);
   }
 }

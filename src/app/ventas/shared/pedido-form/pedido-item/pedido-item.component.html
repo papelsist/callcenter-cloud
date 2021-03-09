@@ -1,5 +1,10 @@
-<ion-item-sliding>
-  <ion-item button [disabled]="disabled" (click)="onSelection()" detail="false">
+<ion-item-sliding [disabled]="isCargo()">
+  <ion-item
+    button
+    [disabled]="disabled || isCargo()"
+    (click)="onSelection()"
+    detail="false"
+  >
     <ion-label class="ion-text-wrap">
       <div class="descripcion">
         <h2>

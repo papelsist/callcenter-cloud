@@ -23,7 +23,7 @@ export class PedidoValidators {
       return null;
       // Criterio no aplica en ventas de credito
     }
-    const maximo = 10000.0;
+    const maximo = 100000.0;
     return total > maximo ? { importeMaximo: true } : null;
   }
 

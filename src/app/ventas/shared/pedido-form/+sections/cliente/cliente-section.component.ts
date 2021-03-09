@@ -9,7 +9,7 @@ import {
 } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { AlertController, ModalController } from '@ionic/angular';
-import { Cliente, Socio } from '@papx/models';
+import { Cliente, Socio, TipoDePedido } from '@papx/models';
 import { Observable } from 'rxjs';
 import { startWith } from 'rxjs/operators';
 import { SocioSelectorComponent } from './socio-selector.component';
@@ -129,5 +129,9 @@ export class ClienteSectionComponent implements OnInit {
         .get('socio')
         .setValue({ id, nombre, clave, direccion: direccionFiscal });
     }
+  }
+
+  get isContado() {
+    return this.parent.get('tipo').value !== TipoDePedido.CREDITO;
   }
 }

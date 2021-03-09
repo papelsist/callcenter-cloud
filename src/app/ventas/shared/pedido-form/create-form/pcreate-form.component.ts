@@ -54,6 +54,7 @@ export class PedidoCreateFormComponent extends BaseComponent implements OnInit {
     this.facade.setPedido(this.data);
     this.facade.actualizarProductos();
     this.addListeners();
+    this.facade.actualizarValidaciones();
   }
 
   actualizar() {

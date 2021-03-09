@@ -43,6 +43,22 @@ export class VentasDataService {
     private functions: AngularFireFunctions
   ) {}
 
+  fetchCotizaciones(user: User) {
+    return this.afs
+      .collection(this.PEDIDOS_COLLECTION, (ref) =>
+        ref
+          .where('status', '==', 'COTIZACION')
+          .where('uid', '==', user.uid)
+          .limit(10)
+      )
+      .valueChanges()
+      .pipe(
+        catchError((err) =>
+          throwError('Error fetching cotizciones del usuario ' + err.message)
+        )
+      );
+  }
+
   private fetchVentas(status: Status) {
     const filter = getFilter(status);
     return this.getPedidos(filter);
@@ -75,8 +91,10 @@ export class VentasDataService {
 
   async createPedido(pedido: Partial<Pedido>, user: User) {
     try {
+      const cleanData = this.cleanPedidoPayload(pedido);
       const payload = {
-        ...this.cleanPedidoPayload(pedido),
+        ...cleanData,
+        fecha: new Date().toISOString(),
         uid: user.uid,
         vigencia: addDays(new Date(), 10).toISOString(),
         dateCreated: firebase.firestore.FieldValue.serverTimestamp(),
@@ -120,8 +138,9 @@ export class VentasDataService {
 
   async updatePedido(id: string, data: Object, user: User) {
     try {
+      const cleanData = this.cleanPedidoPayload(data);
       const payload = {
-        ...this.cleanPedidoPayload(data),
+        ...cleanData,
         version: firebase.firestore.FieldValue.increment(1),
         updateUser: user.displayName,
         updateUserId: user.uid,
@@ -162,6 +181,6 @@ export class VentasDataService {
   }
 
   cleanPedidoPayload(data: Object) {
-    return omitBy(data, (value, _) => value == undefined || value === null);
+    return omitBy(data, (value, _) => value === undefined || value === null);
   }
 }

@@ -1,6 +1,6 @@
 <ng-container *ngIf="state$  | async as state">
   <papx-ventas-header
-    title="Cotizaciones"
+    [title]="getTitle(state.filterByUser)"
     [filterActivated]="state.filterByUser"
     (filter)="onFilter()"
   ></papx-ventas-header>
@@ -10,6 +10,8 @@
       [pedidos]="state.cotizaciones"
       (selection)="onSelection($event)"
       (copiar)="onCopiar($event, state.usuario)"
+      (cerrar)="onCerrar($event, state.usuario)"
+      [uid]="state?.usuario?.uid"
     ></papx-pedidos-list>
   </ion-content>
 

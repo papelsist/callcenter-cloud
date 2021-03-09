@@ -3,10 +3,8 @@ import { TipoDePedido, FormaDePago, PedidoDet } from '@papx/models';
 import round from 'lodash-es/round';
 import sumBy from 'lodash-es/sumBy';
 
-// import uuidv4 from 'uuid/v4';
-
 export function generarCargoPorTarjeta(
-  items: PedidoDet[],
+  items: Partial<PedidoDet>[],
   tipo: TipoDePedido,
   fp: FormaDePago
 ): PedidoDet {
@@ -15,7 +13,6 @@ export function generarCargoPorTarjeta(
   }
   const netos = items.filter((item) => item.modoVenta === 'N');
   if (netos.length > 0) {
-    console.log('Calculando maniobra para: ', netos);
     const importeNeto = round(sumBy(netos, 'subtotal'), 2);
     const cargo = fp === FormaDePago.TARJETA_CRE ? 0.02 : 0.01;
     const precio = round(importeNeto * cargo, 2);
@@ -23,7 +20,7 @@ export function generarCargoPorTarjeta(
     const subtotal = importe;
     const impuesto = round(importe * 0.16, 2);
     const total = subtotal + impuesto;
-    const id = 'ccro'; // uuidv4()
+    const id = 'z_cargo-tarjeta'; // uuidv4()
     return {
       id,
       cantidad: 1,
@@ -41,6 +38,10 @@ export function generarCargoPorTarjeta(
         imageUrl: 'assets/images/1273567240.jpg',
         precioCredito: 0.0,
         precioContado: precio,
+        kilos: 0,
+        gramos: 0,
+        unidad: 'PZA',
+        presentacion: 'ND',
       },
       clave: 'MANIOBRA',
       descripcion: 'M A N I O B R A',
@@ -62,7 +63,9 @@ export function generarCargoPorTarjeta(
   }
 }
 
-export function generarCargoPorCorte(items: PedidoDet[]): PedidoDet | null {
+export function generarCargoPorCorte(
+  items: Partial<PedidoDet>[]
+): Partial<PedidoDet> | null {
   const found = items.filter((item) => item.corte);
   if (found && found.length > 0) {
     const cortes = found.map((item) => item.corte);
@@ -75,7 +78,7 @@ export function generarCargoPorCorte(items: PedidoDet[]): PedidoDet | null {
     }
     const impuesto = round(importe * 0.16, 2);
     const total = subtotal + impuesto;
-    const id = 'corteh348hh';
+    const id = 'z_cargo-corte';
     return {
       id,
       cantidad: 1,
@@ -92,6 +95,10 @@ export function generarCargoPorCorte(items: PedidoDet[]): PedidoDet | null {
         modoVenta: 'N',
         precioCredito: precio,
         precioContado: precio,
+        kilos: 0,
+        gramos: 0,
+        unidad: 'PZA',
+        presentacion: 'ND',
       },
       clave: 'CORTE',
       descripcion: 'CORTE',
@@ -115,7 +122,7 @@ export function generarCargoPorCorte(items: PedidoDet[]): PedidoDet | null {
 
 export function generarCargoPorFlete(): PedidoDet {
   const precio = 0.0;
-  const id = 'fte001';
+  const id = 'z_cargo-flete';
   return {
     id,
     cantidad: 1,
@@ -130,9 +137,12 @@ export function generarCargoPorFlete(): PedidoDet {
       clave: 'MANIOBRAF',
       descripcion: 'M A N I O B R A F',
       modoVenta: 'N',
-      imageUrl: 'assets/images/1273567240.jpg',
       precioCredito: precio,
       precioContado: precio,
+      kilos: 0,
+      gramos: 0,
+      unidad: 'PZA',
+      presentacion: 'ND',
     },
     clave: 'MANIOBRAF',
     descripcion: 'M A N I O B R A F',

@@ -23,7 +23,7 @@
       button
       (click)="select(prod)"
     >
-      <ion-label [color]="!prod.activo ? 'danger' : ''">
+      <ion-label>
         <ion-grid class="ion-no-padding">
           <ion-row>
             <ion-col size="2">
@@ -35,15 +35,7 @@
               <ion-text color="primary">
                 <h2>
                   {{ prod.descripcion }}
-                  <span class="ion-padding-start" *ngIf="!prod.activo">
-                    DESCONTINUADO
-                  </span>
                 </h2>
-              </ion-text>
-            </ion-col>
-            <ion-col size="2">
-              <ion-text>
-                <h2>Exis: {{ prod.disponible }}</h2>
               </ion-text>
             </ion-col>
           </ion-row>
@@ -53,20 +45,6 @@
             </ion-col>
           </ion-row>
         </ion-grid>
-        <p>
-          <span>
-            Contado:
-            <ion-text [color]="tipo === 'CONTADO' ? 'success' : ''">
-              {{ prod.precioContado | currency }}
-            </ion-text>
-          </span>
-          <span class="ion-padding-start">
-            Crédito:
-            <ion-text [color]="tipo === 'CREDITO' ? 'success' : ''">
-              {{ prod.precioCredito | currency }}
-            </ion-text>
-          </span>
-        </p>
       </ion-label>
     </ion-item>
   </ion-list>

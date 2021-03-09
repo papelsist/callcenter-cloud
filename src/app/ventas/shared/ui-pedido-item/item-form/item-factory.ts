@@ -66,7 +66,7 @@ export function buildForm(builder: FormBuilder): FormGroup {
  *
  * @param producto
  */
-export function extractData(producto: Producto) {
+export function extractData(producto: Producto): Partial<PedidoDet> {
   const {
     clave,
     descripcion,
@@ -129,11 +129,13 @@ export function buildPedidoItem(
   const corte: Corte = formData.corte;
   const producto: Producto = formData.producto;
   const cantidad: number = formData.cantidad;
-  const produtoData = extractData(producto);
+
+  const itemData = extractData(producto);
+  itemData.producto.existencia = producto.existencia;
 
   const item: PedidoDet = {
     ...formData,
-    ...produtoData,
+    ...itemData,
     cantidad,
     kilos: calcularKilos(cantidad, producto),
     precioOriginal:
@@ -160,7 +162,6 @@ export function calcularImportes(
   cantidad: number,
   tipo: TipoDePedido
 ): PedidoSummary {
-  console.log('Recalculando importe para: ', tipo);
   if (!producto) {
     return {
       importe: 0,

@@ -53,7 +53,7 @@
     </ion-button>
   </ion-item>
   <ion-item-options side="end">
-    <ion-item-option (click)="clienteNuevo.emit()">
+    <ion-item-option (click)="clienteNuevo.emit()" *ngIf="isContado">
       <ion-icon slot="bottom" name="person-add"></ion-icon>
       Nuevo
     </ion-item-option>

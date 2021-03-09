@@ -2,7 +2,12 @@
   <ion-menu side="start" menuId="first" contentId="main" #mnu>
     <ion-header>
       <ion-toolbar color="primary">
-        <ion-title>Callcenter APP</ion-title>
+        <ion-buttons slot="start">
+          <ion-button>
+            <ion-icon name="person" slot="icon-only"></ion-icon>
+          </ion-button>
+        </ion-buttons>
+        <ion-title>{{ (user$ | async)?.displayName }}</ion-title>
       </ion-toolbar>
     </ion-header>
     <ion-content>

@@ -76,6 +76,7 @@ export function getClienteMostrador(): Partial<Cliente> {
     id: '402880fc5e4ec411015e4ecc5dfc0554',
     rfc: 'XAXX010101000',
     nombre: 'MOSTRADOR',
+    clave: '1',
     permiteCheque: false,
     activo: true,
   };

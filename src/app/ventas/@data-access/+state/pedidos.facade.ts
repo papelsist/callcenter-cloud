@@ -43,11 +43,9 @@ export class PedidosFacade {
   }
 
   async cerrarPedido(id: string, pedido: Partial<Pedido>, user: User) {
-    pedido.status =
-      pedido.warnings && pedido.warnings.length > 0
-        ? 'POR_AUTORIZAR'
-        : 'COTIZACION';
-
+    pedido.status = pedido.autorizacionesRequeridas
+      ? 'POR_AUTORIZAR'
+      : 'COTIZACION';
     pedido.cerrado = new Date().toISOString();
     await this.updatePedido(id, pedido, user);
   }

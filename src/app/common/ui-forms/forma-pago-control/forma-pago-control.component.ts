@@ -57,7 +57,7 @@ export class FormaDePagoControlComponent
     { clave: FormaDePago.DEPOSITO_CHEQUE, descripcion: 'Dep cheque' },
     { clave: FormaDePago.DEPOSITO_MIXTO, descripcion: 'Dep mixto' },
     { clave: FormaDePago.TARJETA_CRE, descripcion: 'Tarjeta (Cre)' },
-    { clave: FormaDePago.TARJETA_DEB, descripcion: 'Tarjeta (Dev)' },
+    { clave: FormaDePago.TARJETA_DEB, descripcion: 'Tarjeta (Deb)' },
     { clave: FormaDePago.CHEQUE, descripcion: 'Cheque' },
     { clave: FormaDePago.CHEQUE_PSTF, descripcion: 'Cheque (PSF)' },
     { clave: FormaDePago.NO_DEFINIDO, descripcion: 'No definido' },
