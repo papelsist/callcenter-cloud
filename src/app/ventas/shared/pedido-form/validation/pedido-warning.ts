@@ -27,6 +27,8 @@ export class PedidoWarnings {
     return warnings;
   }
   static ValidarClienteActivo(cliente: Partial<Cliente>, errors: Warning[]) {
+    console.log('Cte activo: ', cliente.activo);
+    console.log('Cte activo doble bang: ', !!cliente.activo);
     if (!cliente.activo) {
       errors.push({
         error: 'CLIENTE_ACTIVO',

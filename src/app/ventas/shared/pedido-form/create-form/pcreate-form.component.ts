@@ -117,6 +117,7 @@ export class PedidoCreateFormComponent extends BaseComponent implements OnInit {
         if (s) {
           this.form.get('sucursal').setValue(s.nombre);
           this.form.get('sucursalId').setValue(s.id);
+          // this.facade.actualizarExistenciasDeSucursal(s.nombre);
         }
       });
   }

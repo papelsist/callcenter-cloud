@@ -137,7 +137,6 @@ export class PcreateFacade {
     this.liveClienteSub = this.clienteDataService
       .fetchLiveCliente(id)
       .subscribe((cte) => {
-        console.log('Actualizando cliente: ', cte);
         const { cfdiMail, nombre } = cte;
         this.controls.cliente.setValue(cte);
         this.form.get('nombre').setValue(nombre, { emitEvent: true });
@@ -146,6 +145,8 @@ export class PcreateFacade {
         if (cte.credito) {
           this.recalcular();
         }
+        console.log('Cliente actualizado: ', cte);
+        this.actualizarValidaciones();
       });
   }
 
@@ -380,13 +381,42 @@ export class PcreateFacade {
 
   private actualizarDisponible(item: Partial<PedidoDet>): Partial<PedidoDet> {
     const exis = item.producto.existencia;
-    const cant = item.cantidad;
-    const disp = Object.keys(exis).reduce(
-      (p, c) => p + toNumber(exis[c].cantidad),
-      0.0
-    );
-    item.faltante = disp > cant ? 0 : cant - disp;
+    if (exis) {
+      const cant = item.cantidad;
+      const disp = Object.keys(exis).reduce(
+        (p, c) => p + toNumber(exis[c].cantidad),
+        0.0
+      );
+      item.faltante = disp > cant ? 0 : cant - disp;
+    }
     return item;
+  }
+
+  public actualizarExistenciasDeSucursal(sucursal: string) {
+    let sname = sucursal.toLowerCase();
+    if (sname === 'calle 4') sname = 'calle4';
+    if (sname === 'vertiz 176') sname = 'vertis176';
+
+    this._currentPartidas.forEach((item) => {
+      const prod = item.producto;
+      if (prod.existencia) {
+        const exis = prod.existencia;
+        const almacen = exis[sname];
+        if (almacen) {
+          console.log('Almacen: ', almacen);
+          const actual = toNumber(almacen.cantidad);
+          const faltante =
+            item.cantidad - actual <= 0 ? 0 : item.cantidad - actual;
+          console.log(
+            'Prod: %s Requerido: %f Exis: %f Faltante %f',
+            prod.clave,
+            item.cantidad,
+            actual,
+            faltante
+          );
+        }
+      }
+    });
   }
 
   closeLiveSubscriptions() {
@@ -405,7 +435,6 @@ export class PcreateFacade {
 
   public actualizarValidaciones() {
     console.groupCollapsed('---- Actualizando validaciones -------');
-    console.log('Cliente: ', this.form.get('cliente').value);
     this.warnings();
     this.autorizaciones();
     console.groupEnd();
@@ -424,6 +453,7 @@ export class PcreateFacade {
     if (this.currentPedido) {
       this.currentPedido.warnings = warnings;
     }
+    console.log('Warnings: ', warnings);
     this._warnings.next(warnings);
   }
 
