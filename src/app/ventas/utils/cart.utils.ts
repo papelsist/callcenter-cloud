@@ -42,7 +42,6 @@ export const DESCUENTOS = [
 export function calcularImporteBruto(partidas: PedidoDet[]): number {
   const items = normalize(partidas);
   const importe = sumBy(items, (i: PedidoDet) => {
-    console.log('Evaluando: ', i);
     if (i.producto.modoVenta === 'B') {
       const { cantidad, precio } = i;
       const factor = i.unidad === 'MIL' ? 1000 : 1;
@@ -55,8 +54,11 @@ export function calcularImporteBruto(partidas: PedidoDet[]): number {
   return importe;
 }
 
-export function findDescuentoPorVolumen(importe: number) {
-  const mayores = DESCUENTOS.filter((item) => item.importe >= importe);
+export function findDescuentoPorVolumen(
+  importe: number,
+  descuentos = DESCUENTOS
+) {
+  const mayores = descuentos.filter((item) => item.importe >= importe);
   if (mayores.length > 0) {
     return mayores[0].descuento;
   } else {
@@ -116,7 +118,7 @@ export function recalcularPartidas(
   let descuento = calcularDescuento(items, tipo, cliente);
   const descuentoOriginal = descuento;
 
-  console.group('Recalculando partidas');
+  console.groupCollapsed('Recalculando partidas');
   console.log('Descuento calculado: ', descuento);
   console.log('Descuento especial: ', descuentoEspecial);
   console.log('Descuento original: ', descuentoOriginal);

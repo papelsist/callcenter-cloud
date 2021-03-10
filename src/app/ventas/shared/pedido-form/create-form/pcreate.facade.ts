@@ -3,13 +3,16 @@ import { FormBuilder, FormGroup } from '@angular/forms';
 
 import { ModalController } from '@ionic/angular';
 
-import { BehaviorSubject, Observable, Subject, Subscription } from 'rxjs';
+import { BehaviorSubject, Observable, of, Subject, Subscription } from 'rxjs';
 import {
   distinctUntilChanged,
   map,
   take,
   startWith,
   takeUntil,
+  withLatestFrom,
+  switchMap,
+  tap,
 } from 'rxjs/operators';
 
 import unique from 'lodash-es/uniq';
@@ -31,16 +34,17 @@ import { ClientesDataService } from '@papx/shared/clientes/@data-access/clientes
 import { ProductoService } from '@papx/shared/productos/data-access';
 import { ClienteSelectorController } from '@papx/shared/clientes/cliente-selector';
 import { ClienteFormController } from '@papx/shared/clientes/cliente-form/cliente-form.controller';
+import { CatalogosService } from '@papx/data-access';
 
 import * as cargosBuilder from '../../../utils/cargos';
 import { recalcularPartidas, buildSummary } from '../../../utils';
 import { ItemController } from '../../ui-pedido-item';
 import { AutorizacionesDePedido } from '../../../utils';
+import * as cartUtils from '../../../utils/cart.utils';
 
 import * as utils from '../pedido-form.utils';
 import { PedidoForm } from '../pedido-form';
 import { PedidoWarnings } from '../validation/pedido-warning';
-import { CatalogosService } from '@papx/data-access';
 
 @Injectable()
 export class PcreateFacade {
@@ -97,6 +101,47 @@ export class PcreateFacade {
   private user: User;
 
   descuentos$ = this.catalogos.descuentos$;
+
+  nextDescuento$ = this.partidas$.pipe(
+    map((items: PedidoDet[]) =>
+      this.isCredito() ? 0.0 : cartUtils.calcularImporteBruto(items)
+    ),
+    switchMap((neto) =>
+      this.catalogos.descuentos$.pipe(
+        map((descuentos) => {
+          const next = descuentos.find((item) => item.inicial >= neto);
+          return {
+            netoAcual: neto,
+            nextDescuento: next,
+          };
+        })
+      )
+    )
+    // withLatestFrom(this.catalogos.descuentos$)
+    // tap((dd) => console.log('Evaluando: ', dd)),
+    // map(([neto, descuentos]) => {
+    //   const idx = descuentos.findIndex((item) => item.importe >= neto);
+    //   if (idx) {
+    //     const maxIndex = descuentos.length - 1;
+    //     const nextIndex = idx + 1;
+    //     if (nextIndex <= maxIndex) {
+    //       const next = descuentos[nextIndex];
+    //       const faltante = next.inicial - neto;
+    //       const faltantePercent = faltante / next.inicial;
+    //       // console.log(
+    //       //   'Faltante %f Neto Actual: %f Proximo: %f  Falta(%): porc',
+    //       //   faltante,
+    //       //   neto,
+    //       //   next.inicial,
+    //       //   faltantePercent
+    //       // );
+    //       return faltante;
+    //     }
+    //   }
+    //   return 0;
+    // }),
+    // tap((faltante) => console.log('Faltante: ', faltante))
+  );
 
   constructor(
     private itemController: ItemController,

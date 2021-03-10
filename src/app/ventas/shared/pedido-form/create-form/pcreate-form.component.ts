@@ -17,9 +17,13 @@ import {
 } from 'rxjs/operators';
 import { merge, Observable } from 'rxjs';
 
+import round from 'lodash-es/round';
+
 import { BaseComponent } from '@papx/core';
 import { Cliente, FormaDePago, Pedido, TipoDePedido } from '@papx/models';
 import { PcreateFacade } from './pcreate.facade';
+import { ToastController } from '@ionic/angular';
+import { FormatService } from 'src/app/core/services/format.service';
 
 @Component({
   selector: 'papx-pedido-form',
@@ -47,7 +51,12 @@ export class PedidoCreateFormComponent extends BaseComponent implements OnInit {
 
   descuentos$ = this.facade.descuentos$;
 
-  constructor(private facade: PcreateFacade, private cd: ChangeDetectorRef) {
+  constructor(
+    private facade: PcreateFacade,
+    private cd: ChangeDetectorRef,
+    private toast: ToastController,
+    private format: FormatService
+  ) {
     super();
   }
 
@@ -57,6 +66,26 @@ export class PedidoCreateFormComponent extends BaseComponent implements OnInit {
     this.facade.actualizarProductos();
     this.addListeners();
     this.facade.actualizarValidaciones();
+
+    // TEMPO
+    this.facade.nextDescuento$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(({ nextDescuento, netoAcual }) => {
+        if (nextDescuento && netoAcual > 0.0) {
+          const faltante = round(nextDescuento.inicial - netoAcual);
+          const faltantePercent = faltante / nextDescuento.inicial;
+          if (faltantePercent < 0.06)
+            this.notificar(
+              'Alerta: ',
+              `Su pedido actual está a solo: ${this.format.formatCurrency(
+                faltante
+              )} de alcanzar el próximo descuento que es del ${
+                nextDescuento.descuento
+              } %`,
+              0
+            );
+        }
+      });
   }
 
   actualizar() {
@@ -218,5 +247,26 @@ export class PedidoCreateFormComponent extends BaseComponent implements OnInit {
 
   toogleReordenar() {
     this.facade.toggleReorer();
+  }
+
+  async notificar(
+    header: string = 'Notificación',
+    message: string,
+    duration: number
+  ) {
+    const t = await this.toast.create({
+      header,
+      message,
+      duration,
+      animated: true,
+      color: 'warning',
+      buttons: [
+        {
+          text: 'Cerrar',
+          role: 'cancel',
+        },
+      ],
+    });
+    await t.present();
   }
 }
