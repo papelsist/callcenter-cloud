@@ -84,3 +84,13 @@
     text-transform: uppercase;
   }
 }
+
+.descuentos-voluman-modal .alert-input-wrapper {
+  --min-width: 70%;
+  --max-width: 70%;
+  input {
+    margin: 0;
+    font-size: 0.8rem;
+    text-transform: capitalize;
+  }
+}

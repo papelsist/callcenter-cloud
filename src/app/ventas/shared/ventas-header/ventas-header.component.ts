@@ -17,7 +17,7 @@ import {
         <ion-title>{{ title }}</ion-title>
         <ion-buttons slot="end">
           <papx-ventas-filter-button
-            (filter)="filter.emit($event)"
+            (filter)="filter.emit(filterActivated)"
             [active]="filterActivated"
           >
           </papx-ventas-filter-button>
@@ -31,6 +31,6 @@ import {
 export class VentasHeaderComponent {
   @Input() title: string = 'NO TITLE!';
   @Input() filterActivated = false;
-  @Output() filter = new EventEmitter();
+  @Output() filter = new EventEmitter<boolean>();
   constructor() {}
 }

@@ -1,17 +1,17 @@
-<ng-container *ngIf="state$  | async as state">
+<ng-container *ngIf="vm$ | async as vm">
   <papx-ventas-header
-    [title]="getTitle(state.filterByUser)"
-    [filterActivated]="state.filterByUser"
-    (filter)="onFilter()"
+    [title]="getTitle(vm.filtrar)"
+    [filterActivated]="vm.filtrar"
+    (filter)="onFilter($event)"
   ></papx-ventas-header>
 
   <ion-content>
     <papx-pedidos-list
-      [pedidos]="state.cotizaciones"
+      [pedidos]="cotizaciones$ | async"
       (selection)="onSelection($event)"
-      (copiar)="onCopiar($event, state.usuario)"
-      (cerrar)="onCerrar($event, state.usuario)"
-      [uid]="state?.usuario?.uid"
+      (copiar)="onCopiar($event, vm.user)"
+      (cerrar)="onCerrar($event, vm.user)"
+      [uid]="vm.user.uid"
     ></papx-pedidos-list>
   </ion-content>
 

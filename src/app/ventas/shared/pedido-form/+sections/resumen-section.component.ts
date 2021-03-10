@@ -16,7 +16,7 @@ import { PcreateFacade } from '../create-form/pcreate.facade';
   template: `
     <ion-grid [formGroup]="parent">
       <ion-row>
-        <ion-col>
+        <ion-col size="12" size-md="8">
           <ion-item>
             <ion-label position="floating">Uso de CFDI</ion-label>
             <ion-select
@@ -39,7 +39,7 @@ import { PcreateFacade } from '../create-form/pcreate.facade';
             <p>Se requiere un uso de CFDI</p>
           </ion-note>
         </ion-col>
-        <ion-col>
+        <ion-col size="12" size-md="4">
           <ion-item>
             <ion-label position="floating">CFDI Email</ion-label>
             <ion-input
@@ -71,7 +71,7 @@ import { PcreateFacade } from '../create-form/pcreate.facade';
             Númer máximo de caracteres 250
           </ion-note>
         </ion-col>
-        <ion-col size-sm="5" size-md="4">
+        <ion-col size="12" size-sm="5" size-md="4">
           <ion-item>
             <ion-label position="floating">Comprador</ion-label>
             <ion-input
@@ -90,14 +90,62 @@ import { PcreateFacade } from '../create-form/pcreate.facade';
           </ion-note>
         </ion-col>
       </ion-row>
+
+      <ion-row *ngIf="summary$ | async as summary" class="summary">
+        <ion-col size="12" size-ls="6">
+          <ion-item>
+            <ion-label position="floating">Importe</ion-label>
+            <ion-input
+              color="primary"
+              readonly="true"
+              value="{{ summary.importe | currency }}"
+            ></ion-input>
+          </ion-item>
+        </ion-col>
+        <ion-col size="12" size-ls="6">
+          <ion-item>
+            <ion-label position="floating">Descuento</ion-label>
+            <ion-input
+              color="primary"
+              readonly="true"
+              value="{{ summary.descuentoImporte | currency }}"
+            ></ion-input>
+            <ion-note slot="end" color="warning">
+              {{ summary.descuento / 100 | percent }}
+            </ion-note>
+          </ion-item>
+        </ion-col>
+
+        <ion-col size="12" size-ls="6">
+          <ion-item>
+            <ion-label position="floating">Subtotal</ion-label>
+            <ion-input
+              readonly="true"
+              color="primary"
+              value="{{ summary.subtotal | currency }}"
+            ></ion-input>
+          </ion-item>
+        </ion-col>
+        <ion-col size="12" size-ls="6">
+          <ion-item>
+            <ion-label position="floating">IVA</ion-label>
+            <ion-input
+              readonly="true"
+              color="primary"
+              value="{{ summary.impuesto | currency }}"
+            ></ion-input>
+          </ion-item>
+        </ion-col>
+      </ion-row>
     </ion-grid>
-    <div *ngIf="summary$ | async as summary" class="summary">
+    <!-- <div *ngIf="summary$ | async as summary" class="summary">
       <span class="imp"> Importe: {{ summary.importe | currency }} </span>
       <span class="imp"> Descuento: {{ summary.descuento | currency }} </span>
       <span class="imp"> Subtotal: {{ summary.subtotal | currency }} </span>
       <span class="imp"> IVA: {{ summary.impuesto | currency }} </span>
       <span class="imp"> Total: {{ summary.total | currency }} </span>
-    </div>
+    </div> -->
+    <!-- <ion-grid *ngIf="summary$ | async as summary" class="summary"> </ion-grid> -->
   `,
   styles: [
     `

@@ -9,6 +9,7 @@
     <ion-title>{{ getHeaderLabel() }}</ion-title>
     <ion-buttons slot="end">
       <papx-pedido-options-button
+        [descuentos]="descuentos$ | async"
         (cerrar)="onCerrar()"
       ></papx-pedido-options-button>
     </ion-buttons>

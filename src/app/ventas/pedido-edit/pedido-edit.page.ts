@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { Pedido, User } from '@papx/models';
 import { PedidosFacade } from '../@data-access/+state';
@@ -8,13 +8,17 @@ import { PedidosFacade } from '../@data-access/+state';
   templateUrl: './pedido-edit.page.html',
   styleUrls: ['./pedido-edit.page.scss'],
 })
-export class PedidoEditPage implements OnInit {
+export class PedidoEditPage implements OnInit, OnDestroy {
   errors: any;
   warnings: any[];
   vm$ = this.facade.vm$;
   constructor(public facade: PedidosFacade, private router: Router) {}
 
   ngOnInit() {}
+
+  ngOnDestroy() {
+    this.facade.setCurrent(null);
+  }
 
   async onSave(id: string, pedido: Partial<Pedido>, user: User) {
     pedido.status = 'COTIZACION';

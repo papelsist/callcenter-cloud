@@ -21,6 +21,7 @@ import { PedidoOptionsComponent } from './options/pedido-options.component';
 import { PedidoOptionsButtonComponent } from './options/pedido-options-btn.component';
 import { SocioSelectorComponent } from './+sections/cliente/socio-selector.component';
 import { SharedClienteFormModule } from '@papx/shared/clientes/cliente-form/cliente-form.module';
+import { DescuentosModalComponent } from './options/descuentos-modal.component';
 
 const components = [
   PedidoCreateFormComponent,
@@ -36,6 +37,7 @@ const components = [
   PedidoFormFooterComponent,
   ClienteSectionComponent,
   SocioSelectorComponent,
+  DescuentosModalComponent,
 ];
 
 @NgModule({

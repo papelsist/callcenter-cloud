@@ -9,11 +9,13 @@ import {
 import {
   ActionSheetController,
   AlertController,
+  ModalController,
   PopoverController,
 } from '@ionic/angular';
-import { TipoDePedido } from '@papx/models';
+import { TipoDePedido, DescuentoPorVolumen } from '@papx/models';
 
 import { PcreateFacade } from '../create-form/pcreate.facade';
+import { DescuentosModalComponent } from './descuentos-modal.component';
 import { PedidoOptionsComponent } from './pedido-options.component';
 
 @Component({
@@ -32,12 +34,14 @@ import { PedidoOptionsComponent } from './pedido-options.component';
 })
 export class PedidoOptionsButtonComponent implements OnInit {
   @Output() cerrar = new EventEmitter();
+  @Input() descuentos: DescuentoPorVolumen[] = [];
 
   constructor(
     private popoverController: PopoverController,
     private facade: PcreateFacade,
     private actionSheet: ActionSheetController,
-    private alert: AlertController
+    private alert: AlertController,
+    private modal: ModalController
   ) {}
 
   ngOnInit() {}
@@ -59,12 +63,20 @@ export class PedidoOptionsButtonComponent implements OnInit {
   }
 
   private buildOptionButtons() {
+    let options = [];
     if (this.facade.getPedido()) {
-      return this.editOptions();
-    } else return this.createOptions();
+      options = [...this.editOptions()];
+    } else {
+      options = [...this.createOptions()];
+    }
+    if (this.facade.tipo !== TipoDePedido.CREDITO) {
+      options.push(this.buildDescuentosPorVolumenOption());
+    }
+    return options;
   }
+
   private createOptions() {
-    return [
+    const options = [
       {
         text: 'Cliente nuevo',
         role: 'selected',
@@ -78,6 +90,15 @@ export class PedidoOptionsButtonComponent implements OnInit {
         handler: () => this.setDescuentoEspecial(),
       },
     ];
+    return options;
+  }
+
+  private buildDescuentosPorVolumenOption() {
+    return {
+      text: 'Descuentos (Vol)',
+      icon: 'archive',
+      handler: () => this.showDescuentos(),
+    };
   }
 
   private editOptions() {
@@ -143,5 +164,16 @@ export class PedidoOptionsButtonComponent implements OnInit {
       ],
     });
     await alert.present();
+  }
+
+  async showDescuentos() {
+    const modal = await this.modal.create({
+      component: DescuentosModalComponent,
+      componentProps: { descuentos: this.descuentos },
+      animated: true,
+      cssClass: 'descuentos-modal',
+      mode: 'ios',
+    });
+    await modal.present();
   }
 }

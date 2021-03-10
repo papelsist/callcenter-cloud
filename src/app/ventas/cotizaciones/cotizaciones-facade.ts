@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
 import { AuthService } from '@papx/auth';
-import { UserInfo } from '@papx/models';
+import { Pedido, UserInfo } from '@papx/models';
 
-import { BehaviorSubject, Observable, combineLatest } from 'rxjs';
-import { distinctUntilChanged, map } from 'rxjs/operators';
+import { BehaviorSubject, Observable, combineLatest, of } from 'rxjs';
+import { distinctUntilChanged, map, switchMap } from 'rxjs/operators';
 import { VentasDataService } from '../@data-access';
 
 export namespace Cotizaciones {
@@ -11,7 +11,6 @@ export namespace Cotizaciones {
     filterByUser: boolean;
     title: string;
     usuario: UserInfo;
-    cotizaciones: any[];
     selectedCotizacion: any | null;
   }
 }
@@ -19,7 +18,6 @@ let _state: Cotizaciones.State = {
   title: 'Cotizaciones',
   filterByUser: true,
   usuario: undefined,
-  cotizaciones: [],
   selectedCotizacion: null,
 };
 
@@ -27,46 +25,10 @@ let _state: Cotizaciones.State = {
 export class CotizacionesFacade {
   private store = new BehaviorSubject<Cotizaciones.State>(_state);
 
-  private user$ = this.auth.userInfo$;
   public state$ = this.store.asObservable();
-
-  // Puglic properties
-  filterByUser$ = this.state$.pipe(
-    map((state) => state.filterByUser),
-    distinctUntilChanged()
-  );
-
-  title$ = this.state$.pipe(
-    map((state) => state.title),
-    distinctUntilChanged()
-  );
-  cotizaciones$ = this.state$.pipe(
-    map((state) => state.cotizaciones),
-    distinctUntilChanged()
-  );
 
   constructor(
     private dataService: VentasDataService,
     private auth: AuthService
-  ) {
-    combineLatest([
-      auth.userInfo$,
-      this.filterByUser$,
-      this.dataService.cotizaciones$,
-    ])
-      .pipe(
-        map(([usuario, filterByUser, cotizaciones]) => ({
-          usuario,
-          filterByUser,
-          cotizaciones,
-        }))
-      )
-      .subscribe((data) => {
-        this.store.next((_state = { ..._state, ...data }));
-      });
-  }
-
-  toggleFilter() {
-    this.store.next({ ..._state, filterByUser: !_state.filterByUser });
-  }
+  ) {}
 }

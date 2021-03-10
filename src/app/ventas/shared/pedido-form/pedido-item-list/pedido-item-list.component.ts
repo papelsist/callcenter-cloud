@@ -70,7 +70,8 @@ export class PedidoItemListComponent implements OnInit {
   }
 
   doReorder(ev: any) {
-    this.items = ev.detail.complete(this.items);
-    this.facade.reordenarPartidas(this.items);
+    // this.items = ev.detail.complete(this.items);
+    ev.detail.complete(this.items);
+    this.facade.reordenarPartidas(ev.detail.from, ev.detail.to);
   }
 }

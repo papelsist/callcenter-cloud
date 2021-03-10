@@ -92,16 +92,21 @@ export class AuthService {
     }
   }
 
-  async createUser(email: string, password: string) {
+  async createUser(email: string, password: string, displayName: string) {
     const credentials = await this.auth.createUserWithEmailAndPassword(
       email,
       password
     );
+    return credentials;
+    // return credentials;
+
+    /*
     await credentials.user.sendEmailVerification({
       url: this.hostUrl,
       handleCodeInApp: false,
     });
-    return credentials;
+    */
+    // return credentials;
   }
 
   sendEmailVerification(user: User) {
@@ -118,6 +123,7 @@ export class AuthService {
     const callable = this.fns.httpsCallable('createSiipapUser');
     return callable(data).pipe(
       map(() => this.auth.signInWithEmailAndPassword(email, password)),
+      /*
       map(async (p) => {
         const d = await p;
         const user = d.user;
@@ -127,6 +133,7 @@ export class AuthService {
         });
         return user;
       }),
+      */
       catchError((err) => throwError(err))
     );
   }

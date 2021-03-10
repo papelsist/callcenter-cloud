@@ -33,7 +33,7 @@ export class PedidoItemComponent implements OnInit {
   }
 
   onSelection() {
-    if (!this.disabled) {
+    if (!this.disabled && !this.isCargo()) {
       this.selection.emit(this.item);
     }
   }

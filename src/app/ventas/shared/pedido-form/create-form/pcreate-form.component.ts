@@ -45,6 +45,8 @@ export class PedidoCreateFormComponent extends BaseComponent implements OnInit {
   errors$ = this.facade.errors$;
   hasErrors$ = this.facade.errors$.pipe(map((errors) => errors.length > 0));
 
+  descuentos$ = this.facade.descuentos$;
+
   constructor(private facade: PcreateFacade, private cd: ChangeDetectorRef) {
     super();
   }

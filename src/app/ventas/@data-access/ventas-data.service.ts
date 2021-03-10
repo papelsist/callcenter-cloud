@@ -45,13 +45,13 @@ export class VentasDataService {
 
   fetchCotizaciones(user: User) {
     return this.afs
-      .collection(this.PEDIDOS_COLLECTION, (ref) =>
+      .collection<Pedido>(this.PEDIDOS_COLLECTION, (ref) =>
         ref
           .where('status', '==', 'COTIZACION')
           .where('uid', '==', user.uid)
-          .limit(10)
+          .limit(20)
       )
-      .valueChanges()
+      .valueChanges({ idField: 'id' })
       .pipe(
         catchError((err) =>
           throwError('Error fetching cotizciones del usuario ' + err.message)

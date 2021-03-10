@@ -1,7 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { AlertController } from '@ionic/angular';
+import { AuthService } from '@papx/auth';
+import { BaseComponent } from '@papx/core';
 import { Pedido, User } from '@papx/models';
+import { BehaviorSubject, combineLatest, of } from 'rxjs';
+import { map, switchMap, takeUntil, tap, withLatestFrom } from 'rxjs/operators';
+import { VentasDataService } from '../@data-access';
 import { PedidosFacade } from '../@data-access/+state';
 
 import { VentasFacade } from '../@data-access/+state/ventas.facade';
@@ -14,21 +19,37 @@ import { Cotizaciones, CotizacionesFacade } from './cotizaciones-facade';
   styleUrls: ['./cotizaciones.page.scss'],
   providers: [CotizacionesFacade],
 })
-export class CotizacionesPage implements OnInit {
-  state$ = this.facade.state$;
+export class CotizacionesPage extends BaseComponent implements OnInit {
+  filtrarPorUsuario$ = new BehaviorSubject<boolean>(true);
+  user$ = this.auth;
 
+  vm$ = combineLatest([this.filtrarPorUsuario$, this.auth.user$]).pipe(
+    map(([filtrar, user]) => ({ filtrar, user }))
+  );
+
+  cotizaciones$ = this.vm$.pipe(
+    switchMap((vm) =>
+      vm.filtrar
+        ? this.dataService.fetchCotizaciones(vm.user)
+        : this.dataService.cotizaciones$
+    )
+  );
   constructor(
     private facade: CotizacionesFacade,
     private router: Router,
     private ventasController: VentasController,
     private pedidosFacade: PedidosFacade,
-    private alert: AlertController
-  ) {}
+    private alert: AlertController,
+    private auth: AuthService,
+    private dataService: VentasDataService
+  ) {
+    super();
+  }
 
   ngOnInit() {}
 
-  onFilter() {
-    this.facade.toggleFilter();
+  onFilter(val: boolean) {
+    this.filtrarPorUsuario$.next(!val);
   }
 
   onSelection(event: Partial<Pedido>) {
@@ -67,15 +88,10 @@ export class CotizacionesPage implements OnInit {
     const {
       data: { cerrar },
     } = await modal.onWillDismiss();
-    console.log('DatA: ', cerrar);
     if (cerrar) {
-      // console.log('Cerrar pedido: ', event);
-      // console.log('Requiere autorizacion: ', event.warnings);
       this.pedidosFacade.cerrarPedido(event.id, event, user);
     }
   }
-
-  enEsperaDeAutorizacion() {}
 
   getTitle(filtered: boolean) {
     return filtered ? 'Mis cotizaciones' : 'Cotizaciones';

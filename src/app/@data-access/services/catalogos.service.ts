@@ -4,7 +4,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError, map, shareReplay, switchMap } from 'rxjs/operators';
 
-import { Transporte } from '@papx/models';
+import { DescuentoPorVolumen, Transporte } from '@papx/models';
 import { AngularFirestore } from '@angular/fire/firestore';
 
 import sortBy from 'lodash-es/sortBy';
@@ -16,6 +16,10 @@ export class CatalogosService {
     map((data) => sortBy(data, 'nombre')),
     shareReplay()
   );
+
+  descuentos$ = this.firestore
+    .collection<DescuentoPorVolumen>('descuentos_volumen')
+    .valueChanges();
 
   constructor(
     private http: HttpClient,

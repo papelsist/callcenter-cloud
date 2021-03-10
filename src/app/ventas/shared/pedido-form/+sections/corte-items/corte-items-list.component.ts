@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 
 import { PedidoDet } from '@papx/models';
+import { PcreateFacade } from '../../create-form/pcreate.facade';
 
 @Component({
   selector: 'papx-cortes-list',
@@ -18,10 +19,11 @@ import { PedidoDet } from '@papx/models';
               <span *ngIf="corte.instruccion === 'ESPECIAL'">
                 {{ corte.instruccionEspecial }}
               </span>
-              <small class="ion-padding-start">
-                ({{ corte.limpio ? 'Limpio' : '' }}) ({{
-                  corte.refinado ? 'Refinado' : ''
-                }})
+              <small class="ion-padding-start" *ngIf="corte.limpio">
+                Limpio
+              </small>
+              <small class="ion-padding-start" *ngIf="corte.refinado">
+                Refinado
               </small>
               <p>
                 <span> Cantidad: {{ corte.cantidad | number: '1.0' }} </span>
@@ -31,7 +33,10 @@ import { PedidoDet } from '@papx/models';
               </p>
             </ion-label>
             <ion-chip slot="start" color="primary" class="clave">
-              {{ item.clave }}
+              <ion-icon name="cut"></ion-icon>
+              <ion-label>
+                {{ item.clave }}
+              </ion-label>
             </ion-chip>
             <ion-chip slot="end" color="warning">
               {{ item.corte.precio * item.corte.cantidad | currency }}
@@ -48,10 +53,11 @@ export class CorteItemsListComponent {
   @Input() partidas: Partial<PedidoDet>[] = [];
   @Input() parent: FormGroup;
 
-  constructor() {}
+  constructor(private facade: PcreateFacade) {}
 
   doReorder(ev: any) {
-    // console.log('Dragged from index', ev.detail.from, 'to', ev.detail.to);
-    // ev.detail.complete(this.partidas);
+    //console.log('Dragged from index', ev.detail.from, 'to', ev.detail.to);
+    ev.detail.complete(this.partidas);
+    this.facade.reordenarPartidas(ev.detail.from, ev.detail.to);
   }
 }

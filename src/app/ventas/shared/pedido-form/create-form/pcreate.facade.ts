@@ -40,6 +40,7 @@ import { AutorizacionesDePedido } from '../../../utils';
 import * as utils from '../pedido-form.utils';
 import { PedidoForm } from '../pedido-form';
 import { PedidoWarnings } from '../validation/pedido-warning';
+import { CatalogosService } from '@papx/data-access';
 
 @Injectable()
 export class PcreateFacade {
@@ -94,13 +95,17 @@ export class PcreateFacade {
 
   private currentPedido: Pedido;
   private user: User;
+
+  descuentos$ = this.catalogos.descuentos$;
+
   constructor(
     private itemController: ItemController,
     private clienteSelector: ClienteSelectorController,
     private clienteForm: ClienteFormController,
     private clienteDataService: ClientesDataService,
     private productoDataService: ProductoService,
-    private auth: AuthService,
+    private catalogos: CatalogosService,
+    auth: AuthService,
     private fb: FormBuilder,
     private modal: ModalController
   ) {
@@ -112,7 +117,7 @@ export class PcreateFacade {
   }
 
   setPedido(data: Partial<Pedido>) {
-    console.log('Registrando datos iniciales del pedido: ', data);
+    // console.log('Registrando datos iniciales del pedido: ', data);
     if (data.id) {
       this.currentPedido = data as Pedido;
     }
@@ -132,7 +137,7 @@ export class PcreateFacade {
   }
 
   private refreshCliente(id: string) {
-    console.log('Registrando Live CLIENTE ');
+    // console.log('Registrando Live CLIENTE ');
     this.closeClienteSubs();
     this.liveClienteSub = this.clienteDataService
       .fetchLiveCliente(id)
@@ -145,7 +150,7 @@ export class PcreateFacade {
         if (cte.credito) {
           this.recalcular();
         }
-        console.log('Cliente actualizado: ', cte);
+        // console.log('Cliente actualizado: ', cte);
         this.actualizarValidaciones();
       });
   }
@@ -249,8 +254,13 @@ export class PcreateFacade {
     this.recalcular();
   }
 
-  async reordenarPartidas(items: Partial<PedidoDet>[]) {
+  async reordenarPartidas(from: number, to: number) {
     if (this.form.enabled) {
+      // console.log('Reordenando de %f al %f', from, to);
+      const items = [...this._currentPartidas];
+      const elm = items.splice(from, 1)[0];
+      items.splice(to, 0, elm);
+
       this._currentPartidas = [...items];
       this._partidas.next(this._currentPartidas);
       this.form.markAsDirty();
