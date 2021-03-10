@@ -85,12 +85,19 @@
   }
 }
 
-.descuentos-voluman-modal .alert-input-wrapper {
-  --min-width: 70%;
-  --max-width: 70%;
-  input {
-    margin: 0;
-    font-size: 0.8rem;
-    text-transform: capitalize;
-  }
+// .descuentos-voluman-modal .alert-input-wrapper {
+//   --min-width: 70%;
+//   --max-width: 70%;
+//   input {
+//     margin: 0;
+//     font-size: 0.8rem;
+//     text-transform: capitalize;
+//   }
+// }
+
+ion-popover.menu {
+  --width: 540px;
+  --max-width: 100%;
+  box-shadow: -8px 0 16px rgba(0, 0, 0, 0.12);
+  border-radius: 0;
 }

@@ -4,7 +4,7 @@ import {
   Input,
   OnInit,
 } from '@angular/core';
-import { ModalController } from '@ionic/angular';
+import { ModalController, PopoverController } from '@ionic/angular';
 import { DescuentoPorVolumen } from '@papx/models';
 
 @Component({
@@ -38,10 +38,10 @@ import { DescuentoPorVolumen } from '@papx/models';
 })
 export class DescuentosModalComponent implements OnInit {
   @Input() descuentos: DescuentoPorVolumen[];
-  constructor(private modal: ModalController) {}
+  constructor(private controller: PopoverController) {}
 
   ngOnInit() {}
   async close() {
-    await this.modal.dismiss();
+    await this.controller.dismiss();
   }
 }

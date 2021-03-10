@@ -167,12 +167,22 @@ export class PedidoOptionsButtonComponent implements OnInit {
   }
 
   async showDescuentos() {
+    /*
     const modal = await this.modal.create({
       component: DescuentosModalComponent,
       componentProps: { descuentos: this.descuentos },
       animated: true,
       cssClass: 'descuentos-modal',
       mode: 'ios',
+    });
+    await modal.present();
+    */
+    const modal = await this.popoverController.create({
+      component: DescuentosModalComponent,
+      componentProps: { descuentos: this.descuentos },
+      animated: true,
+      mode: 'md',
+      cssClass: 'menu',
     });
     await modal.present();
   }
