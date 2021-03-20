@@ -1,5 +1,6 @@
 import {
   ChangeDetectionStrategy,
+  ChangeDetectorRef,
   Component,
   Input,
   OnInit,
@@ -25,6 +26,8 @@ import { CodigoPostalService } from '../codigo-postal.service';
 export class DireccionFormComponent extends BaseComponent implements OnInit {
   @Input() direccion: Direccion;
   @Input() title = 'Dirección';
+  @Input() parent: FormGroup = null;
+  @Input() parentPropertyName = 'direccion';
   form: FormGroup;
   colonias$ = new BehaviorSubject([]);
 
@@ -32,7 +35,8 @@ export class DireccionFormComponent extends BaseComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private modalCtrl: ModalController,
-    private service: CodigoPostalService
+    private service: CodigoPostalService,
+    private cd: ChangeDetectorRef
   ) {
     super();
   }
@@ -48,6 +52,13 @@ export class DireccionFormComponent extends BaseComponent implements OnInit {
     this.controls.codigoPostal.valueChanges
       .pipe(takeUntil(this.destroy$))
       .subscribe((zip) => this.buscar(zip));
+    if (this.direccion) {
+      this.buscar(this.direccion.codigoPostal);
+    }
+    if (this.parent) {
+      this.form.setParent(this.parent);
+      this.parent.addControl(this.parentPropertyName, this.form);
+    }
   }
 
   private buildForm(dir: Partial<Direccion> = { pais: 'MEXICO' }): FormGroup {
@@ -86,6 +97,7 @@ export class DireccionFormComponent extends BaseComponent implements OnInit {
           const { estado, municipio } = data[0];
           this.form.patchValue({ estado, municipio });
           this.colonias$.next(data.map((x) => x.asentamiento));
+          this.cd.markForCheck();
         }
       },
       (err) => console.log('Error obteniendo Zip Data', err)

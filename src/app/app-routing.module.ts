@@ -71,6 +71,13 @@ const routes2: Routes = [
         ...canActivate(redirectUnauthorized),
       },
       {
+        path: 'transportes',
+        loadChildren: () =>
+          import('./transportes/transportes.module').then(
+            (m) => m.TransportesPageModule
+          ),
+      },
+      {
         path: '',
         redirectTo: 'home',
         pathMatch: 'full',

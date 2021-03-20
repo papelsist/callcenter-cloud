@@ -1,0 +1,61 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Catálogo de transportes </ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="addTransporte()">
+        <ion-icon name="add" slot="icon-only"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <ion-searchbar
+    placeholder="Filtrar"
+    (ionChange)="onFilter($event)"
+  ></ion-searchbar>
+  <ion-list>
+    <ion-item-sliding *ngFor="let t of filteredList$ | async">
+      <ion-item buttom>
+        <ion-label class="ion-text-wrap">
+          <ion-text color="primary">
+            <h2>{{t.nombre}}</h2>
+          </ion-text>
+          <address *ngIf="t.direccion as d">
+            <div class="row">
+              <span> Calle: {{d.calle}} </span>
+              <span class="ion-padding-start"
+                ># Exterior {{d.numeroExterior}}</span
+              >
+              <span class="ion-padding-start" *ngIf="d.numeroInterior"
+                ># Int: {{d.numeroInterior}}</span
+              >
+            </div>
+            <p class="row">
+              <span> Colonia: {{d.colonia}} </span>
+              <span> Municipio: {{d.municipio}} </span>
+              <span>Estado: {{d.estado}}</span>
+            </p>
+            <p>
+              Código postal:
+              <ion-text color="warning"> {{d.codigoPostal}} </ion-text>
+            </p>
+          </address>
+        </ion-label>
+        <ion-button slot="end" fill="clear" (click)="onEdit(t)">
+          <ion-icon name="create" slot="start"></ion-icon>
+          <ion-label>Editar</ion-label>
+        </ion-button>
+      </ion-item>
+      <ion-item-options>
+        <ion-item-option (click)="delete(t)" color="danger" slot="bottom">
+          <ion-label>Eliminar</ion-label>
+          <ion-icon name="trash" slot="bottom"></ion-icon>
+        </ion-item-option>
+      </ion-item-options>
+    </ion-item-sliding>
+  </ion-list>
+</ion-content>

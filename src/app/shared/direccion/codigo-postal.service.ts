@@ -5,7 +5,7 @@ import { catchError } from 'rxjs/operators';
 
 @Injectable({ providedIn: 'root' })
 export class CodigoPostalService {
-  apiUrl = 'https://api-sepomex.hckdrk.mx/query/info_cp/37296';
+  apiUrl = 'https://api-sepomex.hckdrk.mx/query/info_cp';
   constructor(private http: HttpClient) {}
 
   fetchData(zip: string): Observable<any[]> {
