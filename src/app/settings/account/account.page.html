@@ -1,0 +1,61 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="settings"></ion-back-button>
+    </ion-buttons>
+    <ion-title>SX-DEPOSITOS APP</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content *ngIf="user$ | async as userInfo">
+  <ion-grid>
+    <ion-row>
+      <ion-col size-sm="12" size-md="6" offset-md="3" size-lg="4" offset-lg="4">
+        <div class="container">
+          <ion-text color="secondary">
+            <h2 class="ion-text-center">Inicio de sesion y seguridad</h2>
+          </ion-text>
+          <ion-list>
+            <ion-item>
+              <ion-label position="floating">Nombre</ion-label>
+              <ion-input [value]="userInfo.displayName" readOnly></ion-input>
+              <ion-button fill="clear" slot="end">Modificar</ion-button>
+            </ion-item>
+            <ion-item>
+              <ion-label position="floating">Correo electrónico</ion-label>
+              <ion-input [value]="userInfo.email" readOnly></ion-input>
+            </ion-item>
+            <ion-item>
+              <ion-label position="floating">Número de celular</ion-label>
+              <ion-input [value]="userInfo.phoneNumber" readOnly></ion-input>
+              <ion-button fill="clear" slot="end">Modificar</ion-button>
+            </ion-item>
+            <ion-item>
+              <ion-label position="floating">Contraseña</ion-label>
+              <ion-input value="***" type="password" disabled></ion-input>
+              <ion-button fill="clear" slot="end">Modificar</ion-button>
+            </ion-item>
+
+            <ion-item>
+              <ion-avatar slot="start">
+                <img
+                  src="https://via.placeholder.com/150?text='Puede tomar su foto de perfil'"
+                />
+              </ion-avatar>
+              <ion-label>Foto de prefil</ion-label>
+              <ion-button slot="end" fill="clear">
+                <ion-icon slot="icon-only" name="camera"></ion-icon>
+              </ion-button>
+            </ion-item>
+          </ion-list>
+          <!-- <div>
+            <img
+              src="https://via.placeholder.com/250?text='Puede tomar su foto de perfil'"
+              alt=""
+            />
+          </div> -->
+        </div>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+</ion-content>

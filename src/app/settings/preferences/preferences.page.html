@@ -1,0 +1,26 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/settings"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Preferencias</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <ion-list>
+    <ion-list-header color="tertiary">
+      <ion-label> Interfaz gráfica </ion-label>
+    </ion-list-header>
+    <ion-item>
+      <ion-label>Dark mode</ion-label>
+      <ion-toggle
+        (ionChange)="toggleDarkMode($event)"
+        [(ngModel)]="displayService.dark"
+      >
+        Dark mode
+      </ion-toggle>
+      <ion-icon name="moon" slot="start"></ion-icon>
+    </ion-item>
+  </ion-list>
+</ion-content>

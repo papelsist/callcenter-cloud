@@ -63,6 +63,14 @@ const routes2: Routes = [
           ),
       },
       {
+        path: 'settings',
+        loadChildren: () =>
+          import('./settings/settings.module').then(
+            (m) => m.SettingsPageModule
+          ),
+        ...canActivate(redirectUnauthorized),
+      },
+      {
         path: '',
         redirectTo: 'home',
         pathMatch: 'full',
