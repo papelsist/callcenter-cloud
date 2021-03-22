@@ -144,7 +144,7 @@ export function buildPedidoItem(
         : producto.precioContado,
   };
 
-  if (corte.tantos > 0) {
+  if (corte.cantidad > 0) {
     if (corte.instruccion !== 'ESPECIAL') {
       corte.instruccionEspecial = null;
     }

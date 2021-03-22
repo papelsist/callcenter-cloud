@@ -61,22 +61,6 @@
         ></ion-input>
       </ion-item>
     </ion-col>
-    <!-- <ion-col>
-      <ion-item>
-        <ion-label position="floating"
-          >Descuento
-          <ion-text color="warning"
-            >({{ form.get("descuento").value / 100 | percent }})</ion-text
-          >
-        </ion-label>
-        <ion-input
-          color="primary"
-          value="{{ form.get('descuentoImporte').value || 0.0 | currency }}"
-          readonly
-          tabindex="-1"
-        ></ion-input>
-      </ion-item>
-    </ion-col> -->
     <ion-col>
       <ion-item>
         <ion-label position="floating">Importe</ion-label>
@@ -90,14 +74,11 @@
     </ion-col>
   </ion-row>
 </ion-grid>
-<papx-corte-field
-  [parent]="form"
-  *ngIf="controls.tantos.value > 0"
-></papx-corte-field>
+<papx-corte-field [parent]="form"></papx-corte-field>
 <papx-existencia-field
   [producto]="controls.producto.valueChanges | async"
   [existencias]="existencia"
   [sucursal]="sucursal"
   [faltante]="form.get('faltante').value"
 ></papx-existencia-field>
-<papx-pedido-item-validation [parent]="form"></papx-pedido-item-validation>
+<!-- <papx-pedido-item-validation [parent]="form"></papx-pedido-item-validation> -->

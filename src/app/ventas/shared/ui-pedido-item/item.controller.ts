@@ -17,6 +17,7 @@ export class ItemController {
         tipo,
         sucursal,
       },
+      cssClass: 'pedido-item-modal',
     });
     await modal.present();
     const { data } = await modal.onWillDismiss<Partial<PedidoDet>>();

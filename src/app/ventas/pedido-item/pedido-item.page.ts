@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { TipoDePedido } from '@papx/models';
 import { ItemController } from '../shared/ui-pedido-item';
 
 @Component({
@@ -9,5 +10,7 @@ import { ItemController } from '../shared/ui-pedido-item';
 export class PedidoItemPage implements OnInit {
   constructor(private itemController: ItemController) {}
 
-  ngOnInit() {}
+  ngOnInit() {
+    this.itemController.addItem(TipoDePedido.COD);
+  }
 }

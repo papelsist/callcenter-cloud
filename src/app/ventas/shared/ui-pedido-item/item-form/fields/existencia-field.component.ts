@@ -39,8 +39,8 @@ import { Producto } from '@papx/models';
       <ion-row *ngIf="existencias">
         <ion-col
           *ngFor="let item of existencias | keyvalue"
-          size-md="3"
-          size-sm="6"
+          size-md="2"
+          size-sm="3"
         >
           <ion-item [ngClass]="{ active: getLabel(item.key) === sucursal }">
             <ion-label position="floating">{{ getLabel(item.key) }}</ion-label>
