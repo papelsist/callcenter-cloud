@@ -1,12 +1,18 @@
-import { Autorizacion } from './autorizacion';
+import { Autorizacion, AutorizacionRechazo } from './autorizacion';
 import { Banco } from './banco';
 import { Cliente } from './cliente';
 import { CuentaDeBanco } from './cuenta-de-banco';
-import { Sucursal } from './sucursal';
+import { Pedido } from './pedidos-model';
+
+import { User } from './user';
 
 export interface SolicitudDeDeposito {
   id: string;
-  sucursal?: Partial<Sucursal>;
+  folio: number;
+  sucursal: string;
+  sucursalId: string;
+  tipo: 'CRE' | 'CHE' | 'JUR' | 'CHO' | 'CON';
+  callcenter?: boolean;
   fecha: string;
   cliente: Partial<Cliente>;
   banco: Partial<Banco>;
@@ -21,8 +27,19 @@ export interface SolicitudDeDeposito {
   total: number;
   dateCreated?: string;
   lastUpdated?: string;
-  createUser?: string;
-  updateUser?: string;
+  createUser: Partial<User>;
+  updateUser: Partial<User>;
+  uid: string;
   autorizacion?: Autorizacion;
+  rechazo?: AutorizacionRechazo;
+  rechasosAnteriores?: AutorizacionRechazo[];
   status: 'PENDIENTE' | 'AUTORIZADO' | 'RECHAZADO';
+  retraso?: number;
+  pedidos?: Partial<Pedido>[];
+  appVersion?: number;
+}
+
+export interface UpdateSolicitud {
+  id: string;
+  changes: Partial<SolicitudDeDeposito>;
 }

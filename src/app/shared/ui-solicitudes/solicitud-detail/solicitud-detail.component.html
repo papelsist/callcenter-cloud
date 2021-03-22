@@ -1,0 +1,141 @@
+<ion-list-header>
+  <ion-label class="ion-text-center">
+    <h1>
+      <span class="ion-padding-end">Total: </span>
+      <ion-text color="primary">
+        {{ solicitud.total | currency }}
+      </ion-text>
+    </h1>
+  </ion-label>
+</ion-list-header>
+<div class="container">
+  <ion-item>
+    <ion-label position="floating">Transferencia:</ion-label>
+    <ion-input
+      color="warning"
+      value="{{ solicitud.transferencia | currency }}"
+      readonly
+    ></ion-input>
+    <ion-icon name="send" slot="start"></ion-icon>
+  </ion-item>
+  <ion-item>
+    <ion-label position="floating"> Efectivo: </ion-label>
+    <ion-input
+      color="warning"
+      value="{{ solicitud.efectivo | currency }}"
+      readonly
+    >
+    </ion-input>
+    <ion-icon name="cash" slot="start"></ion-icon>
+  </ion-item>
+  <ion-item>
+    <ion-label position="floating"> Cheque: </ion-label>
+    <ion-input
+      color="warning"
+      value="{{ solicitud.cheque | currency }}"
+      readonly
+    >
+    </ion-input>
+    <ion-icon name="wallet" slot="start"></ion-icon>
+  </ion-item>
+  <ion-item>
+    <ion-label position="floating"> Banco origen: </ion-label>
+    <ion-input color="warning" value="{{ solicitud.banco.nombre }}" readonly>
+    </ion-input>
+    <ion-icon size="small" slot="start" name="business"></ion-icon>
+  </ion-item>
+  <ion-item>
+    <ion-label position="floating">Cuenta destino:</ion-label>
+    <ion-input
+      color="warning"
+      readonly
+      value="{{ solicitud.cuenta.descripcion }} ({{ solicitud.cuenta.numero }})"
+    ></ion-input>
+    <ion-icon slot="start" name="folder"></ion-icon>
+  </ion-item>
+  <ion-item>
+    <ion-label position="floating"> Fecha Depósito: </ion-label>
+    <ion-input
+      color="warning"
+      readonly
+      value="{{ solicitud.fechaDeposito | date: 'dd/MM/yyyy' }}"
+    >
+    </ion-input>
+    <ion-icon slot="start" name="calendar"></ion-icon>
+  </ion-item>
+  <ion-item>
+    <ion-label position="floating">Referencia: </ion-label>
+    <ion-input color="warning" value="{{ solicitud.referencia }}" readonly>
+    </ion-input>
+    <ion-icon slot="start" name="information-circle"></ion-icon>
+  </ion-item>
+
+  <ion-item>
+    <ion-label position="floating"> Solicito: </ion-label>
+    <ion-input
+      class="ion-text-wrap"
+      value="{{ solicitud.solicita ? solicitud.solicita : 'ND' }}"
+      readonly
+    >
+    </ion-input>
+    <ion-icon slot="start" name="person"></ion-icon>
+  </ion-item>
+
+  <ion-item>
+    <ion-label position="floating"> Fecha: </ion-label>
+    <ion-input value="{{ solicitud.fecha | date: 'dd/MM/yyy HH:mm' }}" readonly>
+    </ion-input>
+
+    <ion-icon slot="start" name="calendar-outline"></ion-icon>
+    <ion-note slot="end" [color]="retrasoColor">
+      {{ retraso }}
+    </ion-note>
+  </ion-item>
+
+  <ion-item>
+    <ion-label position="floating"> Sucursal: </ion-label>
+    <ion-input
+      value="{{ solicitud.sucursal ? solicitud.sucursal : 'ND' }}"
+      readonly
+    >
+    </ion-input>
+    <ion-icon slot="start" name="storefront"></ion-icon>
+  </ion-item>
+</div>
+<ion-item>
+  <ion-label class="ion-text-wrap" color="secondary">
+    <h2>{{ solicitud.cliente.nombre }}</h2>
+  </ion-label>
+  <ion-icon name="people-circle" slot="start"></ion-icon>
+</ion-item>
+<div *ngIf="solicitud.status === 'RECHAZADO'">
+  <ion-list class="ion-padding-buttom">
+    <ion-list-header color="warning">
+      <ion-label> Rechazo </ion-label>
+    </ion-list-header>
+    <ng-container *ngIf="solicitud.rechazo as r">
+      <ion-item>
+        <ion-label>
+          <h2>Motivo: {{ r.motivo }}</h2>
+        </ion-label>
+      </ion-item>
+      <ion-item>
+        <ion-label>
+          <h2>Comentario: {{ r.comentario }}</h2>
+        </ion-label>
+      </ion-item>
+      <ion-item>
+        <ion-label>
+          <h2>
+            Fecha: {{ r.dateCreated.toDate() | date: "dd/MM/yyyy : HH:mm" }}
+          </h2>
+        </ion-label>
+      </ion-item>
+      <ion-item>
+        <ion-label>
+          <h2>Usuario: {{ r.userName }}</h2>
+        </ion-label>
+      </ion-item>
+    </ng-container>
+  </ion-list>
+</div>

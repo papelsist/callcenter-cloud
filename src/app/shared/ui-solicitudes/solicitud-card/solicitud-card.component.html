@@ -1,0 +1,71 @@
+<ion-card mode="ios">
+  <ion-card-header>
+    <ion-card-title class="ion-text-center">
+      Folio: {{ solicitud.folio }}
+      <ion-text color="primary">
+        <span class="ion-padding-start">{{ solicitud.total | currency }}</span>
+      </ion-text>
+      <ion-text color="warning" class="ion-padding-start" *ngIf="solicitud.sbc">
+        (SBC)
+      </ion-text>
+    </ion-card-title>
+  </ion-card-header>
+  <ion-card-content class="ion-no-padding">
+    <ion-list class="ion-no-padding">
+      <ion-item class="importes">
+        <h2 *ngIf="solicitud.transferencia > 0">
+          Transferencia: {{ solicitud.transferencia | currency }}
+        </h2>
+        <h2 *ngIf="solicitud.cheque > 0">
+          Cheque: {{ solicitud.cheque | currency }}
+        </h2>
+        <h2 *ngIf="solicitud.efectivo > 0">
+          Efectivo: {{ solicitud.efectivo | currency }}
+        </h2>
+      </ion-item>
+      <ion-item>
+        <ion-label class="ion-text-wrap">
+          <ion-text color="primary">
+            <h3>
+              {{ solicitud.banco.nombre }}
+            </h3>
+          </ion-text>
+          <p>
+            Cuenta destino:
+            <ion-text color="primary">
+              {{ solicitud.cuenta.descripcion }} ({{ solicitud.cuenta.numero }})
+            </ion-text>
+          </p>
+          <p>
+            Fecha depósito:
+            <ion-text color="primary">
+              {{ solicitud.fechaDeposito | date: 'dd/MM/yyyy' }}
+            </ion-text>
+          </p>
+        </ion-label>
+      </ion-item>
+      <ion-item>
+        <ion-label>
+          <p>
+            <ion-text color="warning">
+              {{ solicitud.sucursal }}
+            </ion-text>
+          </p>
+          <h3>Solicito: {{ solicitud.solicita }}</h3>
+          <p class="fecha">
+            <span *ngIf="solicitud.lastUpdated">
+              Actualizado:{{ solicitud.lastUpdated | date: 'dd/MM/yyy HH:mm' }}
+            </span>
+            <ion-text [color]="retrasoColor" class="ion-padding-start">
+              {{ retraso }}
+            </ion-text>
+          </p>
+        </ion-label>
+      </ion-item>
+      <ion-item>
+        <p class="ion-text-wrap">{{ solicitud.cliente.nombre }}</p>
+      </ion-item>
+    </ion-list>
+    <ng-content></ng-content>
+  </ion-card-content>
+</ion-card>

@@ -4,7 +4,7 @@ import { CommonUiCoreModule } from '@papx/common/ui-core';
 import { CommonUiForms } from '@papx/common/ui-forms';
 
 import { PedidoCreateFormComponent } from './create-form';
-import { ClienteFieldComponent } from './cliente-field/cliente-field.component';
+// import { ClienteFieldComponent } from './cliente-field/cliente-field.component';
 import { TipoDePedidoComponent } from './tipo-field/tipo-de-pedido-field.component';
 import { PedidoItemListComponent } from './pedido-item-list/pedido-item-list.component';
 import { PedidoItemComponent } from './pedido-item/pedido-item.component';
@@ -25,7 +25,7 @@ import { DescuentosModalComponent } from './options/descuentos-modal.component';
 
 const components = [
   PedidoCreateFormComponent,
-  ClienteFieldComponent,
+  // ClienteFieldComponent,
   TipoDePedidoComponent,
   PedidoItemComponent,
   PedidoItemListComponent,

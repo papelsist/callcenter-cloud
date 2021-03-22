@@ -25,9 +25,8 @@ export class AuthService {
   readonly hostUrl = environment.hostUrl;
 
   readonly user$ = this.auth.user.pipe(
-    // map((user) => (user ? mapUser(user) : null)),
-    // shareReplay()
     map((user) => (user ? mapUser(user) : null)),
+    take(1),
     shareReplay()
   );
 
@@ -41,14 +40,6 @@ export class AuthService {
     }),
 
     catchError((err) => throwError(err))
-  );
-
-  readonly userDto$ = this.user$.pipe(
-    map((u) => {
-      const { uid, email, displayName } = u;
-      return { uid, email, displayName };
-    })
-    // pluck<User, UsuarioDto>('uid', 'displayName', 'email')
   );
 
   constructor(

@@ -1,0 +1,15 @@
+<ion-item button (click)="lookupCliente()" [disabled]="disabled">
+  <ion-icon name="person" slot="start"></ion-icon>
+  <ion-label class="ion-text-wrap" color="primary">
+    <h2>
+      {{ value ? value.nombre : 'Seleccione un cliente' }}
+    </h2>
+    <ion-text color="medium">
+      <p *ngIf="value">RFF: {{ value.rfc }}</p>
+    </ion-text>
+  </ion-label>
+  <!-- <ion-button fill="outline" slot="end">View</ion-button> -->
+  <ion-note color="warning" slot="end">
+    {{ value ? (value.credito ? 'CREDITO' : 'CONTADO') : '' }}
+  </ion-note>
+</ion-item>

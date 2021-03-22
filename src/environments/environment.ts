@@ -12,7 +12,7 @@ export const environment = {
     messagingSenderId: '245292921623',
     appId: '1:245292921623:web:116c7620999796721cfd52',
   },
-  useEmulators: false,
+  useEmulators: true,
   hostUrl: 'http://localhost:8100/',
 };
 

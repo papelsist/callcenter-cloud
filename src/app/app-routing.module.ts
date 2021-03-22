@@ -78,6 +78,13 @@ const routes2: Routes = [
           ),
       },
       {
+        path: 'solicitudes',
+        loadChildren: () =>
+          import('./solicitudes/solicitudes.module').then(
+            (m) => m.SolicitudesPageModule
+          ),
+      },
+      {
         path: '',
         redirectTo: 'home',
         pathMatch: 'full',

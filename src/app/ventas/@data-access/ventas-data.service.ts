@@ -8,7 +8,7 @@ import {
 import { Pedido, PedidoDet, Status, User } from '@papx/models';
 import { Observable, throwError } from 'rxjs';
 import { AngularFireFunctions } from '@angular/fire/functions';
-import { catchError } from 'rxjs/operators';
+import { catchError, map, take } from 'rxjs/operators';
 
 import firebase from 'firebase/app';
 import omitBy from 'lodash-es/omitBy';
@@ -182,5 +182,25 @@ export class VentasDataService {
 
   cleanPedidoPayload(data: Object) {
     return omitBy(data, (value, _) => value === undefined || value === null);
+  }
+
+  findByFolio(folio: number): Observable<Partial<Pedido>> {
+    return this.afs
+      .collection(this.PEDIDOS_COLLECTION, (ref) =>
+        ref.where('folio', '==', folio).limit(1)
+      )
+      .snapshotChanges()
+      .pipe(
+        take(1),
+        map(
+          (actions) =>
+            actions.map((a) => {
+              const data = a.payload.doc.data() as Pedido;
+              const id = a.payload.doc.id;
+              return { id, ...data };
+            })[0]
+        ),
+        catchError((error: any) => throwError(error))
+      );
   }
 }

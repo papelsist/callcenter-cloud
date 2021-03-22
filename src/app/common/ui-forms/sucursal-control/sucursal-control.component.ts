@@ -13,7 +13,7 @@ import { SUCURSALES } from './sucursales';
   selector: 'papx-sucursal-control',
   template: `
     <ion-item>
-      <!-- <ion-label position="floating">Sucursal</ion-label> -->
+      <ion-label position="floating" *ngIf="floating">Sucursal</ion-label>
       <ion-select
         placeholder="Sucursal"
         [compareWith]="compareWith"
@@ -21,6 +21,7 @@ import { SUCURSALES } from './sucursales';
         [interfaceOptions]="customPopoverOptions"
         (ionChange)="onSelection($event)"
         [value]="value"
+        [disabled]="disabled"
       >
         <ion-select-option
           *ngFor="let sucursal of sucursales"
@@ -57,6 +58,7 @@ export class SucursalControlComponent implements OnInit, ControlValueAccessor {
   value: Partial<Sucursal>;
 
   @Input() sucursales: Partial<Sucursal[]> = SUCURSALES;
+  @Input() floating = false;
 
   customPopoverOptions: any = {
     header: 'Catálogo de sucursales',
@@ -69,6 +71,7 @@ export class SucursalControlComponent implements OnInit, ControlValueAccessor {
 
   writeValue(obj: any): void {
     this.value = obj;
+    this.cd.markForCheck();
   }
 
   registerOnChange(fn: any): void {

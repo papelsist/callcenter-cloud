@@ -15,7 +15,7 @@ export const mapUser = (credentials: firebase.User): User => {
 
   return {
     uid,
-    displayName: displayName ?? 'Anonimo',
+    displayName: displayName ?? 'ERR DisplayName ',
     email,
     emailVerified,
     isAnonymous,

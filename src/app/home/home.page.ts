@@ -9,7 +9,7 @@ import { AuthService } from '../@auth/auth.service';
 })
 export class HomePage {
   title = 'Callcenter App';
-  user$ = this.auth.user$;
+  user$ = this.auth.userInfo$;
   host = location.href;
   constructor(private auth: AuthService, private afm: AngularFireMessaging) {}
 
