@@ -165,6 +165,10 @@ export class PcreateFacade {
     // console.log('Registrando datos iniciales del pedido: ', data);
     if (data.id) {
       this.currentPedido = data as Pedido;
+      if (this.currentPedido.envio === null) {
+        delete this.currentPedido.envio;
+      }
+      // console.log('Editando: ', this.currentPedido);
     }
     let value: any = { ...data };
     if (data.sucursal && data.sucursalId) {
@@ -353,7 +357,7 @@ export class PcreateFacade {
 
   private setCliente(cliente: Partial<Cliente>) {
     this.controls.cliente.setValue(cliente);
-    this.form.get('cfdiMail').setValue(cliente.cfdiMail);
+    // this.form.get('cfdiMail').setValue(cliente.cfdiMail);
     this.form.get('nombre').setValue(cliente.nombre);
     if (cliente.credito)
       // Solo para clientes de credito vale la pena
@@ -388,7 +392,8 @@ export class PcreateFacade {
   }
 
   resolvePedidoData(): Partial<Pedido> {
-    const { sucursalEntity, ...rest } = this.form.value;
+    const { sucursalEntity, envio, ...rest } = this.form.value;
+
     this._currentPartidas = this._currentPartidas.map((item) => {
       return {
         ...item,
@@ -404,6 +409,14 @@ export class PcreateFacade {
     if (this.currentPedido && this.currentPedido.warnings) {
       res.warnings = [...this.currentPedido.warnings];
     }
+    console.log('Analizando envio: ', envio);
+    if (envio && envio.tipo) {
+      res.envio = envio;
+    } else {
+      res.envio = null;
+    }
+    console.log('Envio res: ', envio);
+
     return res;
   }
 

@@ -49,7 +49,7 @@ export class VentasDataService {
         ref
           .where('status', '==', 'COTIZACION')
           .where('uid', '==', user.uid)
-          .limit(20)
+          .limit(50)
       )
       .valueChanges({ idField: 'id' })
       .pipe(
@@ -92,13 +92,16 @@ export class VentasDataService {
   async createPedido(pedido: Partial<Pedido>, user: User) {
     try {
       const cleanData = this.cleanPedidoPayload(pedido);
-      const payload = {
+
+      const payload: Partial<Pedido> = {
         ...cleanData,
         fecha: new Date().toISOString(),
-        uid: user.uid,
         vigencia: addDays(new Date(), 10).toISOString(),
-        dateCreated: firebase.firestore.FieldValue.serverTimestamp(),
+        dateCreated: firebase.firestore.Timestamp.now(),
+        lastUpdated: firebase.firestore.Timestamp.now(),
         createUser: user.displayName,
+        updateUser: user.displayName,
+        uid: user.uid,
         appVersion: 2,
       };
 
@@ -144,11 +147,13 @@ export class VentasDataService {
         version: firebase.firestore.FieldValue.increment(1),
         updateUser: user.displayName,
         updateUserId: user.uid,
-        lastUpdated: firebase.firestore.FieldValue.serverTimestamp(),
+        uid: user.uid,
+        lastUpdated: firebase.firestore.Timestamp.now(),
       };
       await this.afs
         .collection(this.PEDIDOS_COLLECTION)
         .doc(id)
+        // .set(payload, { merge: false });
         .update(payload);
     } catch (error: any) {
       console.error('Error actualizando: ', error);
@@ -180,8 +185,16 @@ export class VentasDataService {
     return this.updatePedido(pedido.id, data, user);
   }
 
-  cleanPedidoPayload(data: Object) {
-    return omitBy(data, (value, _) => value === undefined || value === null);
+  cleanPedidoPayload(data: Partial<Pedido>) {
+    if (data.descuentoEspecial === null) {
+      data.descuentoEspecial = 0.0;
+    }
+    const res: Partial<Pedido> = omitBy(
+      data,
+      (value, _) => value === undefined || value === null
+    );
+    if (data.envio === null) res.envio = null;
+    return res;
   }
 
   findByFolio(folio: number): Observable<Partial<Pedido>> {

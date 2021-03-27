@@ -22,6 +22,7 @@ import { PedidoOptionsButtonComponent } from './options/pedido-options-btn.compo
 import { SocioSelectorComponent } from './+sections/cliente/socio-selector.component';
 import { SharedClienteFormModule } from '@papx/shared/clientes/cliente-form/cliente-form.module';
 import { DescuentosModalComponent } from './options/descuentos-modal.component';
+import { ClienteControlModule } from './cliente-control/cliente-control.module';
 
 const components = [
   PedidoCreateFormComponent,
@@ -46,6 +47,7 @@ const components = [
     CommonUiForms,
     EnvioModule,
     SharedClienteFormModule,
+    ClienteControlModule,
   ],
   exports: [...components],
   declarations: [...components],

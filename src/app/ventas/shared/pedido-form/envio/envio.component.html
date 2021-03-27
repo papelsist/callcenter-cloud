@@ -3,7 +3,10 @@
     <ion-col size="12" size-sm="4" push-sm="8">
       <ion-item>
         <ion-label position="stacked"> Habilitar</ion-label>
-        <ion-toggle (ionChange)="setEnvio($event)"></ion-toggle>
+        <ion-toggle
+          (ionChange)="setEnvio($event)"
+          [checked]="form.enabled"
+        ></ion-toggle>
       </ion-item>
     </ion-col>
     <ion-col size="12" size-sm="8" pull-sm="4">

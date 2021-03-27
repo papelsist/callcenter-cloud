@@ -68,6 +68,8 @@ export class TransportesPage implements OnInit {
     const modal = await this.modalCtrl.create({
       component: TransporteFormComponent,
       animated: true,
+      mode: 'ios',
+      cssClass: 'transporte-modal',
     });
     await modal.present();
     const { data } = await modal.onWillDismiss();
@@ -82,6 +84,7 @@ export class TransportesPage implements OnInit {
       componentProps: { transporte: t },
       animated: true,
       mode: 'ios',
+      cssClass: 'transporte-modal',
     });
     await modal.present();
     const { data } = await modal.onWillDismiss();

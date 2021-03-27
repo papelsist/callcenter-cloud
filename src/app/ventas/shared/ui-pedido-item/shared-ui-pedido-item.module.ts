@@ -1,4 +1,11 @@
 import { NgModule } from '@angular/core';
+
+import { MatInputModule } from '@angular/material/input';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
+import { MatSelectModule } from '@angular/material/select';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
+
 import { CommonUiCoreModule } from '@papx/common/ui-core';
 import { CommonUiForms } from '@papx/common/ui-forms';
 import { ProductoSelectorModule } from '@papx/shared/productos/producto-selector';
@@ -10,7 +17,16 @@ import { ItemController } from './item.controller';
 import { ITEM_FORM_FIELDS } from './item-form';
 
 @NgModule({
-  imports: [CommonUiCoreModule, CommonUiForms, ProductoSelectorModule],
+  imports: [
+    CommonUiCoreModule,
+    CommonUiForms,
+    ProductoSelectorModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatIconModule,
+    MatSelectModule,
+    MatAutocompleteModule,
+  ],
   exports: [],
   declarations: [ItemModalComponent, ItemFormComponent, ...ITEM_FORM_FIELDS],
   providers: [ItemController, ItemFormComponent],

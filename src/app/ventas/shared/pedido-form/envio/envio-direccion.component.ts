@@ -9,7 +9,7 @@ import {
 } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 
-import { ClienteDireccion } from '@papx/models';
+import { ClienteDireccion, Direccion, buildDireccionKey } from '@papx/models';
 import { DireccionController } from '@papx/shared/direccion';
 
 @Component({
@@ -26,7 +26,7 @@ import { DireccionController } from '@papx/shared/direccion';
 
         <ion-label position="floating"> Dirección de engrega </ion-label>
         <ion-select
-          placeholder="Seleccione la dirección "
+          placeholder="Seleccione otra dirección"
           interface="action-sheet"
           [interfaceOptions]="customActionSheetOptions"
           cancelText="Cancelar"
@@ -36,15 +36,10 @@ import { DireccionController } from '@papx/shared/direccion';
           <ion-select-option [value]="s" *ngFor="let s of direcciones">
             <p class="ion-text-wrap">
               {{ s.direccion.calle }} # {{ s.direccion.numeroExterior }}
-              {{ s.direccion.colonia }},
             </p>
           </ion-select-option>
+          <ion-select-option [value]="null"> Otra </ion-select-option>
         </ion-select>
-        <div *ngIf="value as s" class="ion-padding-bottom ion-text-wrap">
-          {{ s.direccion.municipio }} , {{ s.direccion.estado }}, C.P:{{
-            s.direccion.codigoPostal
-          }}
-        </div>
       </ion-item>
 
       <ion-item-options side="end">
@@ -52,16 +47,31 @@ import { DireccionController } from '@papx/shared/direccion';
           Nueva
           <ion-icon slot="bottom" name="add"></ion-icon>
         </ion-item-option>
-        <ion-item-option color="danger">
-          Eliminar
-          <ion-icon slot="bottom" name="trash"></ion-icon>
-        </ion-item-option>
-        <ion-item-option color="tertiary">
-          Modificar
-          <ion-icon slot="bottom" name="create"></ion-icon>
-        </ion-item-option>
       </ion-item-options>
     </ion-item-sliding>
+    <ion-item *ngIf="!!value">
+      <address>
+        <span
+          >Calle: {{ value.direccion.calle }} Número:
+          {{ value.direccion.numeroExterior }}
+          <span *ngIf="value.direccion.numeroInterior"
+            >Int: {{ value.direccion.numeroInterior }}</span
+          >
+        </span>
+        <div>
+          <span>Colonia: {{ value.direccion.colonia }}</span>
+        </div>
+        <div>
+          <span>Municipio: {{ value.direccion.municipio }}</span>
+          <span class="ion-padding-start"
+            >Estado: {{ value.direccion.estado }}</span
+          >
+        </div>
+        <ion-text color="warning">
+          <div>CP: {{ value.direccion.codigoPostal }}</div>
+        </ion-text>
+      </address>
+    </ion-item>
   `,
   providers: [
     {
@@ -75,6 +85,12 @@ import { DireccionController } from '@papx/shared/direccion';
     `
       .text {
         color: red;
+      }
+      address {
+        display: flex;
+        flex-direction: column;
+        font-size: 0.9rem;
+        padding: 10px 0px 5px;
       }
     `,
   ],
@@ -99,7 +115,6 @@ export class EnvioDireccionComponent
   ngOnChanges(changes: SimpleChanges): void {
     const { firstChange, currentValue } = changes.direcciones;
     if (!firstChange) {
-      // console.log('Direcciones: ', currentValue);
     }
   }
   writeValue(obj: any): void {
@@ -120,25 +135,35 @@ export class EnvioDireccionComponent
   }
 
   compareWith(currentValue: any, compareValue: any) {
-    if (!compareValue) {
+    console.log('Comparing: ', currentValue, compareValue);
+    if (!currentValue || !compareValue) {
       return false;
     }
-    return currentValue.id === compareValue.id;
+    return currentValue.nombre === compareValue.nombre;
   }
 
   onSelection({ detail: { value } }: any) {
-    this.value = value;
-    this.onChange(value);
-    this.dc.markForCheck();
+    console.log('Value:', value);
+    if (value) {
+      this.value = value;
+      this.onChange(value);
+      this.dc.markForCheck();
+    } else {
+      this.addDireccion();
+    }
   }
 
   ngOnInit() {}
 
   async addDireccion() {
-    const direccion = await this.direccionController.addDireccion();
+    const direccion: Direccion = await this.direccionController.addDireccion();
     if (direccion) {
-      this.value = direccion;
-      this.onChange(direccion);
+      const de: ClienteDireccion = {
+        nombre: buildDireccionKey(direccion),
+        direccion,
+      };
+      this.value = de;
+      this.onChange(de);
       this.dc.markForCheck();
     }
   }

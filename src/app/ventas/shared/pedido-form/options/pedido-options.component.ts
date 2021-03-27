@@ -66,6 +66,7 @@ export class PedidoOptionsComponent implements OnInit {
           tabindex: 99,
           name: 'descuento',
           max: 40,
+          value: this.facade.descuentoEspecial,
         },
       ],
       buttons: [

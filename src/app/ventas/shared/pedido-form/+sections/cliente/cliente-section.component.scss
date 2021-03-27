@@ -5,6 +5,13 @@
   column-gap: 7px;
 }
 
+.main-row {
+  display: grid;
+  align-items: center;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  font-size: 1rem;
+}
+
 .info-row {
   display: grid;
   align-items: center;

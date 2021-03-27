@@ -16,10 +16,14 @@ import {
   catchError,
   debounceTime,
   distinctUntilChanged,
-  filter,
+  filter as xfilter,
   map,
   switchMap,
 } from 'rxjs/operators';
+
+import includes from 'lodash-es/includes';
+import filter from 'lodash-es/filter';
+
 import { ClientesDataService } from '../@data-access/clientes-data.service';
 
 @Component({
@@ -30,7 +34,7 @@ import { ClientesDataService } from '../@data-access/clientes-data.service';
 })
 export class ClienteSelectorComponent implements OnInit, AfterViewInit {
   filter$ = new BehaviorSubject('');
-  clientes$: Observable<Partial<Cliente>[]>;
+  clientes$;
   @ViewChild(IonSearchbar) searchBar: IonSearchbar;
 
   constructor(
@@ -41,11 +45,21 @@ export class ClienteSelectorComponent implements OnInit, AfterViewInit {
   ngOnInit() {
     this.clientes$ = this.filter$.pipe(
       map((term) => term.toUpperCase()),
-      debounceTime(400),
+      debounceTime(100),
       distinctUntilChanged(),
-      filter((term) => term.length > 3),
-      switchMap((term) => this.service.searchClientes(term)),
+      xfilter((term) => term.length > 2),
+      switchMap((term) => this.lookUp(term)),
       catchError((err) => this.handleError(err))
+    );
+  }
+
+  lookUp(value: string) {
+    return this.service.clientesCache$.pipe(
+      map((rows) =>
+        filter(rows, (item) =>
+          includes(item.nombre.toLowerCase(), value.toLowerCase())
+        )
+      )
     );
   }
 
@@ -60,11 +74,16 @@ export class ClienteSelectorComponent implements OnInit, AfterViewInit {
   }
 
   select(c: Partial<Cliente>) {
-    this.modalCtrl.dismiss(c);
+    this.service.findById(c.id).subscribe(
+      (found) => {
+        this.modalCtrl.dismiss(found);
+      },
+      (err) => this.modalCtrl.dismiss(null)
+    );
   }
 
   onSearch({ target: { value } }: any) {
-    // if (this.tipo === 'CREDITO') this.filter$.next(value);
+    this.filter$.next(value);
   }
 
   onEnter(event: any) {

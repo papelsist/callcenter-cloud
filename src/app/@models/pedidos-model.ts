@@ -64,6 +64,7 @@ export interface Pedido {
   createUser?: string;
   updateUser?: string;
   updateUserId?: string;
+  uid?: string;
 }
 
 export interface PedidoDet {

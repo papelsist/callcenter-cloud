@@ -31,6 +31,7 @@ export class ItemController {
   ): Promise<Partial<PedidoDet> | null> {
     const modal = await this.modalController.create({
       component: ItemModalComponent,
+      cssClass: 'pedido-item-modal',
       componentProps: {
         tipo,
         sucursal,

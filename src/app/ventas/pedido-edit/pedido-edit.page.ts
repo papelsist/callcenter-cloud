@@ -22,6 +22,7 @@ export class PedidoEditPage implements OnInit, OnDestroy {
 
   async onSave(id: string, pedido: Partial<Pedido>, user: User) {
     pedido.status = 'COTIZACION';
+    // console.log('Actualizando pedido: ', pedido);
     await this.facade.updatePedido(id, pedido, user);
     this.router.navigate(['/', 'ventas', 'cotizaciones']);
   }

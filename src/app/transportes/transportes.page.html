@@ -22,7 +22,10 @@
       <ion-item buttom>
         <ion-label class="ion-text-wrap">
           <ion-text color="primary">
-            <h2>{{t.nombre}}</h2>
+            <h2>
+              {{t.nombre}}
+              <span class="ion-padding-start">{{t.sucursal}}</span>
+            </h2>
           </ion-text>
           <address *ngIf="t.direccion as d">
             <div class="row">

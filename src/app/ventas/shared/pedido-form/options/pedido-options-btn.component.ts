@@ -48,7 +48,7 @@ export class PedidoOptionsButtonComponent implements OnInit {
 
   async showOptions(ev: any) {
     const action = await this.actionSheet.create({
-      header: 'Operaciones con el pedido ..',
+      header: 'Operaciones con el pedido',
       animated: true,
       translucent: true,
       buttons: [
@@ -110,7 +110,7 @@ export class PedidoOptionsButtonComponent implements OnInit {
         handler: () => this.facade.registrarClienteNuevo(),
       },
       {
-        text: 'Descuento especial',
+        text: 'Descuento especial ',
         role: 'selected',
         icon: 'archive',
         handler: () => this.setDescuentoEspecial(),
@@ -135,15 +135,18 @@ export class PedidoOptionsButtonComponent implements OnInit {
    */
   async setDescuentoEspecial() {
     if (this.facade.tipo === TipoDePedido.CREDITO) return; // No procede
+
     const alert = await this.alert.create({
       header: 'Descuento especial',
       message: 'Registre el descuento',
+      mode: 'ios',
       inputs: [
         {
           type: 'number',
           placeholder: 'Descuento',
           tabindex: 99,
           name: 'descuento',
+          value: this.facade.descuentoEspecial,
           max: 40,
         },
       ],

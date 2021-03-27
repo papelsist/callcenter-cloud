@@ -128,24 +128,9 @@ export class EnvioComponent extends BaseComponent implements OnInit {
       );
   }
 
-  // private registerClienteListener() {
-  //   this.parent
-  //     .get('cliente')
-  //     .valueChanges.pipe(distinctUntilChanged(), takeUntil(this.destroy$))
-  //     .subscribe((cte: Cliente) => {
-  //       if (cte) {
-  //         console.log('Cliente detecado2: ', cte.nombre);
-  //         console.log('Direcciones: ', cte.direcciones);
-  //         if (!cte.direcciones) {
-  //           this.direcciones = findDirecciones(cte);
-  //           console.log('Direcciones found: ', this.direcciones);
-  //         }
-  //       }
-  //     });
-  // }
-
   setEnvio({ detail: { checked } }: any) {
     checked ? this.form.enable() : this.form.disable();
+    this.parent.markAsDirty();
   }
 
   get tipo(): AbstractControl {

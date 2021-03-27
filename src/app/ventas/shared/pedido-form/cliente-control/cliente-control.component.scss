@@ -1,0 +1,24 @@
+.cliente-field {
+  width: 100%;
+}
+.mat-option {
+  height: 30px;
+  line-height: 35px;
+}
+.cliente-panel {
+  display: flex;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  .nombre {
+    flex-basis: 85%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+.credito {
+  font-size: 14px;
+  font-weight: bold;
+  margin-left: auto;
+  color: rgb(14, 72, 110);
+}

@@ -10,14 +10,17 @@
             {{ this.item.modoVenta === "B" ? "PB" : "PN" }}
           </strong>
         </h2>
-
-        <ion-icon
-          class="ion-padding-start"
-          name="cut"
-          color="warning"
-          *ngIf="item.corte"
-          slot="icon-only"
-        ></ion-icon>
+        <ng-container *ngIf="item.corte as corte">
+          <ion-icon
+            class="ion-padding-start"
+            name="cut"
+            color="warning"
+            slot="icon-only"
+          ></ion-icon>
+          <small class="ion-padding-start ion-text-uppercase">
+            {{ corte.instruccion }}
+          </small>
+        </ng-container>
       </div>
 
       <ion-grid class="ion-no-padding">
@@ -25,17 +28,25 @@
           <ion-col class="ion-hide-sm-up" size="12" size-sm="12">
             Cant: {{ item.cantidad | number: "1.0" }}
           </ion-col>
-          <ion-col size="12" size-sm="12" size-md="6" size-lg="4">
+          <ion-col size="12" size-sm="6" size-md="4" size-lg="3">
             <span>Precio : {{ item.precio | currency }}</span>
           </ion-col>
-          <ion-col size="12" size-sm="12" size-md="6" size-lg="4">
+          <ion-col size="12" size-sm="6" size-md="4" size-lg="3">
             <span>Importe: {{ item.importe | currency }}</span>
           </ion-col>
-          <ion-col size-sm="12" size-md="12" size-lg="4">
+          <ion-col size="12" size-sm="6" size-md="4" size-lg="3">
             <span>
               Desc: ({{ item.descuento / 100 | percent }})
               {{ item.descuentoImporte | currency }}
             </span>
+          </ion-col>
+          <ion-col
+            *ngIf="item.importeCortes > 0.0"
+            size-sm="6"
+            size-md="12"
+            size-lg="3"
+          >
+            <span> Cortes: {{ item.importeCortes | currency }} </span>
           </ion-col>
         </ion-row>
       </ion-grid>

@@ -10,6 +10,7 @@ import {
 import { ItemValitators } from './item.validators';
 
 import round from 'lodash-es/round';
+import isEmpty from 'lodash-es/isEmpty';
 
 /**
  * Pure factory function
@@ -45,8 +46,8 @@ export function buildForm(builder: FormBuilder): FormGroup {
         precio: [10.0],
         refinado: false,
         limpio: false,
-      },
-      { validators: [ItemValitators.corteValidator] }
+      }
+      // { validators: [ItemValitators.corteValidator] }
     ),
   });
   return form;
@@ -144,10 +145,7 @@ export function buildPedidoItem(
         : producto.precioContado,
   };
 
-  if (corte.cantidad > 0) {
-    if (corte.instruccion !== 'ESPECIAL') {
-      corte.instruccionEspecial = null;
-    }
+  if (!isEmpty(corte.instruccion)) {
     item.corte = corte;
     item.importeCortes = round(corte.cantidad * corte.precio, 2);
   } else {

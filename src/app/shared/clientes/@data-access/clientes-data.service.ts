@@ -19,6 +19,8 @@ export class ClientesDataService {
     shareReplay()
   );
 
+  clientesCache$ = this.fetchClientesCache().pipe(shareReplay());
+
   constructor(
     private http: HttpClient,
     private afs: AngularFirestore,
@@ -34,7 +36,7 @@ export class ClientesDataService {
   }
 
   fetchClientesCache(): Observable<ClienteDto[]> {
-    const ref = this.fs.ref('catalogos/ctes.json');
+    const ref = this.fs.ref('catalogos/ctes-all.json');
     return ref.getDownloadURL().pipe(
       switchMap((url) =>
         this.http.get<any[]>(url).pipe(

@@ -77,10 +77,12 @@ export class ItemFormComponent extends BaseComponent implements OnInit {
   }
 
   ngOnInit() {
+    console.log('Editando: ', this.item);
     if (this.item) {
       const { producto, cantidad, precio, importe, corte } = this.item;
       this.form.patchValue({ producto, cantidad, precio, importe });
       if (corte) {
+        console.log('Corte: ', corte);
         this.form.get('corte').patchValue(corte);
       }
       this.updateExistenciasPanel();

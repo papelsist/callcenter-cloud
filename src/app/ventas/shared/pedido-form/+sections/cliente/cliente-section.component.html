@@ -2,16 +2,14 @@
   <ion-item button [disabled]="disabled" (click)="changeCliente.emit()">
     <ion-label class="ion-text-wrap" [color]="!this.cte ? 'warning' : ''">
       <div class="main-row">
-        <h2 *ngIf="nombre$ | async as nombre">
+        <span *ngIf="nombre$ | async as nombre">
           {{ nombre }}
-          <ion-text color="danger" *ngIf="!cte.activo">
-            <sub>SUSPENDIDO</sub>
-          </ion-text>
-        </h2>
+          <ion-text color="danger" *ngIf="!cte.activo"> SUSPENDIDO </ion-text>
+        </span>
       </div>
       <div class="info-row">
         <ion-text color="secondary">
-          <p>RFC: {{ cte?.rfc }}</p>
+          <span>RFC: {{ cte?.rfc }}</span>
         </ion-text>
         <div class="credito" *ngIf="cte?.credito as cre">
           <p>

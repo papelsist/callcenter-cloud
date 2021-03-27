@@ -23,7 +23,7 @@ import { Direccion, Transporte } from '@papx/models';
         </ion-buttons>
       </ion-toolbar>
     </ion-header>
-    <ion-content class="ion-padding" [formGroup]="form">
+    <ion-content [formGroup]="form">
       <ion-grid>
         <ion-row>
           <ion-col>
@@ -35,14 +35,56 @@ import { Direccion, Transporte } from '@papx/models';
               ></ion-input>
             </ion-item>
           </ion-col>
-          <ion-row>
-            <papx-direccion-form
-              [direccion]="direccion"
-              [parent]="form"
-            ></papx-direccion-form>
-          </ion-row>
+          <ion-col size="3">
+            <papx-sucursal-name-control
+              class="sucursal"
+              formControlName="sucursal"
+            ></papx-sucursal-name-control>
+          </ion-col>
+        </ion-row>
+        <ion-row>
+          <ion-col>
+            <ion-item>
+              <ion-label position="floating">Teléfono 1</ion-label>
+              <ion-input
+                formControlName="telefono1"
+                placeholder="Tel 1"
+                type="tel"
+                clearOnEdit="true"
+                inputmode="tel"
+              ></ion-input>
+            </ion-item>
+          </ion-col>
+          <ion-col>
+            <ion-item>
+              <ion-label position="floating">Teléfono 2</ion-label>
+              <ion-input
+                formControlName="telefono2"
+                placeholder="Tel 2"
+                type="tel"
+                clearOnEdit="true"
+                inputmode="tel"
+              ></ion-input>
+            </ion-item>
+          </ion-col>
+          <ion-col>
+            <ion-item>
+              <ion-label position="floating">Teléfono 3</ion-label>
+              <ion-input
+                formControlName="telefono3"
+                placeholder="Tel 3"
+                type="tel"
+                clearOnEdit="true"
+                inputmode="tel"
+              ></ion-input>
+            </ion-item>
+          </ion-col>
         </ion-row>
       </ion-grid>
+      <papx-direccion-form
+        [direccion]="direccion"
+        [parent]="form"
+      ></papx-direccion-form>
     </ion-content>
     <ion-footer>
       <ion-toolbar>
@@ -58,6 +100,13 @@ import { Direccion, Transporte } from '@papx/models';
       </ion-toolbar>
     </ion-footer>
   `,
+  styles: [
+    `
+      .sucursal {
+        height: 100%;
+      }
+    `,
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TransporteFormComponent implements OnInit {
@@ -76,6 +125,10 @@ export class TransporteFormComponent implements OnInit {
           Validators.maxLength(2500),
         ],
       ],
+      telefono1: [null],
+      telefono2: [null],
+      telefono3: [null],
+      sucursal: [null],
     });
     if (this.transporte) {
       this.form.patchValue(this.transporte);

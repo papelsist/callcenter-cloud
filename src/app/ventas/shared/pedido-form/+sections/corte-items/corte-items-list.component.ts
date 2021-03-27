@@ -12,12 +12,9 @@ import { PcreateFacade } from '../../create-form/pcreate.facade';
         <ion-reorder *ngFor="let item of partidas; index as idx; odd as odd">
           <ion-item>
             <ion-label class="ion-text-wrap" *ngIf="item.corte as corte">
-              {{ corte.tantos }} tantos
-              <span *ngIf="corte.instruccion !== 'ESPECIAL'">
+              {{ item.descripcion }}
+              <span>
                 {{ corte.instruccion }}
-              </span>
-              <span *ngIf="corte.instruccion === 'ESPECIAL'">
-                {{ corte.instruccionEspecial }}
               </span>
               <small class="ion-padding-start" *ngIf="corte.limpio">
                 Limpio
@@ -34,9 +31,7 @@ import { PcreateFacade } from '../../create-form/pcreate.facade';
             </ion-label>
             <ion-chip slot="start" color="primary" class="clave">
               <ion-icon name="cut"></ion-icon>
-              <ion-label>
-                {{ item.clave }}
-              </ion-label>
+              <ion-label> {{ item.clave }}</ion-label>
             </ion-chip>
             <ion-chip slot="end" color="warning">
               {{ item.corte.precio * item.corte.cantidad | currency }}

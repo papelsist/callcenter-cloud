@@ -1,14 +1,17 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { AlertController } from '@ionic/angular';
+
+import { BehaviorSubject, combineLatest, of } from 'rxjs';
+import { map, switchMap, takeUntil, tap, withLatestFrom } from 'rxjs/operators';
+
+import sortBy from 'lodash-es/sortBy';
+
 import { AuthService } from '@papx/auth';
 import { BaseComponent } from '@papx/core';
 import { Pedido, User } from '@papx/models';
-import { BehaviorSubject, combineLatest, of } from 'rxjs';
-import { map, switchMap, takeUntil, tap, withLatestFrom } from 'rxjs/operators';
 import { VentasDataService } from '../@data-access';
 import { PedidosFacade } from '../@data-access/+state';
-
 import { VentasFacade } from '../@data-access/+state/ventas.facade';
 import { VentasController } from '../shared/ventas.controller';
 import { Cotizaciones, CotizacionesFacade } from './cotizaciones-facade';

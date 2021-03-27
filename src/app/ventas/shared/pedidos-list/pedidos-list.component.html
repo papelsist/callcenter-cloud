@@ -12,12 +12,36 @@
           <span> {{ pedido.sucursal }} </span>
           <span>{{ pedido.tipo }} </span>
           <span> {{ pedido.dateCreated?.toDate() | date: "dd/MM/yyyy" }} </span>
-          <span vendedor class="ion-hide-sm-down">
-            {{ pedido.updateUser }}
+          <span>
+            {{ pedido.createUser }}
           </span>
+          <span *ngIf="pedido.envio">
+            {{ pedido.envio.tipo }}
+          </span>
+          <span comentario>
+            {{ pedido.comentario }}
+          </span>
+          <span
+            descuento-especial
+            *ngIf="pedido.descuentoEspecial && pedido.descuentoEspecial > 0"
+          >
+            Dscto {{ pedido.descuentoEspecial / 100 | percent }}
+          </span>
+          <ion-icon
+            name="airplane"
+            color="primary"
+            *ngIf="pedido.envio"
+            class="ion-padding-start"
+          ></ion-icon>
         </div>
-        <p class="ion-hide-sm-up">
-          <span vendedor> {{ pedido.updateUser }} </span>
+        <p class="row-3">
+          <span> Actualizó:</span>
+          <span vendedor>{{ pedido.updateUser }}</span>
+          <span class="ion-padding-start">
+            ({{
+              pedido?.lastUpdated?.toDate() | date: "dd/MM/yyyy: HH:mm"
+            }})</span
+          >
         </p>
       </ion-label>
 

@@ -6,6 +6,7 @@
   ></papx-ventas-header>
 
   <ion-content>
+    <ion-searchbar></ion-searchbar>
     <papx-pedidos-list
       [pedidos]="cotizaciones$ | async"
       (selection)="onSelection($event)"

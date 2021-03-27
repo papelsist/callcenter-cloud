@@ -6,7 +6,7 @@ ion-item {
   display: flex;
   justify-content: flex-start;
   align-items: center;
-  font-size: 1rem;
+  font-size: 0.9rem;
   span:nth-child(n + 2) {
     padding-left: 10px;
   }
@@ -19,8 +19,28 @@ ion-item {
   font-size: 0.9rem;
 }
 
+.row-3 {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  font-size: 0.8rem;
+  span:nth-child(n + 2) {
+    padding-left: 10px;
+  }
+}
+
 span[vendedor] {
-  font-size: 0.9rem;
   font-style: italic;
+  color: var(--ion-color-warning);
+}
+
+span[comentario] {
+  font-style: italic;
+  font-size: 0.8rem;
+  color: var(--ion-color-secondary);
+}
+span[descuento-especial] {
+  font-style: italic;
+  font-size: 0.8rem;
   color: var(--ion-color-warning);
 }

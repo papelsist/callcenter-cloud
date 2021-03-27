@@ -1,0 +1,37 @@
+<mat-form-field class="cliente-field" [appearance]="apparence">
+  <mat-label>Cliente</mat-label>
+  <input
+    type="text"
+    [placeholder]="placeholder"
+    matInput
+    position="below"
+    [matAutocomplete]="auto"
+    [formControl]="control"
+    autocomplete="off"
+    autocorrect="off"
+    autocapitalize="off"
+    spellcheck="false"
+  />
+  <mat-icon matSuffix>account_circle</mat-icon>
+  <mat-hint align="end" *ngIf="isDeCredito()">CREDITO</mat-hint>
+</mat-form-field>
+<mat-autocomplete
+  #auto="matAutocomplete"
+  autoActiveFirstOption
+  [disableRipple]="false"
+  [displayWith]="displayFn"
+  (optionSelected)="onSelection($event.option.value)"
+>
+  <mat-option *ngFor="let c of filteredClientes$ | async" [value]="c">
+    <div class="cliente-panel">
+      <span class="nombre"> {{ c.nombre }} ({{ c.rfc }}) </span>
+      <span
+        class="crredito"
+        *ngIf="c.credito"
+        [ngClass]="{ credito: c.credito }"
+      >
+        CREDITO
+      </span>
+    </div>
+  </mat-option>
+</mat-autocomplete>

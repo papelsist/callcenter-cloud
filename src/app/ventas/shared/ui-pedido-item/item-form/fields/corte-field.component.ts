@@ -56,20 +56,6 @@ import { map, tap } from 'rxjs/operators';
           </ion-item>
         </ion-col>
       </ion-row>
-      <!-- <ion-row>
-        <ion-col>
-          <ion-item>
-            <ion-label>Refinado</ion-label>
-            <ion-checkbox formControlName="refinado"></ion-checkbox>
-          </ion-item>
-        </ion-col>
-        <ion-col>
-          <ion-item>
-            <ion-label position="fixed">Limpio</ion-label>
-            <ion-toggle formControlName="limpio"></ion-toggle>
-          </ion-item>
-        </ion-col>
-      </ion-row> -->
     </ion-grid>
   `,
   styles: [

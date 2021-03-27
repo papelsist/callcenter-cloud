@@ -24,15 +24,6 @@ export const buildDireccionForm = (fb: FormBuilder): FormGroup => {
   );
 };
 
-export const getDireccionKey = (dd: any): string => {
-  console.log('Generando Direccion key para: ', dd);
-  const calle = dd.calle.trim() || '';
-  const key = `${calle.substr(0, 10)} #:${dd.numeroExterior || ''} CP:${
-    dd.codigoPostal
-  }`;
-  return key;
-};
-
 export function getFormValidationErrors(form: FormGroup): any[] {
   const result = [];
   Object.keys(form.controls).forEach((key) => {
