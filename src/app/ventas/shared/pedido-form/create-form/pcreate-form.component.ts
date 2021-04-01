@@ -269,4 +269,8 @@ export class PedidoCreateFormComponent extends BaseComponent implements OnInit {
     });
     await t.present();
   }
+
+  getCartState() {
+    return this.facade.resolvePedidoData();
+  }
 }

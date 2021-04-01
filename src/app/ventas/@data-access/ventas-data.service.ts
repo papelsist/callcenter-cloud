@@ -216,4 +216,20 @@ export class VentasDataService {
         catchError((error: any) => throwError(error))
       );
   }
+
+  saveCart(state: Partial<Pedido>, uid: string) {
+    return this.afs.collection('cart').doc(uid).set(state, { merge: true });
+  }
+
+  deleteCart(uid: string) {
+    return this.afs.collection('cart').doc(uid).delete();
+  }
+
+  getCart(uid: string) {
+    return this.afs
+      .collection<Partial<Pedido>>('cart')
+      .doc(uid)
+      .valueChanges()
+      .pipe(take(1));
+  }
 }

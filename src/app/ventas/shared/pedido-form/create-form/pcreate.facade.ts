@@ -162,21 +162,22 @@ export class PcreateFacade {
   }
 
   setPedido(data: Partial<Pedido>) {
-    // console.log('Registrando datos iniciales del pedido: ', data);
+    console.log('Registrando datos iniciales del pedido: ', data);
+
     if (data.id) {
       this.currentPedido = data as Pedido;
       if (this.currentPedido.envio === null) {
         delete this.currentPedido.envio;
       }
-      // console.log('Editando: ', this.currentPedido);
     }
     let value: any = { ...data };
     if (data.sucursal && data.sucursalId) {
       const sucursalEntity = { id: data.sucursalId, nombre: data.sucursal };
       value = { ...value, sucursalEntity };
     }
+
     this.form.patchValue(value);
-    if (data.id) {
+    if (data.partidas) {
       const summ = utils.getPedidoSummary(data);
       this._summary.next(summ);
       this._currentPartidas = value.partidas;

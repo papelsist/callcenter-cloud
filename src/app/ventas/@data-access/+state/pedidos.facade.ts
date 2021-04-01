@@ -2,17 +2,19 @@ import { Injectable } from '@angular/core';
 import { AuthService } from '@papx/auth';
 import { Pedido, User } from '@papx/models';
 import { BehaviorSubject, combineLatest } from 'rxjs';
-import { distinctUntilChanged, map } from 'rxjs/operators';
+import { distinctUntilChanged, map, shareReplay } from 'rxjs/operators';
 import { VentasDataService } from '../ventas-data.service';
 
 export interface PedidosState {
   current: Pedido | null;
   user: User | null;
+  cart: Partial<Pedido> | null;
 }
 
 let _state: PedidosState = {
   current: null,
   user: null,
+  cart: null,
 };
 
 @Injectable({ providedIn: 'root' })
@@ -22,6 +24,12 @@ export class PedidosFacade {
   current$ = this.state$.pipe(
     map((state) => state.current),
     distinctUntilChanged()
+  );
+
+  cart$ = this.state$.pipe(
+    map((state) => state.cart),
+    distinctUntilChanged(),
+    shareReplay(1)
   );
 
   vm$ = combineLatest([this.authService.userInfo$, this.current$]).pipe(
@@ -48,5 +56,18 @@ export class PedidosFacade {
       : 'COTIZACION';
     pedido.cerrado = new Date().toISOString();
     await this.updatePedido(id, pedido, user);
+  }
+
+  async saveCartState(state: Partial<Pedido>, user: User) {
+    await this.dataService.saveCart(state, user.uid);
+  }
+
+  getCartState(user: User) {
+    return this.dataService.getCart(user.uid);
+  }
+
+  cleanCart(user: User) {
+    console.log('Limpiando cart:', user.uid);
+    return this.dataService.deleteCart(user.uid);
   }
 }

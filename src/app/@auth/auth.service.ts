@@ -153,4 +153,11 @@ export class AuthService {
         catchError((err) => throwError(err))
       );
   }
+
+  async updateSucursal(user: UserInfo, sucursal: string) {
+    await this.firestore
+      .collection('usuarios')
+      .doc(user.uid)
+      .update({ sucursal });
+  }
 }
