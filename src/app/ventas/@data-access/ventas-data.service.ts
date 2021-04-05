@@ -5,14 +5,21 @@ import {
   QueryFn,
 } from '@angular/fire/firestore';
 
-import { Pedido, PedidoDet, Status, User } from '@papx/models';
+import {
+  Pedido,
+  PedidoAutorizacion,
+  PedidosSearchCriteria,
+  Status,
+  User,
+} from '@papx/models';
 import { Observable, throwError } from 'rxjs';
 import { AngularFireFunctions } from '@angular/fire/functions';
 import { catchError, map, take } from 'rxjs/operators';
 
 import firebase from 'firebase/app';
 import omitBy from 'lodash-es/omitBy';
-import { addDays } from 'date-fns';
+
+import { addBusinessDays, parseISO } from 'date-fns';
 
 /**
  * Factory function than creates QueryFn instances specific of the status property
@@ -33,7 +40,7 @@ export interface VentasQueryParams {
 @Injectable({ providedIn: 'root' })
 export class VentasDataService {
   PEDIDOS_COLLECTION = 'pedidos';
-  readonly cotizaciones$ = this.fetchVentas('COTIZACION');
+  readonly cotizaciones$ = this.fetchCotizacionesVigentes();
   readonly porautorizar$ = this.fetchVentas('POR_AUTORIZAR');
   readonly pendientes$ = this.fetchPendientes();
   readonly facturas$ = this.fetchVentas('FACTURADO_TIMBRADO');
@@ -43,13 +50,52 @@ export class VentasDataService {
     private functions: AngularFireFunctions
   ) {}
 
+  findCotizaciones(criteria: PedidosSearchCriteria) {
+    return this.afs
+      .collection<Pedido>(this.PEDIDOS_COLLECTION, (ref) => {
+        let query = ref.where('status', '==', 'COTIZACION');
+        if (criteria) {
+          const { fechaInicial, fechaFinal } = criteria;
+          query = query
+            .where('fecha', '>=', parseISO(fechaInicial))
+            .where('fecha', '<=', parseISO(fechaFinal));
+        }
+        query = query.orderBy('fecha', 'desc').limit(20);
+        return query;
+      })
+      .valueChanges({ idField: 'id' })
+      .pipe(
+        catchError((err) =>
+          throwError('Error fetching cotizciones del usuario ' + err.message)
+        )
+      );
+  }
+
   fetchCotizaciones(user: User) {
     return this.afs
       .collection<Pedido>(this.PEDIDOS_COLLECTION, (ref) =>
         ref
-          .where('status', '==', 'COTIZACION')
+          .where('status', '==', 'COTIZACION2')
           .where('uid', '==', user.uid)
           .limit(50)
+      )
+      .valueChanges({ idField: 'id' })
+      .pipe(
+        catchError((err) =>
+          throwError('Error fetching cotizciones del usuario ' + err.message)
+        )
+      );
+  }
+
+  private fetchCotizacionesVigentes() {
+    const desde = addBusinessDays(new Date(), -10);
+    return this.afs
+      .collection<Pedido>(this.PEDIDOS_COLLECTION, (ref) =>
+        ref
+          .where('status', '==', 'COTIZACION')
+          .where('fecha', '>=', desde)
+          .orderBy('fecha', 'desc')
+          .limit(5)
       )
       .valueChanges({ idField: 'id' })
       .pipe(
@@ -96,7 +142,7 @@ export class VentasDataService {
       const payload: Partial<Pedido> = {
         ...cleanData,
         fecha: new Date().toISOString(),
-        vigencia: addDays(new Date(), 10).toISOString(),
+        vigencia: addBusinessDays(new Date(), 10).toISOString(),
         dateCreated: firebase.firestore.Timestamp.now(),
         lastUpdated: firebase.firestore.Timestamp.now(),
         createUser: user.displayName,
@@ -167,15 +213,12 @@ export class VentasDataService {
   }
 
   async autorizarPedido(pedido: Pedido, comentario: string, user: User) {
-    const aut = {
+    const aut: PedidoAutorizacion = {
       comentario,
-      fecha: new Date().toISOString(),
       solicita: pedido.updateUser,
       autoriza: user.displayName,
       uid: user.uid,
-      sucursal: pedido.sucursal,
-      tags: 'CALLCENTER, VENTAS',
-      dateCreated: new Date().toISOString(),
+      dateCreated: firebase.firestore.Timestamp.now(),
     };
 
     const data: Partial<Pedido> = {

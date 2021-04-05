@@ -76,7 +76,7 @@ export function initializeApp1(afa: AngularFireAuth): any {
       deps: [AngularFireAuth],
       multi: true,
     },
-    { provide: BUCKET, useValue: 'papx-ws-dev.appspot.com' },
+    { provide: BUCKET, useValue: 'papx-ws-prod.appspot.com' },
   ],
 })
 export class DataAccessModule {

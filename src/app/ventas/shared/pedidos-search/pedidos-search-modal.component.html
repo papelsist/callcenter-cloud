@@ -1,0 +1,43 @@
+<ion-content class="ion-padding">
+  <ion-list-header>
+    <ion-label> Criterio de búsqueda </ion-label>
+  </ion-list-header>
+  <ion-grid>
+    <ion-row>
+      <ion-col>
+        <ion-item>
+          <ion-label position="floating">Fecha inicial</ion-label>
+          <ion-datetime
+            mode="ios"
+            [displayFormat]="displayFormat"
+            [pickerFormat]="pickerFormat"
+            [doneText]="doneText"
+            [cancelText]="cancelText"
+            [min]="fechaInicialMin"
+            [max]="criteria.fechaFinal"
+            [monthShortNames]="monthShortNames"
+            [(ngModel)]="criteria.fechaInicial"
+          ></ion-datetime>
+        </ion-item>
+      </ion-col>
+      <ion-col>
+        <ion-item>
+          <ion-label position="floating">Fecha final</ion-label>
+          <ion-datetime
+            mode="ios"
+            [displayFormat]="displayFormat"
+            [pickerFormat]="pickerFormat"
+            [doneText]="doneText"
+            [cancelText]="cancelText"
+            [min]="criteria.fechaInicial"
+            [monthShortNames]="monthShortNames"
+            [(ngModel)]="criteria.fechaFinal"
+          ></ion-datetime>
+        </ion-item>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+</ion-content>
+<ion-button color="primary" expand="block" (click)="submit()">
+  <ion-label> Aceptar </ion-label>
+</ion-button>

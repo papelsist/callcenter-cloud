@@ -2,13 +2,40 @@
   <papx-ventas-header
     [title]="getTitle(vm.filtrar)"
     [filterActivated]="vm.filtrar"
-    (filter)="onFilter($event)"
+    (filter)="filtrarPorUsuario($event)"
   ></papx-ventas-header>
 
   <ion-content>
-    <ion-searchbar></ion-searchbar>
+    <ion-toolbar>
+      <ion-searchbar
+        #searchBar
+        placeholder="Filtrar"
+        searchIcon=""
+        (ionChange)="onFilter(searchBar.value)"
+        debounce="600"
+      ></ion-searchbar>
+      <ion-buttons slot="end">
+        <papx-pedidos-search
+          (citeriaChanged)="onCriteriaChanged($event)"
+        ></papx-pedidos-search>
+      </ion-buttons>
+    </ion-toolbar>
+    <ion-list-header *ngIf="searchCriteria">
+      <ion-label>
+        <span>Filtro por: </span>
+        <span class="ion-padding-start">
+          Del: {{searchCriteria.fechaInicial | date: 'dd/MM/yyyy'}} al
+          {{searchCriteria.fechaFinal | date: 'dd/MM/yyyy'}}
+        </span>
+      </ion-label>
+      <ion-button (click)="deleteCriteria()">
+        <ion-label> Quitar </ion-label>
+        <ion-icon name="close" slot="end"></ion-icon>
+      </ion-button>
+    </ion-list-header>
+
     <papx-pedidos-list
-      [pedidos]="cotizaciones$ | async"
+      [pedidos]="filteredCotizaciones$ | async"
       (selection)="onSelection($event)"
       (copiar)="onCopiar($event, vm.user)"
       (cerrar)="onCerrar($event, vm.user)"

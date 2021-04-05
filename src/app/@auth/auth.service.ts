@@ -24,10 +24,9 @@ import { mapUser } from './utils';
 export class AuthService {
   readonly hostUrl = environment.hostUrl;
 
-  readonly user$ = this.auth.user.pipe(
+  readonly user$ = this.auth.authState.pipe(
     map((user) => (user ? mapUser(user) : null)),
-    take(1),
-    shareReplay()
+    shareReplay(1)
   );
 
   readonly claims$ = this.auth.idTokenResult.pipe(

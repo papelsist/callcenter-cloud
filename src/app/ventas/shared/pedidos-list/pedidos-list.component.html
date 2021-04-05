@@ -12,9 +12,7 @@
           <span> {{ pedido.sucursal }} </span>
           <span>{{ pedido.tipo }} </span>
           <span> {{ pedido.dateCreated?.toDate() | date: "dd/MM/yyyy" }} </span>
-          <span>
-            {{ pedido.createUser }}
-          </span>
+          <span> Creado por: {{ pedido.createUser }} </span>
           <span *ngIf="pedido.envio">
             {{ pedido.envio.tipo }}
           </span>

@@ -154,14 +154,12 @@ export interface InstruccionDeEnvio {
 }
 
 export interface PedidoAutorizacion {
-  solicita: string;
   autoriza: string;
+  solicita: string;
   uid: string;
-  fecha: string;
-  sucursal?: string;
-  tags?: string;
   comentario?: string;
-  dateCreated: string;
+  dateCreated: firebase.firestore.Timestamp;
+  replicado?: firebase.firestore.Timestamp;
 }
 
 export class PedidoLog {
@@ -200,7 +198,6 @@ export interface Factura {
   uuid: string;
   creado: string;
   createUser: string;
-  updateUser: string;
   cancelado?: string;
   canceladoComentario?: string;
 }
@@ -260,4 +257,10 @@ export interface PedidoItemParams {
 export interface Warning {
   error: string;
   descripcion: string;
+}
+
+export interface PedidosSearchCriteria {
+  fechaInicial: string;
+  fechaFinal: string;
+  createUser?: string;
 }
