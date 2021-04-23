@@ -22,8 +22,6 @@ import { mapUser } from './utils';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  readonly hostUrl = environment.hostUrl;
-
   readonly user$ = this.auth.authState.pipe(
     map((user) => (user ? mapUser(user) : null)),
     shareReplay(1)
