@@ -26,7 +26,6 @@ export class ExistenciasService {
   constructor(private afs: AngularFirestore) {}
 
   async fetchExistencia(id: string) {
-    console.log('UBuscando producto: ', id);
     const prod = await this.afs.doc<Producto>(`productos/${id}`).ref.get();
     if (prod.exists) {
       return prod.data().existencia ?? {};
