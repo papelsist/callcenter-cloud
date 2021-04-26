@@ -39,6 +39,8 @@ export class AuthService {
     catchError((err) => throwError(err))
   );
 
+  readonly sucursal$ = this.userInfo$.pipe(pluck('sucursal'), shareReplay(1));
+
   constructor(
     private readonly auth: AngularFireAuth,
     private readonly fns: AngularFireFunctions,

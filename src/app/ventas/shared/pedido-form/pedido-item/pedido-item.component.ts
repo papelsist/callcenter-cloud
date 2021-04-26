@@ -45,7 +45,7 @@ export class PedidoItemComponent implements OnInit {
   }
 
   isCargo() {
-    const cve = this.item.producto.clave;
+    const cve = this.item.clave;
     if (cve === 'CORTE') return true;
     if (cve.includes('MANIOBRA')) return true;
     return false;

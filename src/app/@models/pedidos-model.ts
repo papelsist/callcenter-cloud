@@ -62,9 +62,9 @@ export interface Pedido {
   dateCreated?: firebase.firestore.Timestamp;
   lastUpdated?: firebase.firestore.Timestamp;
   createUser?: string;
+  createUserId?: string;
   updateUser?: string;
   updateUserId?: string;
-  uid?: string;
 }
 
 export interface PedidoDet {
@@ -95,6 +95,7 @@ export interface PedidoDet {
   descuentoOriginal?: number; // % Calculado por el sistema
   descuentoEspecial?: number;
   importeCortes?: number;
+  disponible?: number;
   faltante?: number;
   faltanteSucursal?: number;
 

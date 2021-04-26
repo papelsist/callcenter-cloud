@@ -8,12 +8,14 @@ import { SharedUiPedidoItemModule } from '../shared/ui-pedido-item';
 
 import { PedidoEditPage } from './pedido-edit.page';
 import { PedidoExistsGuard } from './pedido.exists.guard';
+import { PedidoResolver } from './pedido.resolver';
 
 const routes: Routes = [
   {
     path: '',
     component: PedidoEditPage,
     canActivate: [PedidoExistsGuard],
+    // resolve: { current: PedidoResolver },
   },
 ];
 

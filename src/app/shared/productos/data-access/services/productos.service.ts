@@ -10,7 +10,7 @@ import { AngularFireStorage } from '@angular/fire/storage';
 import sortBy from 'lodash-es/sortBy';
 import keyBy from 'lodash-es/keyBy';
 
-import { Producto } from '@papx/models';
+import { Almacen, Producto } from '@papx/models';
 
 @Injectable({ providedIn: 'root' })
 export class ProductoService {
@@ -19,6 +19,8 @@ export class ProductoService {
   productosMap$: Observable<{ [key: string]: Producto }> = this.productos$.pipe(
     map((productos) => keyBy(productos, 'id'))
   );
+
+  existencias = {};
 
   constructor(
     private firestore: AngularFirestore,
@@ -66,5 +68,27 @@ export class ProductoService {
           throwError('Error buscando por calve: ' + err.message)
         )
       );
+  }
+
+  fetchById(id: string) {
+    return this.firestore
+      .doc<Producto>(`productos/${id}`)
+      .valueChanges({ idField: 'id' });
+  }
+
+  async fetchExistencia(id: string) {
+    if (this.existencias[id]) {
+      return this.existencias[id];
+    }
+
+    const exis = await this.firestore
+      .doc<Producto>(`existencias/${id}`)
+      .ref.get();
+    if (exis) {
+      this.existencias[id] = exis.data();
+      return exis.data();
+    } else {
+      return {};
+    }
   }
 }

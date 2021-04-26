@@ -6,6 +6,8 @@ import {
 } from '@angular/core';
 
 import toNumber from 'lodash-es/toNumber';
+import values from 'lodash-es/values';
+import max from 'lodash-es/max';
 
 import { Producto } from '@papx/models';
 
@@ -24,6 +26,11 @@ import { Producto } from '@papx/models';
                 </span>
               </ion-text>
             </ion-label>
+            <ion-note color="warning" slot="end">
+              Actualizado al:({{
+                getDisponibleLastUpdated() | date: 'dd/MM/yyyy HH:mm'
+              }})
+            </ion-note>
           </ion-item>
         </ion-col>
         <ion-col *ngIf="faltante > 0">
@@ -90,5 +97,14 @@ export class ExistenciaFieldComponent implements OnInit {
       0.0
     );
     return disponible;
+  }
+
+  getDisponibleLastUpdated() {
+    if (this.existencias) {
+      const ops = values(this.existencias).map((item) =>
+        item.lastUpdated.toMillis()
+      );
+      return max(ops);
+    }
   }
 }

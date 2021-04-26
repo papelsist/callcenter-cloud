@@ -34,6 +34,9 @@ import { PedidoOptionsComponent } from './pedido-options.component';
 })
 export class PedidoOptionsButtonComponent implements OnInit {
   @Output() cerrar = new EventEmitter();
+  @Output() actualizarExistencias = new EventEmitter();
+  @Output() print = new EventEmitter();
+  @Output() email = new EventEmitter();
   @Input() descuentos: DescuentoPorVolumen[] = [];
 
   constructor(
@@ -114,6 +117,24 @@ export class PedidoOptionsButtonComponent implements OnInit {
         role: 'selected',
         icon: 'archive',
         handler: () => this.setDescuentoEspecial(),
+      },
+      {
+        text: 'Actualizar existencias ',
+        role: 'selected',
+        icon: 'refresh',
+        handler: () => this.actualizarExistencias.emit(),
+      },
+      {
+        text: 'Imprimir pedido ',
+        role: 'selected',
+        icon: 'print',
+        handler: () => this.print.emit(),
+      },
+      {
+        text: 'Enviar correo',
+        role: 'selected',
+        icon: 'mail',
+        handler: () => this.email.emit(),
       },
       {
         text: 'Cerrar pedido',

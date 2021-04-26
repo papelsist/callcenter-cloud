@@ -50,26 +50,6 @@
           </ion-col>
         </ion-row>
       </ion-grid>
-      <!--
-      <div class="precios">
-        <p class="ion-hide-sm-up">Cant: {{ item.cantidad | number: "1.0" }}</p>
-        <p>
-          <span>Precio:</span>
-          <span>{{ item.precio | currency }}</span>
-        </p>
-        <p>
-          <span>Imp:</span>
-          <span>{{ item.importe | currency }}</span>
-        </p>
-        <p>
-          <span>Desc:</span>
-          <span>
-            ({{ item.descuento / 100 | percent }})
-            {{ item.descuentoImporte | currency }}
-          </span>
-        </p>
-      </div>
-       -->
     </ion-label>
 
     <div slot="start" class="ion-hide-sm-down cantidad">
@@ -78,8 +58,8 @@
       </ion-text>
     </div>
     <ion-chip color="warning" *ngIf="item.faltante > 0">
-      <ion-icon name="navigate-circle"></ion-icon>
-      <ion-label> Falta material </ion-label>
+      <ion-icon name="alert-circle"></ion-icon>
+      <ion-label> Falta: {{ item.faltante | number: "1.0-0" }} </ion-label>
     </ion-chip>
     <ion-chip color="primary" slot="end">
       {{ item.subtotal | currency }}

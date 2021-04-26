@@ -49,14 +49,6 @@ export class CotizacionesPage extends BaseComponent implements OnInit {
 
   searchCriteria: any = null;
 
-  cotizacionesOld$ = this.vm$.pipe(
-    switchMap((vm) =>
-      vm.filtrar
-        ? this.dataService.fetchCotizaciones(vm.user)
-        : this.dataService.cotizaciones$
-    )
-  );
-
   cotizaciones$ = this.vm$.pipe(
     switchMap((vm) => this.dataService.findCotizaciones(vm.criteria))
   );
@@ -75,7 +67,7 @@ export class CotizacionesPage extends BaseComponent implements OnInit {
   );
 
   constructor(
-    private facade: CotizacionesFacade,
+    private facade: PedidosFacade,
     private router: Router,
     private ventasController: VentasController,
     private pedidosFacade: PedidosFacade,
@@ -150,6 +142,7 @@ export class CotizacionesPage extends BaseComponent implements OnInit {
   }
 
   onSelection(event: Partial<Pedido>) {
+    this.facade.setCurrent(event as Pedido);
     this.router.navigate(['', 'ventas', 'cotizaciones', event.id]);
   }
 

@@ -17,10 +17,5 @@ export class HomePage {
     private clienteService: ClientesDataService
   ) {}
 
-  ionViewDidEnter() {
-    console.log('Did enter.... ');
-    this.clienteService.clientesCache$.subscribe((ctes) =>
-      console.log('Clientes cargados: ', ctes[0])
-    );
-  }
+  ionViewDidEnter() {}
 }

@@ -45,10 +45,7 @@ export class VentasDataService {
   readonly pendientes$ = this.fetchPendientes();
   readonly facturas$ = this.fetchVentas('FACTURADO_TIMBRADO');
 
-  constructor(
-    private afs: AngularFirestore,
-    private functions: AngularFireFunctions
-  ) {}
+  constructor(private afs: AngularFirestore) {}
 
   findCotizaciones(criteria: PedidosSearchCriteria) {
     return this.afs
@@ -88,6 +85,7 @@ export class VentasDataService {
   }
 
   private fetchCotizacionesVigentes() {
+    console.log('Inicializando cotizaciones pendientes.....');
     const desde = addBusinessDays(new Date(), -10);
     return this.afs
       .collection<Pedido>(this.PEDIDOS_COLLECTION, (ref) =>
@@ -131,8 +129,12 @@ export class VentasDataService {
     return this.afs
       .collection<Pedido>(this.PEDIDOS_COLLECTION)
       .doc(id)
-      .valueChanges()
+      .valueChanges({ idField: 'id' })
       .pipe(catchError((err) => throwError(err)));
+  }
+
+  fetchPedido(id: string) {
+    return this.afs.doc(`pedidos/${id}`).valueChanges({ idField: 'id' });
   }
 
   async createPedido(pedido: Partial<Pedido>, user: User) {
@@ -147,7 +149,7 @@ export class VentasDataService {
         lastUpdated: firebase.firestore.Timestamp.now(),
         createUser: user.displayName,
         updateUser: user.displayName,
-        uid: user.uid,
+        createUserId: user.uid,
         appVersion: 2,
       };
 
@@ -155,11 +157,6 @@ export class VentasDataService {
       let folio = 1;
 
       const pedidoRef = this.afs.collection(this.PEDIDOS_COLLECTION).doc().ref;
-
-      // Stats Data
-      const statsRef = this.afs
-        .collection(this.PEDIDOS_COLLECTION)
-        .doc('--stats--').ref;
 
       return this.afs.firestore.runTransaction(async (transaction) => {
         const folioDoc = await transaction.get<any>(folioRef);
@@ -171,12 +168,7 @@ export class VentasDataService {
 
         transaction
           .set(folioRef, { CALLCENTER: folio }, { merge: true })
-          .set(pedidoRef, { ...payload, folio })
-          .set(
-            statsRef,
-            { count: firebase.firestore.FieldValue.increment(1) },
-            { merge: true }
-          );
+          .set(pedidoRef, { ...payload, folio });
         return folio;
       });
     } catch (error: any) {

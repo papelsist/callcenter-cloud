@@ -18,10 +18,13 @@ export class PedidoValidators {
 
   static ImporteMaximo(formGroup: FormGroup): ValidationErrors | null {
     const total: number = formGroup.get('total').value;
+    const fpago: string = formGroup.get('formaDePago').value;
     const tipo = formGroup.get('tipo').value;
     if (tipo === TipoDePedido.CREDITO) {
       return null;
-      // Criterio no aplica en ventas de credito
+    }
+    if (fpago !== FormaDePago.EFECTIVO) {
+      return null;
     }
     const maximo = 100000.0;
     return total > maximo ? { importeMaximo: true } : null;

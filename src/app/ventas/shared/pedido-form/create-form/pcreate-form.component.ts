@@ -6,6 +6,7 @@ import {
   EventEmitter,
   Input,
   ChangeDetectorRef,
+  AfterViewInit,
 } from '@angular/core';
 
 import {
@@ -14,6 +15,7 @@ import {
   tap,
   map,
   distinctUntilChanged,
+  finalize,
 } from 'rxjs/operators';
 import { merge, Observable } from 'rxjs';
 
@@ -24,6 +26,7 @@ import { Cliente, FormaDePago, Pedido, TipoDePedido } from '@papx/models';
 import { PcreateFacade } from './pcreate.facade';
 import { ToastController } from '@ionic/angular';
 import { FormatService } from 'src/app/core/services/format.service';
+import { LoadingService } from '@papx/common/ui-core';
 
 @Component({
   selector: 'papx-pedido-form',
@@ -32,7 +35,9 @@ import { FormatService } from 'src/app/core/services/format.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [PcreateFacade],
 })
-export class PedidoCreateFormComponent extends BaseComponent implements OnInit {
+export class PedidoCreateFormComponent
+  extends BaseComponent
+  implements OnInit, AfterViewInit {
   @Output() save = new EventEmitter<Partial<Pedido>>();
   @Output() cerrarPedido = new EventEmitter<Partial<Pedido>>();
   @Input() data: Partial<Pedido> = {};
@@ -55,7 +60,8 @@ export class PedidoCreateFormComponent extends BaseComponent implements OnInit {
     private facade: PcreateFacade,
     private cd: ChangeDetectorRef,
     private toast: ToastController,
-    private format: FormatService
+    private format: FormatService,
+    private loading: LoadingService
   ) {
     super();
   }
@@ -63,7 +69,6 @@ export class PedidoCreateFormComponent extends BaseComponent implements OnInit {
   ngOnInit() {
     // this.form.disable({ onlySelf: true, emitEvent: true });
     this.facade.setPedido(this.data);
-    this.facade.actualizarProductos();
     this.addListeners();
     this.facade.actualizarValidaciones();
 
@@ -88,8 +93,34 @@ export class PedidoCreateFormComponent extends BaseComponent implements OnInit {
       });
   }
 
-  actualizar() {
-    this.facade.actualizarProductos();
+  ngAfterViewInit() {
+    // setTimeout(() => this.actualizarExistencias(), 1000);
+  }
+
+  async actualizarExistencias() {
+    await this.loading.startLoading('Actualizando existencias');
+    this.facade.actualizarExistencias().subscribe(
+      () => this.loading.stopLoading('Existencias actualizadas'),
+      (err) => this.loading.stopLoading()
+    );
+  }
+
+  imprimirPedido() {
+    this.loading.startLoading('Imprimiendo pedido');
+    this.facade
+      .actualizarExistencias()
+      .pipe(finalize(() => this.loading.stopLoading('Listo..')))
+      .subscribe(() => {});
+  }
+
+  enviarPedido() {
+    this.loading.startLoading('Enviando pedido por correo electrónico');
+    this.facade
+      .actualizarExistencias()
+      .pipe(
+        finalize(() => this.loading.stopLoading('Corrreo enviado exitosamente'))
+      )
+      .subscribe(() => {});
   }
 
   ngOnDestroy() {

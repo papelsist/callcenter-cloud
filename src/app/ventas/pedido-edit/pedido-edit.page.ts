@@ -1,6 +1,13 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import {
+  ActivatedRoute,
+  ActivatedRouteSnapshot,
+  Router,
+} from '@angular/router';
 import { Pedido, User } from '@papx/models';
+import { combineLatest } from 'rxjs';
+import { map, switchMap, take } from 'rxjs/operators';
+import { VentasDataService } from '../@data-access';
 import { PedidosFacade } from '../@data-access/+state';
 
 @Component({
@@ -11,8 +18,22 @@ import { PedidosFacade } from '../@data-access/+state';
 export class PedidoEditPage implements OnInit, OnDestroy {
   errors: any;
   warnings: any[];
+  // current$ = this.route.paramMap.pipe(
+  //   switchMap((params) => this.facade.fetchPedido(params.get('id')))
+  // );
+  // userInfo$ = this.facade.userInfo$;
+
+  // vm$ = combineLatest([this.userInfo$, this.current$]).pipe(
+  //   map(([user, pedido]) => ({ user, pedido }))
+  // );
+
   vm$ = this.facade.vm$;
-  constructor(public facade: PedidosFacade, private router: Router) {}
+  constructor(
+    public facade: PedidosFacade,
+    private router: Router,
+    private route: ActivatedRoute,
+    private service: VentasDataService
+  ) {}
 
   ngOnInit() {}
 

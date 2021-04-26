@@ -3,7 +3,14 @@ import { FormBuilder, FormGroup } from '@angular/forms';
 
 import { ModalController } from '@ionic/angular';
 
-import { BehaviorSubject, Observable, of, Subject, Subscription } from 'rxjs';
+import {
+  BehaviorSubject,
+  merge,
+  Observable,
+  of,
+  Subject,
+  Subscription,
+} from 'rxjs';
 import {
   distinctUntilChanged,
   map,
@@ -13,12 +20,14 @@ import {
   withLatestFrom,
   switchMap,
   tap,
+  delay,
 } from 'rxjs/operators';
 
 import unique from 'lodash-es/uniq';
 import toNumber from 'lodash-es/toNumber';
 
 import {
+  Almacen,
   Cliente,
   FormaDePago,
   Pedido,
@@ -45,6 +54,7 @@ import * as cartUtils from '../../../utils/cart.utils';
 import * as utils from '../pedido-form.utils';
 import { PedidoForm } from '../pedido-form';
 import { PedidoWarnings } from '../validation/pedido-warning';
+import { ExistenciasService } from '@papx/shared/productos/data-access/services/existencias.service';
 
 @Injectable()
 export class PcreateFacade {
@@ -117,30 +127,6 @@ export class PcreateFacade {
         })
       )
     )
-    // withLatestFrom(this.catalogos.descuentos$)
-    // tap((dd) => console.log('Evaluando: ', dd)),
-    // map(([neto, descuentos]) => {
-    //   const idx = descuentos.findIndex((item) => item.importe >= neto);
-    //   if (idx) {
-    //     const maxIndex = descuentos.length - 1;
-    //     const nextIndex = idx + 1;
-    //     if (nextIndex <= maxIndex) {
-    //       const next = descuentos[nextIndex];
-    //       const faltante = next.inicial - neto;
-    //       const faltantePercent = faltante / next.inicial;
-    //       // console.log(
-    //       //   'Faltante %f Neto Actual: %f Proximo: %f  Falta(%): porc',
-    //       //   faltante,
-    //       //   neto,
-    //       //   next.inicial,
-    //       //   faltantePercent
-    //       // );
-    //       return faltante;
-    //     }
-    //   }
-    //   return 0;
-    // }),
-    // tap((faltante) => console.log('Faltante: ', faltante))
   );
 
   constructor(
@@ -149,6 +135,7 @@ export class PcreateFacade {
     private clienteForm: ClienteFormController,
     private clienteDataService: ClientesDataService,
     private productoDataService: ProductoService,
+    private existenciasService: ExistenciasService,
     private catalogos: CatalogosService,
     auth: AuthService,
     private fb: FormBuilder,
@@ -187,20 +174,20 @@ export class PcreateFacade {
   }
 
   private refreshCliente(id: string) {
-    // console.log('Registrando Live CLIENTE ');
     this.closeClienteSubs();
     this.liveClienteSub = this.clienteDataService
       .fetchLiveCliente(id)
       .subscribe((cte) => {
         const { cfdiMail, nombre } = cte;
         this.controls.cliente.setValue(cte);
-        this.form.get('nombre').setValue(nombre, { emitEvent: true });
-        if (cfdiMail)
+        if (nombre && nombre !== 'MOSTRADOR') {
+          this.form.get('nombre').setValue(nombre, { emitEvent: true });
+        }
+        if (cfdiMail && cte.nombre !== 'MOSTRADOR')
           this.form.get('cfdiMail').setValue(cfdiMail, { emitEvent: true });
         if (cte.credito) {
           this.recalcular();
         }
-        // console.log('Cliente actualizado: ', cte);
         this.actualizarValidaciones();
       });
   }
@@ -286,6 +273,7 @@ export class PcreateFacade {
     }
     return this;
   }
+
   async deleteItem(index: number) {
     const partidas = [...this._currentPartidas];
     partidas.splice(index, 1);
@@ -421,71 +409,85 @@ export class PcreateFacade {
     return res;
   }
 
-  actualizarProductos() {
-    console.log('Actualizando productos.....');
-    const current: Partial<PedidoDet>[] = [...this._currentPartidas];
-    const claves = unique(current.map((item) => item.clave));
-    claves.forEach((clave) => {
-      this.productoDataService
-        .findByClave(clave)
-        .pipe(
-          // tap((p) => console.log('Change event: %s ', p.clave, p)),
-          takeUntil(this.destroy$) // Esta es la clave para LiveUpdate the Firebase
-        )
-        .subscribe((prod) => this.actualizarProducto(prod, current));
-    });
-  }
-
-  actualizarProducto(prod: Producto, current: Partial<PedidoDet>[]) {
-    current.forEach((item) => {
-      if (item.producto.clave === prod.clave) {
-        item.producto = prod;
-        item.descripcion = prod.descripcion;
-        this.actualizarDisponible(item);
-      }
-    });
-    this._currentPartidas = current;
-    this._partidas.next(this._currentPartidas);
-  }
-
-  private actualizarDisponible(item: Partial<PedidoDet>): Partial<PedidoDet> {
-    const exis = item.producto.existencia;
-    if (exis) {
-      const cant = item.cantidad;
-      const disp = Object.keys(exis).reduce(
-        (p, c) => p + toNumber(exis[c].cantidad),
-        0.0
-      );
-      item.faltante = disp > cant ? 0 : cant - disp;
-    }
-    return item;
-  }
-
-  public actualizarExistenciasDeSucursal(sucursal: string) {
+  /**
+   *
+   * @returns Public API para actualizar las existencias del pedido
+   */
+  actualizarExistencias(): Observable<any> {
+    const sucursal = this.form.get('sucursal').value;
     let sname = sucursal.toLowerCase();
     if (sname === 'calle 4') sname = 'calle4';
     if (sname === 'vertiz 176') sname = 'vertis176';
 
-    this._currentPartidas.forEach((item) => {
-      const prod = item.producto;
-      if (prod.existencia) {
-        const exis = prod.existencia;
-        const almacen = exis[sname];
-        if (almacen) {
-          console.log('Almacen: ', almacen);
-          const actual = toNumber(almacen.cantidad);
-          const faltante =
-            item.cantidad - actual <= 0 ? 0 : item.cantidad - actual;
-          console.log(
-            'Prod: %s Requerido: %f Exis: %f Faltante %f',
-            prod.clave,
-            item.cantidad,
-            actual,
-            faltante
-          );
-        }
-      }
+    const current: Partial<PedidoDet>[] = [...this._currentPartidas];
+    const ids = unique(current.map((item) => item.productoId));
+    const tasks: Observable<Producto>[] = [];
+    ids.forEach((id) => {
+      const task = this.productoDataService
+        .fetchById(id)
+        .pipe(takeUntil(this.destroy$));
+      tasks.push(task);
     });
+    return merge(...tasks).pipe(
+      tap((p) => {
+        const current: Partial<PedidoDet>[] = [...this._currentPartidas];
+        const found = current.filter((item) => item.clave === p.clave);
+        found.forEach((item, index) => {
+          item.producto.existencia = p.existencia;
+          const res = this.actualizarDisponible(item, p.existencia, sname);
+          current[index] = res;
+        });
+        this._currentPartidas = [...current];
+        this._partidas.next(this._currentPartidas);
+      })
+    );
+  }
+
+  /**
+   *
+   * @returns Public API para imprimir pedido
+   */
+  imprimirPedido(): Observable<any> {
+    const sucursal = this.form.get('sucursal').value;
+    let sname = sucursal.toLowerCase();
+    if (sname === 'calle 4') sname = 'calle4';
+    if (sname === 'vertiz 176') sname = 'vertis176';
+    return of(sucursal).pipe(delay(2000));
+  }
+
+  /**
+   * Public API para enviar el pedido por email
+   *
+   * @returns
+   */
+  enviarPedido(): Observable<any> {
+    const sucursal = this.form.get('sucursal').value;
+    let sname = sucursal.toLowerCase();
+    if (sname === 'calle 4') sname = 'calle4';
+    if (sname === 'vertiz 176') sname = 'vertis176';
+    return of(sucursal).pipe(delay(2000));
+  }
+
+  private actualizarDisponible(
+    item: Partial<PedidoDet>,
+    exis: { [id: string]: Almacen },
+    sucursal: string
+  ): Partial<PedidoDet> {
+    console.log(
+      '---- Actualizando disponible Sucursal: %s  Prod: %s',
+      sucursal,
+      item.clave
+    );
+    const cant = item.cantidad;
+    if (exis) {
+      const disp = exis[sucursal] ? toNumber(exis[sucursal].cantidad) : 0;
+      item.faltante = disp > cant ? 0 : cant - disp;
+      item.disponible = disp;
+    } else {
+      item.faltante = cant;
+      item.disponible = 0;
+    }
+    return item;
   }
 
   closeLiveSubscriptions() {

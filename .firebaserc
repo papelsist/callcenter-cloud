@@ -2,7 +2,7 @@
   "projects": {
     "development": "papx-ws-dev",
     "default": "papx-ws-dev",
-    "dev": "papx-ws-prod"
+    "dev": "papx-ws-dev"
   },
   "targets": {
     "papx-ws-dev": {

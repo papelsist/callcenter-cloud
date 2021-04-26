@@ -8,6 +8,9 @@
       <papx-pedido-options-button
         [descuentos]="descuentos$ | async"
         (cerrar)="onCerrar()"
+        (actualizarExistencias)="actualizarExistencias()"
+        (print)="imprimirPedido()"
+        (email)="enviarPedido()"
       ></papx-pedido-options-button>
     </ion-buttons>
   </ion-toolbar>

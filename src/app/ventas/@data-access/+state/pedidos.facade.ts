@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { AuthService } from '@papx/auth';
 import { Pedido, User } from '@papx/models';
 import { BehaviorSubject, combineLatest } from 'rxjs';
-import { distinctUntilChanged, map, shareReplay } from 'rxjs/operators';
+import { distinctUntilChanged, map, shareReplay, take } from 'rxjs/operators';
 import { VentasDataService } from '../ventas-data.service';
 
 export interface PedidosState {
@@ -31,6 +31,7 @@ export class PedidosFacade {
     distinctUntilChanged(),
     shareReplay(1)
   );
+  userInfo$ = this.authService.userInfo$;
 
   vm$ = combineLatest([this.authService.userInfo$, this.current$]).pipe(
     map(([user, pedido]) => ({ user, pedido }))
@@ -69,5 +70,16 @@ export class PedidosFacade {
   cleanCart(user: User) {
     console.log('Limpiando cart:', user.uid);
     return this.dataService.deleteCart(user.uid);
+  }
+
+  reloadCurrent(id: string) {
+    this.dataService
+      .findById(id)
+      .pipe(take(1))
+      .subscribe((c) => this.setCurrent(c));
+  }
+
+  fetchPedido(id: string) {
+    return this.dataService.fetchPedido(id);
   }
 }
