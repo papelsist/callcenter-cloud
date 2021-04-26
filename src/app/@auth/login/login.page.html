@@ -1,67 +1,71 @@
 <ion-header>
   <ion-toolbar color="tertiary">
-    <ion-title>Pepel SA Callcenter App</ion-title>
+    <ion-buttons slot="start">
+      <ion-button routerLink="/home">
+        <ion-icon name="home" slot="icon-only"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>SX-CALLCENTER</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content class="ion-padding">
-  <div class="container">
-    <div class="child">
-      <h3>Acceso al sistema</h3>
-      <form [formGroup]="form">
-        <ion-item>
-          <ion-label position="floating">Email</ion-label>
-          <ion-input
-            type="email"
-            name="email"
-            formControlName="email"
-            placeholder="Email"
-            autocomplete="on"
-            autofocus="true"
-            inputmode="email"
-          ></ion-input>
-        </ion-item>
+  <ion-grid [formGroup]="form">
+    <ion-row class="ion-justify-content-center">
+      <ion-col
+        class="ion-align-self-center"
+        size-xs="12"
+        size-sm="8"
+        size-md="6"
+        size-lg="6"
+      >
+        <div class="ion-text-center">
+          <h3>Acceso al sistema</h3>
+        </div>
+        <div>
+          <ion-item>
+            <ion-label position="floating">Email</ion-label>
+            <ion-input
+              type="email"
+              formControlName="email"
+              placeholder="Email"
+              autocomplete="email"
+              [autofocus]="true"
+            ></ion-input>
+          </ion-item>
 
-        <ion-item class="ion-margin-top">
-          <ion-label position="floating">Password</ion-label>
-          <ion-input
-            type="password"
-            name="password"
-            autocomplete="current-password"
-            placeholder="Digite su contraseña"
-            formControlName="password"
-            enterkeyhint="enter"
-            (keyup.enter)="doEnter($event)"
-          ></ion-input>
-        </ion-item>
-        <ion-button
-          expand="block"
-          [disabled]="form.invalid || ((loading$ | async))"
-          type="submit"
-          class="ion-margin-top"
-          (click)="login()"
-        >
-          <ion-icon name="log-in" slot="start"></ion-icon>
-          <ion-label>Accesar</ion-label>
-          <ion-spinner
-            slot="end"
-            name="lines"
-            *ngIf="loading$ | async"
-          ></ion-spinner>
-        </ion-button>
-      </form>
-      <div *ngIf="error$ | async as error" class="ion-padding">
-        <ion-note color="danger"> {{error}} </ion-note>
-      </div>
-      <p>
-        Si no tienes cuenta y eres empleado autorizado de Papel S.A. de C.V.
-        para el uso de esta aplicación solicita tu
-        <a routerLink="/signup"> registro</a>
-      </p>
-      <p>
-        Olvidé mi
-        <a routerLink="/restorpassword"> contraseña !</a>
-      </p>
-    </div>
-  </div>
+          <ion-item class="ion-margin-top">
+            <ion-label position="floating">Password</ion-label>
+            <ion-input
+              type="password"
+              autocomplete="current-password"
+              placeholder="Digite su contraseña"
+              formControlName="password"
+              enterkeyhint="enter"
+              (keyup.enter)="doEnter($event)"
+            ></ion-input>
+          </ion-item>
+
+          <ion-button
+            expand="block"
+            [disabled]="form.invalid || ((loading$ | async))"
+            type="submit"
+            class="ion-margin-top"
+            (click)="login()"
+          >
+            <ion-icon name="log-in" slot="start"></ion-icon>
+            <ion-label>Accesar</ion-label>
+            <ion-spinner
+              slot="end"
+              name="lines"
+              *ngIf="loading$ | async"
+            ></ion-spinner>
+          </ion-button>
+        </div>
+        <div *ngIf="error$ | async as error" class="ion-padding">
+          <ion-note color="danger"> {{error}} </ion-note>
+        </div>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
 </ion-content>
