@@ -38,9 +38,10 @@ import { LoadingService } from '@papx/common/ui-core';
 export class PedidoCreateFormComponent
   extends BaseComponent
   implements OnInit, AfterViewInit {
+  @Input() data: Partial<Pedido> = {};
   @Output() save = new EventEmitter<Partial<Pedido>>();
   @Output() cerrarPedido = new EventEmitter<Partial<Pedido>>();
-  @Input() data: Partial<Pedido> = {};
+  @Output() imprimir = new EventEmitter();
   @Output() errors = new EventEmitter();
   @Output() warnings = new EventEmitter();
 
@@ -106,11 +107,7 @@ export class PedidoCreateFormComponent
   }
 
   imprimirPedido() {
-    this.loading.startLoading('Imprimiendo pedido');
-    this.facade
-      .actualizarExistencias()
-      .pipe(finalize(() => this.loading.stopLoading('Listo..')))
-      .subscribe(() => {});
+    this.imprimir.emit();
   }
 
   enviarPedido() {

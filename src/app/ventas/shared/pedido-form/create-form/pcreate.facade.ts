@@ -444,18 +444,6 @@ export class PcreateFacade {
   }
 
   /**
-   *
-   * @returns Public API para imprimir pedido
-   */
-  imprimirPedido(): Observable<any> {
-    const sucursal = this.form.get('sucursal').value;
-    let sname = sucursal.toLowerCase();
-    if (sname === 'calle 4') sname = 'calle4';
-    if (sname === 'vertiz 176') sname = 'vertis176';
-    return of(sucursal).pipe(delay(2000));
-  }
-
-  /**
    * Public API para enviar el pedido por email
    *
    * @returns

@@ -4,7 +4,9 @@ import {
   ActivatedRouteSnapshot,
   Router,
 } from '@angular/router';
+import { LoadingService } from '@papx/common/ui-core';
 import { Pedido, User } from '@papx/models';
+import { ReportsService } from '@papx/shared/reports/reports.service';
 import { combineLatest } from 'rxjs';
 import { map, switchMap, take } from 'rxjs/operators';
 import { VentasDataService } from '../@data-access';
@@ -32,7 +34,9 @@ export class PedidoEditPage implements OnInit, OnDestroy {
     public facade: PedidosFacade,
     private router: Router,
     private route: ActivatedRoute,
-    private service: VentasDataService
+    private service: VentasDataService,
+    private loading: LoadingService,
+    private reports: ReportsService
   ) {}
 
   ngOnInit() {}
@@ -63,5 +67,9 @@ export class PedidoEditPage implements OnInit, OnDestroy {
 
   async showErrors(errors: any) {
     console.log('Mostrar errores: ', errors);
+  }
+
+  async onPrint(event: Pedido, user: User) {
+    this.reports.imprimirPedido(event, user);
   }
 }

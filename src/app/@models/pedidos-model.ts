@@ -8,6 +8,7 @@ import firebase from 'firebase/app';
 
 export interface Pedido {
   id?: string;
+  // fecha: string | firebase.firestore.Timestamp;
   fecha: string;
   sucursal: string;
   sucursalId?: string;

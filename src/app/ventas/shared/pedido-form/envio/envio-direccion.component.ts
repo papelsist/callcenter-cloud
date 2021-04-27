@@ -52,23 +52,21 @@ import { DireccionController } from '@papx/shared/direccion';
     <ion-item *ngIf="!!value">
       <address>
         <span
-          >Calle: {{ value.direccion.calle }} Número:
-          {{ value.direccion.numeroExterior }}
-          <span *ngIf="value.direccion.numeroInterior"
-            >Int: {{ value.direccion.numeroInterior }}</span
+          >Calle: {{ value.calle }} Número:
+          {{ value.numeroExterior }}
+          <span *ngIf="value.numeroInterior"
+            >Int: {{ value.numeroInterior }}</span
           >
         </span>
         <div>
-          <span>Colonia: {{ value.direccion.colonia }}</span>
+          <span>Colonia: {{ value.colonia }}</span>
         </div>
         <div>
-          <span>Municipio: {{ value.direccion.municipio }}</span>
-          <span class="ion-padding-start"
-            >Estado: {{ value.direccion.estado }}</span
-          >
+          <span>Municipio: {{ value.municipio }}</span>
+          <span class="ion-padding-start">Estado: {{ value.estado }}</span>
         </div>
         <ion-text color="warning">
-          <div>CP: {{ value.direccion.codigoPostal }}</div>
+          <div>CP: {{ value.codigoPostal }}</div>
         </ion-text>
       </address>
     </ion-item>
@@ -118,6 +116,7 @@ export class EnvioDireccionComponent
     }
   }
   writeValue(obj: any): void {
+    console.log('Write value: ', obj);
     this.value = obj;
     this.dc.markForCheck();
   }

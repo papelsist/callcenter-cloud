@@ -30,16 +30,24 @@ const HorarioValidator = (
   control: AbstractControl
 ): ValidationErrors | null => {
   const horario = control.value;
-  const horaInicial = hourToDate(horario.horaInicial);
-  const horaFinal = hourToDate(horario.horaFinal);
-  const diff = differenceInHours(horaFinal, horaInicial);
-  return diff < 1 ? { tooEarly: true } : null;
+  if (typeof horario == 'string') {
+    return null;
+  }
+  if (horario) {
+    const horaInicial = hourToDate(horario.horaInicial);
+    const horaFinal = hourToDate(horario.horaFinal);
+    const diff = differenceInHours(horaFinal, horaInicial);
+    return diff < 1 ? { tooEarly: true } : null;
+  }
+  return null;
 };
 
 const findDirecciones = (cliente: Partial<Cliente>): ClienteDireccion[] => {
   if (cliente.rfc === 'XAXX010101000') return [];
-  if (cliente.direcciones) return cliente.direcciones;
-  else {
+  if (cliente.direcciones) {
+    console.log('Cliente direcciones: ', cliente);
+    return cliente.direcciones;
+  } else {
     return [
       {
         direccion: cliente.direccion,
