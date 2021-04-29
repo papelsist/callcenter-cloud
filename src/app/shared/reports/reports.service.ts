@@ -1,16 +1,25 @@
 import { Injectable } from '@angular/core';
-import { FormatService } from '@papx/core';
-import { Pedido, User } from '@papx/models';
+import { AngularFireFunctions } from '@angular/fire/functions';
+
 import firebase from 'firebase/app';
+import { from, of, throwError } from 'rxjs';
+import { catchError, map, switchMap } from 'rxjs/operators';
+
 import pdfMake from 'pdfmake/build/pdfmake';
 import pdfFonts from 'pdfmake/build/vfs_fonts';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
+import { FormatService } from '@papx/core';
+import { Pedido, User } from '@papx/models';
+
 @Injectable({ providedIn: 'root' })
 export class ReportsService {
-  constructor(private format: FormatService) {}
+  constructor(
+    private format: FormatService,
+    private aff: AngularFireFunctions
+  ) {}
 
-  async imprimirPedido(pedido: Partial<Pedido>, user: User) {
+  async generarPedidoGenerator(pedido: Partial<Pedido>, user: User) {
     console.log('Imprimiendo pedido: ', pedido);
     const { cliente, fecha } = pedido;
     let sfecha: any = fecha;
@@ -185,8 +194,14 @@ export class ReportsService {
         logo: 'assets/images/papel-logo.jpg',
       },
     };
+    const pdfDocGenerator = pdfMake.createPdf(docDefinition);
+    // pdfMake.createPdf(docDefinition).open();
+    return pdfDocGenerator;
+  }
 
-    pdfMake.createPdf(docDefinition).open();
+  async imprimirPedido(pedido: Partial<Pedido>, user: User) {
+    const generator = await this.generarPedidoGenerator(pedido, user);
+    generator.open();
   }
 
   async getPapelLogo(): Promise<string> {
@@ -482,5 +497,35 @@ export class ReportsService {
         margin: [0, 5],
       },
     ];
+  }
+
+  async getPedidoPdf(pedido: Partial<Pedido>, user: User) {
+    const generator = await this.generarPedidoGenerator(pedido, user);
+    const prox = new Promise<string>((resolve, reject) => {
+      generator.getBase64((data: any) => {
+        resolve(data);
+      });
+    });
+    const base64 = await prox;
+    return base64;
+  }
+
+  enviarPedido(
+    config: {
+      target: string;
+      tipo: 'COTIZACION' | 'CONFIRMACION';
+      comentario?: string;
+    },
+    pedido: Partial<Pedido>,
+    pdfFile: string
+  ) {
+    const payload = {
+      ...config,
+      pedidoFolio: pedido.folio.toString(),
+      clienteNombre: pedido.nombre,
+      pdfFile,
+    };
+    const callable = this.aff.httpsCallable('enviarPedidoPorMail');
+    return callable(payload).pipe(catchError((err) => throwError(err)));
   }
 }

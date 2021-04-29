@@ -6,6 +6,7 @@
       (save)="onSave(vm.pedido.id, $event, vm.user)"
       (cerrarPedido)="onCerrar(vm.pedido.id, $event, vm.user)"
       (imprimir)="onPrint(vm.pedido, vm.user)"
+      (email)="onEmail($event, vm.pedido, vm.user)"
       (errors)="onErrors($event)"
       (warnings)="onWarnings($event)"
     ></papx-pedido-form>

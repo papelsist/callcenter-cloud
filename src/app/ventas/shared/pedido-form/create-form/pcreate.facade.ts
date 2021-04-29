@@ -1,8 +1,6 @@
 import { Injectable } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 
-import { ModalController } from '@ionic/angular';
-
 import {
   BehaviorSubject,
   merge,
@@ -17,7 +15,6 @@ import {
   take,
   startWith,
   takeUntil,
-  withLatestFrom,
   switchMap,
   tap,
   delay,
@@ -46,7 +43,7 @@ import { ClienteFormController } from '@papx/shared/clientes/cliente-form/client
 import { CatalogosService } from '@papx/data-access';
 
 import * as cargosBuilder from '../../../utils/cargos';
-import { recalcularPartidas, buildSummary } from '../../../utils';
+import { recalcularPartidas, buildSummary, normalize } from '../../../utils';
 import { ItemController } from '../../ui-pedido-item';
 import { AutorizacionesDePedido } from '../../../utils';
 import * as cartUtils from '../../../utils/cart.utils';
@@ -54,7 +51,6 @@ import * as cartUtils from '../../../utils/cart.utils';
 import * as utils from '../pedido-form.utils';
 import { PedidoForm } from '../pedido-form';
 import { PedidoWarnings } from '../validation/pedido-warning';
-import { ExistenciasService } from '@papx/shared/productos/data-access/services/existencias.service';
 
 @Injectable()
 export class PcreateFacade {
@@ -135,11 +131,9 @@ export class PcreateFacade {
     private clienteForm: ClienteFormController,
     private clienteDataService: ClientesDataService,
     private productoDataService: ProductoService,
-    private existenciasService: ExistenciasService,
     private catalogos: CatalogosService,
     auth: AuthService,
-    private fb: FormBuilder,
-    private modal: ModalController
+    private fb: FormBuilder
   ) {
     auth.user$.pipe(take(1)).subscribe((user) => (this.user = user));
   }
@@ -180,19 +174,27 @@ export class PcreateFacade {
       .subscribe((cte) => {
         const { cfdiMail, nombre } = cte;
         this.controls.cliente.setValue(cte);
+
         if (nombre && nombre !== 'MOSTRADOR') {
           this.form.get('nombre').setValue(nombre, { emitEvent: true });
         }
-        if (cfdiMail && cte.nombre !== 'MOSTRADOR')
+
+        if (cfdiMail && cte.nombre !== 'MOSTRADOR') {
+          console.log('Actualizando CfdiMail: ', cfdiMail);
           this.form.get('cfdiMail').setValue(cfdiMail, { emitEvent: true });
+        }
+
         if (cte.credito) {
           this.recalcular();
         }
+
         this.actualizarValidaciones();
+        this.form.markAsDirty();
       });
   }
 
   recalcular() {
+    console.log('Recalculando pedido...');
     const tipo = this.tipo;
     const cliente = this.cliente;
     const formaDePago = this.form.get('formaDePago').value;
@@ -368,6 +370,9 @@ export class PcreateFacade {
   get sucursal(): string {
     return this.form.get('sucursal').value;
   }
+  getPartidas() {
+    return this._currentPartidas;
+  }
 
   isCredito() {
     return this.tipo === TipoDePedido.CREDITO;
@@ -409,6 +414,16 @@ export class PcreateFacade {
     return res;
   }
 
+  getExistenciaActual(item: Partial<PedidoDet>) {
+    return this.productoDataService.fetchById(item.productoId).pipe(take(1));
+  }
+
+  updateItem(item: Partial<PedidoDet>, index: number) {
+    const partidas = [...this._currentPartidas];
+    partidas[index] = item;
+    this._partidas.next(partidas);
+  }
+
   /**
    *
    * @returns Public API para actualizar las existencias del pedido
@@ -419,26 +434,37 @@ export class PcreateFacade {
     if (sname === 'calle 4') sname = 'calle4';
     if (sname === 'vertiz 176') sname = 'vertis176';
 
-    const current: Partial<PedidoDet>[] = [...this._currentPartidas];
+    const items = [...normalize(this._currentPartidas)];
+
+    const current: Partial<PedidoDet>[] = items;
     const ids = unique(current.map((item) => item.productoId));
     const tasks: Observable<Producto>[] = [];
     ids.forEach((id) => {
-      const task = this.productoDataService
-        .fetchById(id)
-        .pipe(takeUntil(this.destroy$));
+      const task = this.productoDataService.fetchById(id).pipe(take(1));
       tasks.push(task);
     });
+
     return merge(...tasks).pipe(
       tap((p) => {
+        console.log('Actualizando disponible de %s', p.clave);
+        const found = current.filter((item) => item.clave === p.clave);
+        console.log('Fou');
+        /*
         const current: Partial<PedidoDet>[] = [...this._currentPartidas];
         const found = current.filter((item) => item.clave === p.clave);
         found.forEach((item, index) => {
+          console.log(
+            'Actualizando disponible de %s index:%f',
+            item.clave,
+            index
+          );
           item.producto.existencia = p.existencia;
           const res = this.actualizarDisponible(item, p.existencia, sname);
           current[index] = res;
         });
         this._currentPartidas = [...current];
         this._partidas.next(this._currentPartidas);
+        */
       })
     );
   }

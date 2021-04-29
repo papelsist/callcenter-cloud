@@ -4,8 +4,12 @@ import {
   Input,
   OnInit,
 } from '@angular/core';
+import { AngularFirestore } from '@angular/fire/firestore';
+
 import { FormGroup } from '@angular/forms';
-import { CatalogosService } from '@papx/data-access';
+
+import { Transporte } from '@papx/models';
+import { take } from 'rxjs/operators';
 
 @Component({
   selector: 'papx-transporte-field',
@@ -37,7 +41,10 @@ export class TransporteFieldComponent implements OnInit {
   @Input() property = 'transporte';
   @Input() label = 'Transporte';
 
-  transportes$ = this.service.transportes$;
+  transportes$ = this.afs
+    .collection<Transporte>('transportes', (ref) => ref.orderBy('nombre'))
+    .valueChanges({ idField: 'id' })
+    .pipe(take(1));
 
   customPopoverOptions: any = {
     header: 'Transporte',
@@ -49,7 +56,7 @@ export class TransporteFieldComponent implements OnInit {
     header: 'Compañías de transportes',
   };
 
-  constructor(private service: CatalogosService) {}
+  constructor(private afs: AngularFirestore) {}
 
   ngOnInit() {}
 

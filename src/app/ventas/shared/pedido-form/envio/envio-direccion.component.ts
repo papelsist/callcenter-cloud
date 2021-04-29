@@ -116,7 +116,6 @@ export class EnvioDireccionComponent
     }
   }
   writeValue(obj: any): void {
-    console.log('Write value: ', obj);
     this.value = obj;
     this.dc.markForCheck();
   }

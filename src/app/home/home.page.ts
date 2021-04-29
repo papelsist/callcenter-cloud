@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
-import { AngularFireMessaging } from '@angular/fire/messaging';
-import { ClientesDataService } from '@papx/shared/clientes/@data-access/clientes-data.service';
+import { MailService } from '@papx/data-access';
+
 import { AuthService } from '../@auth/auth.service';
 
 @Component({
@@ -12,10 +12,7 @@ export class HomePage {
   title = 'Callcenter App';
   user$ = this.auth.userInfo$;
   host = location.href;
-  constructor(
-    private auth: AuthService,
-    private clienteService: ClientesDataService
-  ) {}
+  constructor(private auth: AuthService, private mailService: MailService) {}
 
   ionViewDidEnter() {}
 }

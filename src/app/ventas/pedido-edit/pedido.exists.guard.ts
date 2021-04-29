@@ -17,13 +17,11 @@ export class PedidoExistsGuard implements CanActivate {
   ) {}
 
   canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot) {
-    console.log('CanActivate running.....');
     const id = route.paramMap.get('id');
     // return this.findInStoreOld(id);
     const res = this.findInStore(id).pipe(
       map((r) => {
         const existe = !!r;
-        console.log('Existe: ', existe);
         return existe;
       })
     );

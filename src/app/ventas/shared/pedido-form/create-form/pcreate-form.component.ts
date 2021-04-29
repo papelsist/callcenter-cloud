@@ -20,9 +20,16 @@ import {
 import { merge, Observable } from 'rxjs';
 
 import round from 'lodash-es/round';
+import toNumber from 'lodash-es/toNumber';
 
 import { BaseComponent } from '@papx/core';
-import { Cliente, FormaDePago, Pedido, TipoDePedido } from '@papx/models';
+import {
+  Cliente,
+  FormaDePago,
+  Pedido,
+  PedidoDet,
+  TipoDePedido,
+} from '@papx/models';
 import { PcreateFacade } from './pcreate.facade';
 import { ToastController } from '@ionic/angular';
 import { FormatService } from 'src/app/core/services/format.service';
@@ -42,6 +49,7 @@ export class PedidoCreateFormComponent
   @Output() save = new EventEmitter<Partial<Pedido>>();
   @Output() cerrarPedido = new EventEmitter<Partial<Pedido>>();
   @Output() imprimir = new EventEmitter();
+  @Output() email = new EventEmitter<Partial<Cliente>>();
   @Output() errors = new EventEmitter();
   @Output() warnings = new EventEmitter();
 
@@ -98,8 +106,51 @@ export class PedidoCreateFormComponent
     // setTimeout(() => this.actualizarExistencias(), 1000);
   }
 
-  async actualizarExistencias() {
+  getAlmacen(): string {
+    const sucursal = this.form.get('sucursal').value;
+    let sname = sucursal.toLowerCase();
+    if (sname === 'calle 4') sname = 'calle4';
+    if (sname === 'vertiz 176') sname = 'vertis176';
+    return sname;
+  }
+
+  actualizarExistencias() {
+    // this.loading.startLoading('Actualizando existencias');
+
+    const partidas: Partial<PedidoDet[]> = [...this.facade.getPartidas()];
+    partidas.forEach((item, index) => {
+      if (!item.clave.includes('CORTE') && !item.clave.startsWith('MANIOBRA')) {
+        this.facade.getExistenciaActual(item).subscribe((prod) => {
+          console.log('Actualizando existencia de: %s', item.clave, index);
+          const almacen = prod.existencia[this.getAlmacen()];
+          console.log('Almacen: ', almacen);
+          const cantidad = item.cantidad;
+
+          const disponible = almacen ? toNumber(almacen.cantidad) : 0;
+          const faltante = disponible > cantidad ? 0 : cantidad - disponible;
+          console.log(
+            'Requerido: %f Disponible: %f Faltante: %f',
+            cantidad,
+            disponible,
+            faltante
+          );
+
+          item.disponible = disponible;
+          item.faltante = faltante;
+          this.facade.updateItem(item, index);
+          this.facade.actualizarValidaciones();
+          this.form.markAsDirty();
+          this.cd.markForCheck();
+        });
+      }
+    });
+    console.log('Partidas recalculadas: ', partidas);
+    // this.loading.stopLoading();
+  }
+
+  async actualizarExistencias2() {
     await this.loading.startLoading('Actualizando existencias');
+
     this.facade.actualizarExistencias().subscribe(
       () => this.loading.stopLoading('Existencias actualizadas'),
       (err) => this.loading.stopLoading()
@@ -111,13 +162,7 @@ export class PedidoCreateFormComponent
   }
 
   enviarPedido() {
-    this.loading.startLoading('Enviando pedido por correo electrónico');
-    this.facade
-      .actualizarExistencias()
-      .pipe(
-        finalize(() => this.loading.stopLoading('Corrreo enviado exitosamente'))
-      )
-      .subscribe(() => {});
+    this.email.emit(this.form.get('cliente').value);
   }
 
   ngOnDestroy() {

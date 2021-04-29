@@ -4,13 +4,15 @@ import {
   ActivatedRouteSnapshot,
   Router,
 } from '@angular/router';
+import { AlertController, PopoverController } from '@ionic/angular';
 import { LoadingService } from '@papx/common/ui-core';
-import { Pedido, User } from '@papx/models';
+import { Cliente, Pedido, User } from '@papx/models';
 import { ReportsService } from '@papx/shared/reports/reports.service';
 import { combineLatest } from 'rxjs';
-import { map, switchMap, take } from 'rxjs/operators';
+import { catchError, finalize, map, switchMap, take } from 'rxjs/operators';
 import { VentasDataService } from '../@data-access';
 import { PedidosFacade } from '../@data-access/+state';
+import { EmailTargetComponent } from '../shared/buttons';
 
 @Component({
   selector: 'app-pedido-edit',
@@ -33,10 +35,9 @@ export class PedidoEditPage implements OnInit, OnDestroy {
   constructor(
     public facade: PedidosFacade,
     private router: Router,
-    private route: ActivatedRoute,
-    private service: VentasDataService,
     private loading: LoadingService,
-    private reports: ReportsService
+    private reports: ReportsService,
+    private popoverController: PopoverController
   ) {}
 
   ngOnInit() {}
@@ -47,7 +48,6 @@ export class PedidoEditPage implements OnInit, OnDestroy {
 
   async onSave(id: string, pedido: Partial<Pedido>, user: User) {
     pedido.status = 'COTIZACION';
-    // console.log('Actualizando pedido: ', pedido);
     await this.facade.updatePedido(id, pedido, user);
     this.router.navigate(['/', 'ventas', 'cotizaciones']);
   }
@@ -65,11 +65,44 @@ export class PedidoEditPage implements OnInit, OnDestroy {
     this.warnings = warnings;
   }
 
-  async showErrors(errors: any) {
-    console.log('Mostrar errores: ', errors);
-  }
-
   async onPrint(event: Pedido, user: User) {
     this.reports.imprimirPedido(event, user);
   }
+
+  async onEmail(cliente: Partial<Cliente>, event: Pedido, user: User) {
+    let current = event.cfdiMail;
+    if (!!current && cliente.medios) {
+      const found = cliente.medios.find((item) => item.tipo === 'MAIL');
+      current = found ? found.descripcion : null;
+    }
+    const alert = await this.popoverController.create({
+      component: EmailTargetComponent,
+      componentProps: { value: current },
+      cssClass: 'emal-target-popover',
+      mode: 'ios',
+    });
+    await alert.present();
+    const { data } = await alert.onWillDismiss();
+    if (data) {
+      await this.loading.startLoading('Enviando correo....');
+      try {
+        const pdf = await this.reports.getPedidoPdf(event, user);
+        const res = await this.reports
+          .enviarPedido(data, event, pdf)
+          .toPromise();
+        console.log('Res: ', res);
+        await this.loading.stopLoading();
+      } catch (err) {
+        await this.loading.stopLoading('');
+        this.handleError(err);
+      }
+    }
+  }
+
+  showMessage(message: string, header: string) {}
+
+  async handleError(err: any) {
+    console.log('Err: ', err);
+  }
+  showErrors(errrors: any) {}
 }

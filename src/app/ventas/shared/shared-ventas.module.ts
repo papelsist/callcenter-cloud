@@ -1,7 +1,9 @@
 import { NgModule } from '@angular/core';
+import { ReactiveFormsModule } from '@angular/forms';
 
 import { CommonUiCoreModule } from '@papx/common/ui-core';
 import {
+  EmailTargetComponent,
   ErrorsButtonComponent,
   ErrorsComponent,
   WarningsButtonComponent,
@@ -17,10 +19,11 @@ const COMPONENTS = [
   WarningsComponent,
   ErrorsComponent,
   ErrorsButtonComponent,
+  EmailTargetComponent,
 ];
 
 @NgModule({
-  imports: [CommonUiCoreModule],
+  imports: [CommonUiCoreModule, ReactiveFormsModule],
   declarations: [...COMPONENTS],
   exports: [...COMPONENTS],
 })

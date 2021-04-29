@@ -50,6 +50,7 @@ export class AuthService {
       );
       return user;
     } catch (error) {
+      console.error('EX: ', error);
       throw new Error('Credenciales incorrectas');
     }
   }
