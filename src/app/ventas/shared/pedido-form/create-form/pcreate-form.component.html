@@ -21,6 +21,7 @@
     <ion-row>
       <ion-col>
         <papx-pedido-form-cliente
+          [tipo]="form.get('tipo').valueChanges | async"
           [parent]="form"
           (changeCliente)="onChangeCliente()"
           (clienteNuevo)="onClienteNuevo()"

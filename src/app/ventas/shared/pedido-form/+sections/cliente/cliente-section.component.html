@@ -11,18 +11,28 @@
         <ion-text color="secondary">
           <span>RFC: {{ cte?.rfc }}</span>
         </ion-text>
-        <div class="credito" *ngIf="cte?.credito as cre">
-          <p>
-            <ion-text [color]="cre.creditoActivo ? 'success' : 'danger'">
-              {{ cre.creditoActivo ? "CREDITO" : "CREDITO SUPENDIDO" }}
-            </ion-text>
-          </p>
-        </div>
+        <ng-container *ngIf="tipo === 'CRE'">
+          <div class="credito" *ngIf="cte?.credito as cre">
+            <p>
+              <ion-text [color]="cre.creditoActivo ? 'success' : 'danger'">
+                {{ cre.creditoActivo ? "CREDITO" : "CREDITO SUPENDIDO" }}
+              </ion-text>
+            </p>
+          </div>
+        </ng-container>
       </div>
       <div class="info-row" *ngIf="requiereSocio(cte)">
         <p *ngIf="socio$ | async as socio">
           Socio: {{ socio.nombre }} ({{ socio.clave }})
         </p>
+      </div>
+    </ion-label>
+    <ion-label *ngIf="cte.clave != '1'">
+      <div class="address" *ngIf="cte.direccion as d">
+        <span> Calle: {{ d.calle }} Ext:# {{ d.numeroExterior }} </span>
+        <span> Colonia: {{ d.colonia }} </span>
+        <span> Mpo: {{ d.municipio }} ({{ d.estado }}) </span>
+        <span> CP: {{ d.codigoPostal }} </span>
       </div>
     </ion-label>
     <ion-icon slot="start" name="people"></ion-icon>

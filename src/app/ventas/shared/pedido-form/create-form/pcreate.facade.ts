@@ -179,10 +179,10 @@ export class PcreateFacade {
           this.form.get('nombre').setValue(nombre, { emitEvent: true });
         }
 
-        if (cfdiMail && cte.nombre !== 'MOSTRADOR') {
-          console.log('Actualizando CfdiMail: ', cfdiMail);
-          this.form.get('cfdiMail').setValue(cfdiMail, { emitEvent: true });
-        }
+        // if (cfdiMail && cte.nombre !== 'MOSTRADOR') {
+        //   console.log('Actualizando CfdiMail: ', cfdiMail);
+        //   this.form.get('cfdiMail').setValue(cfdiMail, { emitEvent: true });
+        // }
 
         if (cte.credito) {
           this.recalcular();
@@ -335,6 +335,8 @@ export class PcreateFacade {
     } else {
       if (selected) {
         this.setCliente(selected);
+        this.form.get('cfdiMail').setValue(selected.cfdiMail);
+        console.log('Cliente seleccionado: ', selected);
       }
     }
   }

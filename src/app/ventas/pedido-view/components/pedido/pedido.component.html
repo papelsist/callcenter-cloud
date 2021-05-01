@@ -1,0 +1,29 @@
+<div class="container">
+  <div class="header">
+    <div class="row row-1">
+      <span>Sucursal: {{ pedido.sucursal }}</span>
+      <span>Tipo: {{ pedido.tipo }}</span>
+      <span>Forma de pago: {{ pedido.formaDePago }}</span>
+      <span>Uso de CFDI: {{ pedido.usoDeCfdi }}</span>
+    </div>
+    <div class="row row-2">
+      <span>Comprador: {{ pedido.comprador }}</span>
+      <span>Comentario: {{ pedido.comentario }}</span>
+      <span>Creado: {{ pedido.createUser }}</span>
+      <span>Modificado: {{ pedido.updateUser }}</span>
+    </div>
+    <div class="row-3" *ngIf="pedido.factura as factura">
+      <span>Factura: {{ factura.serie }}-{{ factura.folio }}</span>
+      <span>UUID: {{ factura.uuid }}</span>
+    </div>
+  </div>
+
+  <div class="partidas">
+    <ion-item-divider>Partidas</ion-item-divider>
+    <papx-pedido-items
+      class="items"
+      [items]="pedido.partidas"
+      [pedido]="pedido"
+    ></papx-pedido-items>
+  </div>
+</div>

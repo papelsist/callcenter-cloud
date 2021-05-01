@@ -146,6 +146,11 @@ export class CotizacionesPage extends BaseComponent implements OnInit {
     this.router.navigate(['', 'ventas', 'cotizaciones', event.id]);
   }
 
+  onEdit(event: Partial<Pedido>) {
+    this.facade.setCurrent(event as Pedido);
+    this.router.navigate(['', 'ventas', 'cotizaciones', event.id]);
+  }
+
   async onCopiar(event: Partial<Pedido>, user: User) {
     await this.ventasController.generarCopiaPedido(event, user);
   }

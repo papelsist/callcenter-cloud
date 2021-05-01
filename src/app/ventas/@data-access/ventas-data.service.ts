@@ -12,7 +12,7 @@ import {
   Status,
   User,
 } from '@papx/models';
-import { Observable, throwError } from 'rxjs';
+import { Observable, of, throwError } from 'rxjs';
 import { AngularFireFunctions } from '@angular/fire/functions';
 import { catchError, map, take } from 'rxjs/operators';
 
@@ -20,6 +20,7 @@ import firebase from 'firebase/app';
 import omitBy from 'lodash-es/omitBy';
 
 import { addBusinessDays, parseISO } from 'date-fns';
+import { Periodo } from 'src/app/@models/periodo';
 
 /**
  * Factory function than creates QueryFn instances specific of the status property
@@ -43,7 +44,6 @@ export class VentasDataService {
   readonly cotizaciones$ = this.fetchCotizacionesVigentes();
   readonly porautorizar$ = this.fetchVentas('POR_AUTORIZAR');
   readonly pendientes$ = this.fetchPendientes();
-  readonly facturas$ = this.fetchVentas('FACTURADO_TIMBRADO');
 
   constructor(private afs: AngularFirestore) {}
 
@@ -123,6 +123,24 @@ export class VentasDataService {
           .limit(20)
       )
       .valueChanges({ idField: 'id' });
+  }
+
+  fetchFacturas(periodo: Periodo = Periodo.fromNow(3)) {
+    return this.afs
+      .collection<Pedido>(this.PEDIDOS_COLLECTION, (ref) => {
+        const { fechaInicial, fechaFinal } = periodo;
+        const query = ref
+          .where('status', '==', 'FACTURADO_TIMBRADO')
+          .orderBy('fecha', 'desc')
+          .limit(1);
+        return query;
+      })
+      .valueChanges({ idField: 'id' })
+      .pipe(
+        catchError((err) =>
+          throwError('Error fetching cotizciones del usuario ' + err.message)
+        )
+      );
   }
 
   findById(id: string) {

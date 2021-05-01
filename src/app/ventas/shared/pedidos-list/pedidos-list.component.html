@@ -1,89 +1,89 @@
 <ion-list class="ion-no-padding">
-  <ion-item-sliding *ngFor="let pedido of pedidos; index as idx">
-    <ion-item button (click)="selection.emit(pedido)">
-      <ion-label class="ion-text-wrap">
-        <ion-text color="primary">
-          <h2>
-            {{ pedido.nombre }}
-          </h2>
-        </ion-text>
+  <ng-container *ngFor="let pedido of pedidos; index as idx">
+    <ion-item-sliding class="ion-no-padding">
+      <ion-item button (click)="selection.emit(pedido)" lines="none">
+        <ion-label class="ion-text-wrap">
+          <ion-text color="primary">
+            <h2>
+              {{ pedido.nombre }}
+            </h2>
+          </ion-text>
 
-        <div class="row-2">
-          <span> {{ pedido.sucursal }} </span>
-          <span>{{ pedido.tipo }} </span>
-          <span> {{ pedido.dateCreated?.toDate() | date: "dd/MM/yyyy" }} </span>
-          <span> Creado por: {{ pedido.createUser }} </span>
-          <span *ngIf="pedido.envio">
-            {{ pedido.envio.tipo }}
-          </span>
-          <span comentario>
-            {{ pedido.comentario }}
-          </span>
-          <span
-            descuento-especial
-            *ngIf="pedido.descuentoEspecial && pedido.descuentoEspecial > 0"
-          >
-            Dscto {{ pedido.descuentoEspecial / 100 | percent }}
-          </span>
-          <ion-icon
-            name="airplane"
-            color="primary"
-            *ngIf="pedido.envio"
-            class="ion-padding-start"
-          ></ion-icon>
-        </div>
-        <p class="row-3">
-          <span> Actualizó:</span>
-          <span vendedor>{{ pedido.updateUser }}</span>
-          <span class="ion-padding-start">
-            ({{
-              pedido?.lastUpdated?.toDate() | date: "dd/MM/yyyy: HH:mm"
-            }})</span
-          >
-        </p>
-      </ion-label>
-
-      <ion-badge slot="start" color="tertiary">
-        {{ pedido.folio }}
-      </ion-badge>
-      <ion-chip slot="end">
-        <ion-label>
-          {{ pedido.total | currency }}
+          <div class="row-2">
+            <span> {{ pedido.sucursal }} </span>
+            <span>{{ pedido.tipo }} </span>
+            <span>
+              {{ pedido.dateCreated?.toDate() | date: "dd/MM/yyyy" }}
+            </span>
+            <span> Creado por: {{ pedido.createUser }} </span>
+            <span *ngIf="pedido.envio">
+              {{ pedido.envio.tipo }}
+            </span>
+            <span comentario>
+              {{ pedido.comentario }}
+            </span>
+            <span
+              descuento-especial
+              *ngIf="pedido.descuentoEspecial && pedido.descuentoEspecial > 0"
+            >
+              Dscto {{ pedido.descuentoEspecial / 100 | percent }}
+            </span>
+            <ion-icon
+              name="airplane"
+              color="primary"
+              *ngIf="pedido.envio"
+              class="ion-padding-start"
+            ></ion-icon>
+          </div>
+          <p class="row-3">
+            <span> Actualizó:</span>
+            <span vendedor>{{ pedido.updateUser }}</span>
+            <span class="ion-padding-start">
+              ({{
+                pedido?.lastUpdated?.toDate() | date: "dd/MM/yyyy: HH:mm"
+              }})</span
+            >
+          </p>
         </ion-label>
-        <ion-icon
-          name="alert-circle"
-          color="warning"
-          *ngIf="pedido.warnings && pedido.warnings.length > 0"
-        ></ion-icon>
-        <ion-icon
-          name="checkmark-done"
-          color="success"
-          *ngIf="!pedido.warnings || pedido.warnings.length === 0"
-        ></ion-icon>
-      </ion-chip>
-    </ion-item>
-    <ion-item-options side="end">
-      <ion-item-option color="danger">
-        Eliminar
-        <ion-icon name="trash" slot="bottom"></ion-icon>
-      </ion-item-option>
-      <ion-item-option (click)="cerrar.emit(pedido)">
-        Cerrar
-        <ion-icon
-          name="checkmark-done-outline"
-          slot="bottom"
-          color="success"
-        ></ion-icon>
-      </ion-item-option>
-      <ion-item-option color="medium" (click)="copiar.emit(pedido)">
-        <ion-icon name="copy" slot="bottom"></ion-icon>
-        Copiar
-      </ion-item-option>
 
-      <ion-item-option color="secondary"
-        >Depósito
-        <ion-icon name="cash" slot="bottom"></ion-icon>
-      </ion-item-option>
-    </ion-item-options>
-  </ion-item-sliding>
+        <ion-badge slot="start" color="tertiary">
+          {{ pedido.folio }}
+        </ion-badge>
+        <ion-chip slot="end">
+          <ion-label>
+            {{ pedido.total | currency }}
+          </ion-label>
+          <ion-icon
+            name="alert-circle"
+            color="warning"
+            *ngIf="pedido.warnings && pedido.warnings.length > 0"
+          ></ion-icon>
+          <ion-icon
+            name="checkmark-done"
+            color="success"
+            *ngIf="!pedido.warnings || pedido.warnings.length === 0"
+          ></ion-icon>
+        </ion-chip>
+      </ion-item>
+      <ion-item-options side="end">
+        <!-- <ion-item-option color="primary">
+          Editar
+          <ion-icon name="create" slot="bottom"></ion-icon>
+        </ion-item-option> -->
+        <ion-item-option color="dark" (click)="cerrar.emit(pedido)">
+          Cerrar
+          <ion-icon name="checkmark-done-outline" slot="bottom"></ion-icon>
+        </ion-item-option>
+        <ion-item-option color="medium" (click)="copiar.emit(pedido)">
+          <ion-icon name="copy" slot="bottom"></ion-icon>
+          Copiar
+        </ion-item-option>
+
+        <ion-item-option color="secondary"
+          >Depósito
+          <ion-icon name="cash" slot="bottom"></ion-icon>
+        </ion-item-option>
+      </ion-item-options>
+    </ion-item-sliding>
+  </ng-container>
 </ion-list>

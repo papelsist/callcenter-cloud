@@ -198,6 +198,7 @@ export interface Factura {
   serie: string;
   folio: string;
   uuid: string;
+  cfdi: string;
   creado: string;
   createUser: string;
   cancelado?: string;

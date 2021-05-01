@@ -300,7 +300,7 @@ export class PedidoCreateFormComponent
     if (cliente.credito) {
       if (this.facade.tipo !== TipoDePedido.CREDITO) {
         this.controls.tipo.setValue(TipoDePedido.CREDITO, {
-          emitEvent: false,
+          emitEvent: true,
           onlySelf: true,
         });
         this.controls.formaDePago.setValue(FormaDePago.NO_DEFINIDO, {
@@ -311,7 +311,7 @@ export class PedidoCreateFormComponent
     } else {
       if (this.facade.tipo === TipoDePedido.CREDITO) {
         this.controls.tipo.setValue(TipoDePedido.CONTADO, {
-          emitEvent: false,
+          emitEvent: true,
           onlySelf: true,
         });
       }

@@ -1,31 +1,81 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable, of, throwError } from 'rxjs';
+import { combineLatest, Observable, of, throwError } from 'rxjs';
 
-import { MailJet } from '@papx/models';
-import { catchError } from 'rxjs/operators';
+import { Factura, MailJet } from '@papx/models';
+import { catchError, map, switchMap, tap } from 'rxjs/operators';
+import { AngularFireFunctions } from '@angular/fire/functions';
 
 @Injectable({ providedIn: 'root' })
 export class MailService {
-  // apiUrl = 'https://api.mailjet.com/v3.1/send';
-  apiUrl = 'mail';
-  publicKey = 'dda57c6f1b05ba91716ad671cac123da';
-  privateKey = 'adf9d2d63f72f3ae1aca7c83ceb01855';
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private aff: AngularFireFunctions) {}
 
-  sendMail(payload: MailJet.SendParams): Observable<MailJet.PostResponse> {
-    const headers = new HttpHeaders()
-      .append('Content-Type', 'application/json')
-      .append(
-        'Authorization',
-        'Basic ' +
-          btoa(
-            'dda57c6f1b05ba91716ad671cac123da:adf9d2d63f72f3ae1aca7c83ceb01855'
-          )
-      );
-    console.log('Headers: ', headers);
-    return this.http
-      .post<MailJet.PostResponse>(this.apiUrl, payload, { headers })
-      .pipe(catchError((err) => throwError(err)));
+  sendFactura(
+    factura: Factura,
+    nombre: string,
+    target: string,
+    pdfUrl: string,
+    xmlUrl: string
+  ) {
+    // const { serie, folio, clienteNombre, target, pdfFile, xmlFile } = data;
+    const { serie, folio } = factura;
+
+    const pdf$ = this.getBlob(pdfUrl).pipe(
+      switchMap((pdf) => this.getBase64AsObs(pdf))
+    );
+
+    const xml$ = this.getBlob(xmlUrl).pipe(
+      switchMap((xml) => this.getBase64AsObs(xml))
+    );
+
+    return combineLatest([pdf$, xml$]).pipe(
+      map(([pdfFile, xmlFile]) => ({ pdfFile, xmlFile })),
+      tap((data) => console.log('Base64 data: ', data)),
+      switchMap(({ pdfFile, xmlFile }) => {
+        const payload = {
+          serie,
+          folio,
+          nombre,
+          target,
+          pdfFile,
+          xmlFile,
+        };
+        const callable = this.aff.httpsCallable('enviarFacturaPorMail');
+        return callable(payload).pipe(catchError((err) => throwError(err)));
+      }),
+      catchError((err) => throwError(err))
+    );
+
+    /*
+    const pdfFile = await this.getBase64(pdf);
+    const xmlFile = await this.getBase64(xml);
+    const payload = {
+      serie, folio, nombre, target, pdfFile, xmlFile
+    }
+    const callable = this.aff.httpsCallable('enviarFacturaPorMail');
+    return callable(payload).pipe(catchError((err) => throwError(err)));
+    */
+  }
+
+  getBlob(url: string) {
+    return this.http.get(url, { responseType: 'blob' });
+  }
+
+  getBase64(file: Blob) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = (error) => reject(error);
+    });
+  }
+
+  getBase64AsObs(file: Blob): Observable<string> {
+    return new Observable((subs) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => subs.next(reader.result as string);
+      reader.onerror = (error) => subs.error(error);
+    });
   }
 }

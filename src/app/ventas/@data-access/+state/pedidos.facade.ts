@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core';
 import { AuthService } from '@papx/auth';
+import { MailService } from '@papx/data-access';
 import { Pedido, User } from '@papx/models';
+import { ReportsService } from '@papx/shared/reports/reports.service';
 import { BehaviorSubject, combineLatest } from 'rxjs';
 import { distinctUntilChanged, map, shareReplay, take } from 'rxjs/operators';
 import { VentasDataService } from '../ventas-data.service';
@@ -39,7 +41,9 @@ export class PedidosFacade {
 
   constructor(
     private authService: AuthService,
-    private dataService: VentasDataService
+    private dataService: VentasDataService,
+    private reports: ReportsService,
+    private mailService: MailService
   ) {}
 
   setCurrent(pedido: Pedido) {
@@ -81,5 +85,21 @@ export class PedidosFacade {
 
   fetchPedido(id: string) {
     return this.dataService.fetchPedido(id);
+  }
+
+  async printPedido(pedido: Partial<Pedido>, user: User) {
+    this.reports.imprimirPedido(pedido, user);
+  }
+
+  async sendFacturaByEmail(
+    pedido: Partial<Pedido>,
+    target: string,
+    pdfUrl: string,
+    xmlUrl: string
+  ) {
+    const { nombre, factura } = pedido;
+    this.mailService
+      .sendFactura(factura, nombre, target, pdfUrl, xmlUrl)
+      .subscribe((res) => console.log('Res: ', res));
   }
 }

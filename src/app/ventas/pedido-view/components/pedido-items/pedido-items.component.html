@@ -1,0 +1,41 @@
+<table>
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>Producto</th>
+      <th>Descripción</th>
+      <th>Cantidad</th>
+      <th>Precio</th>
+      <th>Importe</th>
+      <th>Descuento</th>
+      <th>Subtotal</th>
+      <th>Impuesto</th>
+      <th>Total</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let item of items; index as idx">
+      <td>{{ idx + 1 }}</td>
+      <td>{{ item.clave }}</td>
+      <td>{{ item.descripcion }}</td>
+      <td>{{ item.cantidad }}</td>
+      <td>{{ item.precio | currency }}</td>
+      <td>{{ item.importe | currency }}</td>
+      <td>{{ item.descuento | currency }}</td>
+      <td>{{ item.subtotal | currency }}</td>
+      <td>{{ item.impuesto | currency }}</td>
+      <td>{{ item.total | currency }}</td>
+    </tr>
+  </tbody>
+  <tfoot>
+    <tr>
+      <th colspan="3">Partidas: {{ items.length }}</th>
+      <th colspan="2">Totales</th>
+      <th>{{ pedido.importe | currency }}</th>
+      <th>{{ pedido.descuento | currency }}</th>
+      <th>{{ pedido.subtotal | currency }}</th>
+      <th>{{ pedido.impuesto | currency }}</th>
+      <th>{{ pedido.total | currency }}</th>
+    </tr>
+  </tfoot>
+</table>

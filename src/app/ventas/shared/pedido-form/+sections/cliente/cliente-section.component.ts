@@ -9,9 +9,10 @@ import {
 } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { AlertController, ModalController } from '@ionic/angular';
+import { BaseComponent } from '@papx/core';
 import { Cliente, Socio, TipoDePedido } from '@papx/models';
 import { Observable } from 'rxjs';
-import { startWith } from 'rxjs/operators';
+import { startWith, takeUntil } from 'rxjs/operators';
 import { SocioSelectorComponent } from './socio-selector.component';
 
 @Component({
@@ -20,31 +21,44 @@ import { SocioSelectorComponent } from './socio-selector.component';
   styleUrls: ['cliente-section.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ClienteSectionComponent implements OnInit {
+export class ClienteSectionComponent extends BaseComponent implements OnInit {
   @Input() parent: FormGroup;
   @Input() disabled = false;
+  @Input() tipo: TipoDePedido;
   @Output() changeCliente = new EventEmitter();
   @Output() clienteNuevo = new EventEmitter();
 
   nombre$: Observable<string>;
   cliente$: Observable<Partial<Cliente>>;
   socio$: Observable<Socio>;
+
   constructor(
     private alert: AlertController,
     private modalCtrl: ModalController,
     private cd: ChangeDetectorRef
-  ) {}
+  ) {
+    super();
+  }
 
   ngOnInit() {
     this.nombre$ = this.parent
       .get('nombre')
-      .valueChanges.pipe(startWith(this.parent.get('nombre').value));
+      .valueChanges.pipe(
+        startWith(this.parent.get('nombre').value),
+        takeUntil(this.destroy$)
+      );
     this.cliente$ = this.parent
       .get('cliente')
-      .valueChanges.pipe(startWith(this.parent.get('cliente').value));
+      .valueChanges.pipe(
+        startWith(this.parent.get('cliente').value),
+        takeUntil(this.destroy$)
+      );
     this.socio$ = this.parent
       .get('socio')
-      .valueChanges.pipe(startWith(this.parent.get('socio').value));
+      .valueChanges.pipe(
+        startWith(this.parent.get('socio').value),
+        takeUntil(this.destroy$)
+      );
   }
 
   nombreError() {

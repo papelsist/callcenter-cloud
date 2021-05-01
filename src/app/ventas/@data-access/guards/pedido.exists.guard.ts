@@ -6,8 +6,8 @@ import {
 } from '@angular/router';
 import { Observable } from 'rxjs';
 import { filter, map, tap } from 'rxjs/operators';
-import { VentasDataService } from '../@data-access';
-import { PedidosFacade } from '../@data-access/+state';
+import { VentasDataService } from '..';
+import { PedidosFacade } from '../+state';
 
 @Injectable({ providedIn: 'root' })
 export class PedidoExistsGuard implements CanActivate {

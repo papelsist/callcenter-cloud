@@ -7,8 +7,7 @@ import { SharedVentasModule } from '../shared/shared-ventas.module';
 import { SharedUiPedidoItemModule } from '../shared/ui-pedido-item';
 
 import { PedidoEditPage } from './pedido-edit.page';
-import { PedidoExistsGuard } from './pedido.exists.guard';
-import { PedidoResolver } from './pedido.resolver';
+import { PedidoExistsGuard } from '../@data-access/guards/pedido.exists.guard';
 
 const routes: Routes = [
   {

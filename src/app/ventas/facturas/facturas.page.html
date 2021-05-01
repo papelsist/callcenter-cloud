@@ -6,7 +6,11 @@
 
 <ion-content>
   <ion-list *ngIf="facturas$ | async as facturas">
-    <ion-item *ngFor="let pedido of facturas; index as idx">
+    <ion-item
+      *ngFor="let pedido of facturas; index as idx"
+      detail
+      [routerLink]="pedido.id"
+    >
       <ion-label class="ion-text-wrap">
         <h2>
           {{ pedido.nombre }}
@@ -18,7 +22,7 @@
           <ion-text color="warning"> {{ pedido.sucursal }} </ion-text>
 
           <span class="ion-padding-start">
-            {{ getDate(pedido.fecha) | date: "dd/MM/yyyy" }}
+            {{ pedido.fecha | date: "dd/MM/yyyy" }}
           </span>
 
           <sub class="ion-padding-start"> ({{ pedido.updateUser }}) </sub>
