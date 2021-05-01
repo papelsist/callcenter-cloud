@@ -8,8 +8,7 @@ import firebase from 'firebase/app';
 
 export interface Pedido {
   id?: string;
-  // fecha: string | firebase.firestore.Timestamp;
-  fecha: string;
+  fecha: firebase.firestore.Timestamp;
   sucursal: string;
   sucursalId?: string;
   folio?: number;
@@ -50,7 +49,7 @@ export interface Pedido {
   autorizacionesRequeridas?: string;
   cerrado?: string;
   appVersion?: number;
-  vigencia?: string;
+  vigencia?: Date;
   warnings?: Warning[];
   envioPorCorreo?: boolean;
   solicitarConfirmacion?: boolean;

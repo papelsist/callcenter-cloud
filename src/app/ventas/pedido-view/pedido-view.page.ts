@@ -1,11 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 import { AngularFireStorage } from '@angular/fire/storage';
+import { PopoverController } from '@ionic/angular';
+import { LoadingService } from '@papx/common/ui-core';
 import { Pedido, User } from '@papx/models';
 
 import { combineLatest, EMPTY, of } from 'rxjs';
 import { catchError, shareReplay, switchMap, take, map } from 'rxjs/operators';
 
 import { PedidosFacade } from '../@data-access/+state';
+import { EmailTargetComponent } from '../shared/buttons';
 
 @Component({
   selector: 'app-pedido-view',
@@ -57,7 +60,12 @@ export class PedidoViewPage implements OnInit {
   );
   user$ = this.facade.userInfo$;
 
-  constructor(public facade: PedidosFacade, private afs: AngularFireStorage) {}
+  constructor(
+    public facade: PedidosFacade,
+    private afs: AngularFireStorage,
+    private loading: LoadingService,
+    private popoverController: PopoverController
+  ) {}
 
   ngOnInit() {}
 
@@ -71,8 +79,24 @@ export class PedidoViewPage implements OnInit {
     this.facade.printPedido(event, user);
   }
 
-  sendFactura(pedido: Partial<Pedido>, xmlUrl: string, pdfUrl: string) {
+  sendFactura2(pedido: Partial<Pedido>, xmlUrl: string, pdfUrl: string) {
     const target = 'rubencancino6@gmail.com';
     this.facade.sendFacturaByEmail(pedido, target, pdfUrl, xmlUrl);
   }
+
+  async sendFactura(pedido: Partial<Pedido>, xmlUrl: string, pdfUrl: string) {
+    const alert = await this.popoverController.create({
+      component: EmailTargetComponent,
+      componentProps: { value: pedido.cfdiMail, tipo: 'FACTURA' },
+      cssClass: 'emal-target-popover',
+      mode: 'ios',
+    });
+    await alert.present();
+    const { data } = await alert.onWillDismiss();
+    if (data) {
+      this.facade.sendFacturaByEmail(pedido, data.target, pdfUrl, xmlUrl);
+    }
+  }
+
+  private doEmailFactura() {}
 }

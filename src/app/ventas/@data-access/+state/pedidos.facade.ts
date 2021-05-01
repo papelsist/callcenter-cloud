@@ -1,10 +1,20 @@
 import { Injectable } from '@angular/core';
+import { AlertController, LoadingController } from '@ionic/angular';
 import { AuthService } from '@papx/auth';
+import { LoadingService } from '@papx/common/ui-core';
 import { MailService } from '@papx/data-access';
 import { Pedido, User } from '@papx/models';
 import { ReportsService } from '@papx/shared/reports/reports.service';
 import { BehaviorSubject, combineLatest } from 'rxjs';
-import { distinctUntilChanged, map, shareReplay, take } from 'rxjs/operators';
+import {
+  delay,
+  distinctUntilChanged,
+  finalize,
+  map,
+  shareReplay,
+  take,
+  tap,
+} from 'rxjs/operators';
 import { VentasDataService } from '../ventas-data.service';
 
 export interface PedidosState {
@@ -43,7 +53,9 @@ export class PedidosFacade {
     private authService: AuthService,
     private dataService: VentasDataService,
     private reports: ReportsService,
-    private mailService: MailService
+    private mailService: MailService,
+    private loading: LoadingService,
+    private alertController: AlertController
   ) {}
 
   setCurrent(pedido: Pedido) {
@@ -91,15 +103,55 @@ export class PedidosFacade {
     this.reports.imprimirPedido(pedido, user);
   }
 
-  async sendFacturaByEmail(
+  sendFacturaByEmail(
     pedido: Partial<Pedido>,
     target: string,
     pdfUrl: string,
     xmlUrl: string
   ) {
     const { nombre, factura } = pedido;
+
+    this.loading.startLoading('Enviando correo....');
     this.mailService
       .sendFactura(factura, nombre, target, pdfUrl, xmlUrl)
-      .subscribe((res) => console.log('Res: ', res));
+      .pipe(
+        delay(1000),
+        take(1),
+        map((res) => res.Messages[0]),
+        finalize(async () => {
+          console.log('Stoping loading indicator');
+          this.loading.stopLoading();
+        })
+      )
+      .subscribe(
+        (res) => {
+          console.log('Correo enviado Res: ', res);
+          this.showMessage('A: ' + target, 'Envío exitoso');
+        },
+        async (err) => await this.handleError('Error enviando factura', err)
+      );
+    // return this.mailService.sendFactura(factura, nombre, target, pdfUrl, xmlUrl)
+  }
+
+  async handleError(header: string, err: any) {
+    const message = err.message;
+    this.showMessage(message, header);
+  }
+
+  async showMessage(message: string, header: string, subHeader?: string) {
+    const alert = await this.alertController.create({
+      header,
+      subHeader,
+      message,
+      mode: 'ios',
+      animated: true,
+      buttons: [
+        {
+          text: 'Cerrar',
+          role: 'cancel',
+        },
+      ],
+    });
+    await alert.present();
   }
 }

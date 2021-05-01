@@ -5,6 +5,7 @@ import { PendientesPage } from './pendientes.page';
 import { CommonUiCoreModule } from '@papx/common/ui-core';
 import { SharedVentasModule } from '../shared/shared-ventas.module';
 import { PendientesController } from './pendientes.controller';
+import { COMPONENTS } from './components';
 
 const routes: Routes = [
   {
@@ -19,7 +20,7 @@ const routes: Routes = [
     SharedVentasModule,
     RouterModule.forChild(routes),
   ],
-  declarations: [PendientesPage],
+  declarations: [PendientesPage, COMPONENTS],
   providers: [PendientesController],
 })
 export class PendientesPageModule {}

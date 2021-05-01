@@ -1,83 +1,46 @@
-import { Component, OnInit } from '@angular/core';
-import { VentasDataService } from '../@data-access';
+import { Component } from '@angular/core';
 
-import firebase from 'firebase/app';
+import { BehaviorSubject, combineLatest } from 'rxjs';
+import { map, switchMap } from 'rxjs/operators';
 
-import { formatDistanceToNow, parseISO, differenceInHours } from 'date-fns';
-import { es } from 'date-fns/locale';
 import isEmty from 'lodash-es/isEmpty';
-import isString from 'lodash-es/isString';
 
-import { Pedido, User } from '@papx/models';
-import { PendientesController } from './pendientes.controller';
+import { VentasDataService } from '../@data-access';
 import { AuthService } from '@papx/auth';
+import { Pedido, User } from '@papx/models';
+import { filtrarPedidos } from '../@data-access/+state';
+import { PendientesController } from './pendientes.controller';
 
 @Component({
   selector: 'app-pendientes',
   templateUrl: './pendientes.page.html',
   styleUrls: ['./pendientes.page.scss'],
 })
-export class PendientesPage implements OnInit {
-  pedidos$ = this.service.pendientes$;
-  user$ = this.auth.user$;
+export class PendientesPage {
+  filtrarPorUsuario$ = new BehaviorSubject<boolean>(false);
+  searchCriteria: any = null;
+  textFilter$ = new BehaviorSubject<string>('');
+
+  pedidos$ = this.dataService.findPendientes();
+  filteredPedidos$ = filtrarPedidos(this.pedidos$, this.textFilter$);
+
+  vm$ = combineLatest([
+    this.filtrarPorUsuario$,
+    this.auth.userInfo$,
+    this.filteredPedidos$,
+  ]).pipe(map(([filtrar, user, pedidos]) => ({ filtrar, user, pedidos })));
 
   constructor(
-    private service: VentasDataService,
+    private dataService: VentasDataService,
     private auth: AuthService,
     private controller: PendientesController
   ) {}
 
-  ngOnInit() {}
-
-  onFilter(event: any) {}
-
-  getDate(item: any) {
-    if (item instanceof firebase.firestore.Timestamp) {
-      const tt = item as firebase.firestore.Timestamp;
-      return tt.toDate().toISOString();
-    }
+  filtrarPorUsuario(val: boolean) {
+    this.filtrarPorUsuario$.next(!val);
   }
-
-  getHoras(item: any) {}
-
-  fromNow(item: any) {
-    if (item instanceof firebase.firestore.Timestamp) {
-      const tt = item as firebase.firestore.Timestamp;
-      return formatDistanceToNow(tt.toDate(), {
-        addSuffix: true,
-        locale: es,
-      });
-    } else {
-      return 'pending';
-    }
-  }
-
-  getRetraso(item: any) {
-    let fecha;
-    if (item instanceof firebase.firestore.Timestamp) {
-      const tt = item as firebase.firestore.Timestamp;
-      fecha = tt.toDate();
-    } else {
-      fecha = parseISO(item);
-    }
-
-    return differenceInHours(new Date(), fecha);
-  }
-
-  getRetrasoColor(pedido: Partial<Pedido>) {
-    if (pedido.cerrado) {
-      const retrasoHoras = differenceInHours(
-        new Date(),
-        parseISO(pedido.cerrado)
-      );
-      if (retrasoHoras <= 1) {
-        return 'success';
-      } else if (retrasoHoras > 1 && retrasoHoras < 2) {
-        return 'warning';
-      } else {
-        return 'danger';
-      }
-    } else return '';
+  onFilter(event: string) {
+    this.textFilter$.next(event);
   }
 
   async autorizar(pedido: Pedido, user: User) {
@@ -86,7 +49,7 @@ export class PendientesPage implements OnInit {
     if (autorizar && !isEmty(comentario)) {
       await this.controller.starLoading();
       try {
-        await this.service.autorizarPedido(pedido, comentario, user);
+        await this.dataService.autorizarPedido(pedido, comentario, user);
         await this.controller.stopLoading();
       } catch (error) {
         await this.controller.stopLoading();
@@ -100,12 +63,16 @@ export class PendientesPage implements OnInit {
     if (res) {
       await this.controller.starLoading();
       try {
-        await this.service.regresarPedido(pedido.id, user);
+        await this.dataService.regresarPedido(pedido.id, user);
         await this.controller.stopLoading();
       } catch (error) {
         await this.controller.stopLoading();
         this.controller.handelError(error);
       }
     }
+  }
+
+  getTitle(filtered: boolean) {
+    return filtered ? 'Mis pedidos pendientes' : 'Pendientes de antender';
   }
 }

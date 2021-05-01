@@ -30,7 +30,7 @@ export class MailService {
 
     return combineLatest([pdf$, xml$]).pipe(
       map(([pdfFile, xmlFile]) => ({ pdfFile, xmlFile })),
-      tap((data) => console.log('Base64 data: ', data)),
+      // tap((data) => console.log('Base64 data: ', data)),
       switchMap(({ pdfFile, xmlFile }) => {
         const payload = {
           serie,
@@ -40,10 +40,19 @@ export class MailService {
           pdfFile,
           xmlFile,
         };
-        const callable = this.aff.httpsCallable('enviarFacturaPorMail');
-        return callable(payload).pipe(catchError((err) => throwError(err)));
+        const callable = this.aff.httpsCallable<any, MailJet.PostResponseData>(
+          'enviarFacturaPorMail'
+        );
+        return callable(payload);
+        // return of({ message: 'OK' });
       }),
-      catchError((err) => throwError(err))
+      catchError((err) => {
+        return throwError(
+          new Error(
+            'Error interno enviando factura origen: ' + err.message ?? 'ND'
+          )
+        );
+      })
     );
 
     /*

@@ -44,7 +44,7 @@ import { PopoverController } from '@ionic/angular';
               formControlName="tipo"
             >
               <ion-select-option
-                *ngFor="let tipo of ['COTIZACION', 'CONFIRMACION']"
+                *ngFor="let tipo of ['COTIZACION', 'CONFIRMACION', 'FACTURA']"
                 [value]="tipo"
               >
                 {{ tipo }}
@@ -89,6 +89,7 @@ export class EmailTargetComponent implements OnInit {
   @Input() message: string = 'Destino';
   @Input() placeholder = 'Digite el correo destino';
   @Input() value: string = null;
+  @Input() tipo = 'COTIZACION';
 
   form: FormGroup;
 
@@ -100,7 +101,10 @@ export class EmailTargetComponent implements OnInit {
         Validators.required,
         Validators.email,
       ]),
-      tipo: new FormControl('COTIZACION'),
+      tipo: new FormControl({
+        value: this.tipo,
+        disabled: this.tipo === 'FACTURA',
+      }),
     });
   }
 

@@ -13,7 +13,9 @@
             <span>{{pedido.nombre}}</span>
           </ion-text>
 
-          <span class="fecha">{{pedido.fecha | date: 'dd/MM/yyyy'}} </span>
+          <span class="fecha"
+            >{{pedido.fecha.toDate() | date: 'dd/MM/yyyy'}}
+          </span>
         </div>
       </ion-title>
       <ion-buttons slot="end">

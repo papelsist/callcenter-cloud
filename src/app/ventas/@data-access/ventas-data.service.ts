@@ -43,7 +43,6 @@ export class VentasDataService {
   PEDIDOS_COLLECTION = 'pedidos';
   readonly cotizaciones$ = this.fetchCotizacionesVigentes();
   readonly porautorizar$ = this.fetchVentas('POR_AUTORIZAR');
-  readonly pendientes$ = this.fetchPendientes();
 
   constructor(private afs: AngularFirestore) {}
 
@@ -114,27 +113,35 @@ export class VentasDataService {
       .valueChanges({ idField: 'id' });
   }
 
-  private fetchPendientes() {
+  findFacturas(criteria: PedidosSearchCriteria) {
+    return this.afs
+      .collection<Pedido>(this.PEDIDOS_COLLECTION, (ref) => {
+        let query = ref.where('status', '==', 'FACTURADO_TIMBRADO');
+        if (criteria) {
+          const { fechaInicial, fechaFinal } = criteria;
+          query = query
+            .where('fecha', '>=', parseISO(fechaInicial))
+            .where('fecha', '<=', parseISO(fechaFinal));
+        }
+        query = query.orderBy('fecha', 'desc').limit(20);
+        return query;
+      })
+      .valueChanges({ idField: 'id' })
+      .pipe(
+        catchError((err) =>
+          throwError('Error fetching cotizciones del usuario ' + err.message)
+        )
+      );
+  }
+
+  findPendientes() {
     return this.afs
       .collection<Pedido>('pedidos', (ref) =>
         ref
-          .where('status', 'in', ['POR_AUTORIZAR'])
+          .where('status', 'in', ['POR_AUTORIZAR', 'CERRADO'])
           .orderBy('folio', 'desc')
           .limit(20)
       )
-      .valueChanges({ idField: 'id' });
-  }
-
-  fetchFacturas(periodo: Periodo = Periodo.fromNow(3)) {
-    return this.afs
-      .collection<Pedido>(this.PEDIDOS_COLLECTION, (ref) => {
-        const { fechaInicial, fechaFinal } = periodo;
-        const query = ref
-          .where('status', '==', 'FACTURADO_TIMBRADO')
-          .orderBy('fecha', 'desc')
-          .limit(1);
-        return query;
-      })
       .valueChanges({ idField: 'id' })
       .pipe(
         catchError((err) =>
@@ -158,11 +165,11 @@ export class VentasDataService {
   async createPedido(pedido: Partial<Pedido>, user: User) {
     try {
       const cleanData = this.cleanPedidoPayload(pedido);
-
+      const fecha = firebase.firestore.Timestamp.now();
       const payload: Partial<Pedido> = {
         ...cleanData,
-        fecha: new Date().toISOString(),
-        vigencia: addBusinessDays(new Date(), 10).toISOString(),
+        fecha,
+        vigencia: addBusinessDays(fecha.toDate(), 10),
         dateCreated: firebase.firestore.Timestamp.now(),
         lastUpdated: firebase.firestore.Timestamp.now(),
         createUser: user.displayName,
