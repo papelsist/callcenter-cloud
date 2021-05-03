@@ -22,14 +22,7 @@ const routes: Routes = [
             (m) => m.FacturasPageModule
           ),
       },
-      {
-        path: 'facturas/:id',
-        data: { tipo: 'facturas' },
-        loadChildren: () =>
-          import('../pedido-view/pedido-view.module').then(
-            (m) => m.PedidoViewPageModule
-          ),
-      },
+
       {
         path: 'pendientes',
         loadChildren: () =>
@@ -37,6 +30,7 @@ const routes: Routes = [
             (m) => m.PendientesPageModule
           ),
       },
+
       {
         path: '',
         redirectTo: '/ventas/cotizaciones',
@@ -65,6 +59,22 @@ const routes: Routes = [
     loadChildren: () =>
       import('../pedido-edit/pedido-edit.module').then(
         (m) => m.PedidoEditPageModule
+      ),
+  },
+  {
+    path: 'pendientes/:id',
+    data: { tipo: 'pedido' },
+    loadChildren: () =>
+      import('../pedido-view/pedido-view.module').then(
+        (m) => m.PedidoViewPageModule
+      ),
+  },
+  {
+    path: 'facturas/:id',
+    data: { tipo: 'facturas' },
+    loadChildren: () =>
+      import('../pedido-view/pedido-view.module').then(
+        (m) => m.PedidoViewPageModule
       ),
   },
 

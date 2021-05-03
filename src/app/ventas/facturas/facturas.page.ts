@@ -27,7 +27,17 @@ export class FacturasPage {
   ]).pipe(map(([filtrar, user, criteria]) => ({ filtrar, user, criteria })));
 
   facturas$ = this.vm$.pipe(
-    switchMap((vm) => this.dataService.findFacturas(vm.criteria))
+    switchMap((vm) =>
+      this.dataService
+        .findFacturas(vm.criteria)
+        .pipe(
+          map((pedidos) =>
+            vm.filtrar
+              ? pedidos.filter((item) => item.updateUserId === vm.user.uid)
+              : pedidos
+          )
+        )
+    )
   );
 
   filteredFacturas$ = filtrarPedidos(this.facturas$, this.textFilter$);

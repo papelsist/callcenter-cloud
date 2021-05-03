@@ -34,9 +34,7 @@ import { CotizacionesFacade } from './cotizaciones-facade';
 export class CotizacionesPage extends BaseComponent implements OnInit {
   params = this.readParams();
 
-  filtrarPorUsuario$ = new BehaviorSubject<boolean>(
-    this.params.filtrarPorUsuario
-  );
+  filtrarPorUsuario$ = new BehaviorSubject<boolean>(false);
   user$ = this.auth;
   criteria$ = new BehaviorSubject<PedidosSearchCriteria>(null);
   textFilter$ = new BehaviorSubject<string>('');
@@ -50,8 +48,19 @@ export class CotizacionesPage extends BaseComponent implements OnInit {
   searchCriteria: any = null;
 
   cotizaciones$ = this.vm$.pipe(
-    switchMap((vm) => this.dataService.findCotizaciones(vm.criteria))
+    switchMap((vm) =>
+      this.dataService
+        .findCotizaciones(vm.criteria)
+        .pipe(
+          map((pedidos) =>
+            vm.filtrar
+              ? pedidos.filter((item) => item.updateUserId === vm.user.uid)
+              : pedidos
+          )
+        )
+    )
   );
+
   filteredCotizaciones$ = combineLatest([
     this.textFilter$,
     this.cotizaciones$,

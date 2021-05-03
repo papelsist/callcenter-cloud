@@ -59,6 +59,7 @@
         </ion-button>
 
         <ion-button
+          [disabled]="!pedido.factura"
           *ngIf="factura$ | async as fac"
           (click)="sendFactura(pedido, fac.pdfUrl, fac.xmlUrl)"
         >

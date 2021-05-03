@@ -28,7 +28,15 @@ export class PendientesPage {
     this.filtrarPorUsuario$,
     this.auth.userInfo$,
     this.filteredPedidos$,
-  ]).pipe(map(([filtrar, user, pedidos]) => ({ filtrar, user, pedidos })));
+  ]).pipe(
+    map(([filtrar, user, pedidos]) => ({
+      filtrar,
+      user,
+      pedidos: filtrar
+        ? pedidos.filter((item) => item.updateUserId === user.uid)
+        : pedidos,
+    }))
+  );
 
   constructor(
     private dataService: VentasDataService,

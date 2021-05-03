@@ -12,7 +12,15 @@
         </span>
       </h2>
       <p>
-        <ion-text color="warning"> {{ pedido.sucursal }} </ion-text>
+        <span>
+          Factura:
+          <ion-text color="primary">
+            {{ pedido.factura.serie }}-{{ pedido.factura.folio }}
+          </ion-text>
+        </span>
+        <span class="ion-padding-start">
+          {{ pedido.sucursal }}
+        </span>
 
         <span class="ion-padding-start">
           {{ pedido.fecha.toDate() | date: "dd/MM/yyyy" }}

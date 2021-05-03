@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { AngularFireStorage } from '@angular/fire/storage';
 import { PopoverController } from '@ionic/angular';
 import { LoadingService } from '@papx/common/ui-core';
@@ -15,7 +15,7 @@ import { EmailTargetComponent } from '../shared/buttons';
   templateUrl: './pedido-view.page.html',
   styleUrls: ['./pedido-view.page.scss'],
 })
-export class PedidoViewPage implements OnInit {
+export class PedidoViewPage implements OnInit, OnDestroy {
   pedido$ = this.facade.current$;
   pdf$ = this.pedido$.pipe(
     switchMap((p) => {
@@ -68,6 +68,9 @@ export class PedidoViewPage implements OnInit {
   ) {}
 
   ngOnInit() {}
+  ngOnDestroy() {
+    this.facade.setCurrent(null);
+  }
 
   isFactura(pedido: Pedido) {
     return (
