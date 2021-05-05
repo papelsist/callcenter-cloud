@@ -37,14 +37,17 @@
     </ion-item>
 
     <ion-item-options side="end">
-      <ion-item-option (click)="regresar.emit(pedido)">
+      <ion-item-option
+        (click)="regresar.emit(pedido)"
+        *ngIf="pedido.status === 'EN_SUCURSAL'"
+      >
         <ion-icon slot="start" name="arrow-undo"></ion-icon>
         Regresar
       </ion-item-option>
       <ion-item-option
         (click)="autorizar.emit(pedido)"
         color="success"
-        *ngIf="pedido.warnings"
+        *ngIf="pedido.warnings && pedido.warnings.length > 0"
       >
         <ion-icon slot="start" name="thumbs-up-outline"></ion-icon>
         Autorizar

@@ -68,11 +68,7 @@ export class PedidosFacade {
   }
 
   async cerrarPedido(id: string, pedido: Partial<Pedido>, user: User) {
-    pedido.status = pedido.autorizacionesRequeridas
-      ? 'POR_AUTORIZAR'
-      : 'COTIZACION';
-    pedido.cerrado = new Date().toISOString();
-    await this.updatePedido(id, pedido, user);
+    await this.dataService.cerrarPedido(pedido, user);
   }
 
   async saveCartState(state: Partial<Pedido>, user: User) {

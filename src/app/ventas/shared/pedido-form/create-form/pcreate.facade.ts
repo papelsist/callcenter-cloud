@@ -194,7 +194,7 @@ export class PcreateFacade {
   }
 
   recalcular() {
-    console.log('Recalculando pedido...');
+    console.log('RECALCULANDO PEDIDO...');
     const tipo = this.tipo;
     const cliente = this.cliente;
     const formaDePago = this.form.get('formaDePago').value;
@@ -220,9 +220,11 @@ export class PcreateFacade {
     this._partidas.next(this._currentPartidas);
 
     const summary = buildSummary(this._currentPartidas);
+
     this._summary.next(summary);
     this.form.patchValue(summary);
     this.actualizarValidaciones();
+    console.log('Form value: ', this.resolvePedidoData());
     this.form.markAsDirty();
   }
 
@@ -267,6 +269,7 @@ export class PcreateFacade {
       this.sucursal
     );
     if (newItem) {
+      console.log('Partida editada: ', newItem);
       const clone = [...this._currentPartidas];
       clone[index] = newItem;
       this._currentPartidas = [...clone];
@@ -405,14 +408,11 @@ export class PcreateFacade {
     if (this.currentPedido && this.currentPedido.warnings) {
       res.warnings = [...this.currentPedido.warnings];
     }
-    console.log('Analizando envio: ', envio);
     if (envio && envio.tipo) {
       res.envio = envio;
     } else {
       res.envio = null;
     }
-    console.log('Envio res: ', envio);
-
     return res;
   }
 
@@ -549,7 +549,7 @@ export class PcreateFacade {
     const items = this._currentPartidas;
     const descuentoEspecial = this.descuentoEspecial ?? 0.0;
     const aut = AutorizacionesDePedido.Requeridas(items, descuentoEspecial);
-    // console.log('Autorizacion requerida: ', aut);
+    console.log('Autorizacion requerida: ', aut);
     this._autorizaciones = aut;
     this.autorizaciones$.next(this._autorizaciones);
   }

@@ -54,7 +54,11 @@ export class CotizacionesPage extends BaseComponent implements OnInit {
         .pipe(
           map((pedidos) =>
             vm.filtrar
-              ? pedidos.filter((item) => item.updateUserId === vm.user.uid)
+              ? pedidos.filter(
+                  (item) =>
+                    item.createUserId === vm.user.uid ||
+                    item.updateUserId === vm.user.uid
+                )
               : pedidos
           )
         )
@@ -189,10 +193,8 @@ export class CotizacionesPage extends BaseComponent implements OnInit {
       ],
     });
     await modal.present();
-    const {
-      data: { cerrar },
-    } = await modal.onWillDismiss();
-    if (cerrar) {
+    const { data } = await modal.onWillDismiss();
+    if (data && data.cerrar) {
       this.pedidosFacade.cerrarPedido(event.id, event, user);
     }
   }

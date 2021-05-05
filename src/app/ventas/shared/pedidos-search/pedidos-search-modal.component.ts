@@ -33,6 +33,7 @@ export class PedidosSearchModalComponent {
   @Input() criteria: PedidosSearchCriteria = {
     fechaInicial: new Date().toISOString(),
     fechaFinal: new Date().toISOString(),
+    registros: 10,
   };
 
   constructor(private modalController: ModalController) {}

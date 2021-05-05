@@ -144,7 +144,8 @@ export class PedidoCreateFormComponent
         });
       }
     });
-    console.log('Partidas recalculadas: ', partidas);
+    this.facade.actualizarValidaciones();
+    // console.log('Partidas recalculadas: ', partidas);
     // this.loading.stopLoading();
   }
 

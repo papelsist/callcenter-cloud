@@ -8,6 +8,7 @@ import firebase from 'firebase/app';
 
 export interface Pedido {
   id?: string;
+  version?: any;
   fecha: firebase.firestore.Timestamp;
   sucursal: string;
   sucursalId?: string;
@@ -48,6 +49,7 @@ export interface Pedido {
   autorizacion?: PedidoAutorizacion;
   autorizacionesRequeridas?: string;
   cerrado?: string;
+  cierre?: PedidoCierre;
   appVersion?: number;
   vigencia?: Date;
   warnings?: Warning[];
@@ -65,6 +67,7 @@ export interface Pedido {
   createUserId?: string;
   updateUser?: string;
   updateUserId?: string;
+  venta?: string;
 }
 
 export interface PedidoDet {
@@ -136,6 +139,7 @@ export type Status =
   | 'COTIZACION'
   | 'POR_AUTORIZAR'
   | 'CERRADO'
+  | 'EN_SUCURSAL'
   | 'PENDIENTE'
   | 'ATENDIDO'
   | 'POR_FACTURAR'
@@ -161,6 +165,13 @@ export interface PedidoAutorizacion {
   comentario?: string;
   dateCreated: firebase.firestore.Timestamp;
   replicado?: firebase.firestore.Timestamp;
+}
+
+export interface PedidoCierre {
+  userUid: string;
+  userName: string;
+  replicado: firebase.firestore.Timestamp;
+  cerrado: firebase.firestore.Timestamp;
 }
 
 export class PedidoLog {
@@ -265,4 +276,5 @@ export interface PedidosSearchCriteria {
   fechaInicial: string;
   fechaFinal: string;
   createUser?: string;
+  registros: number;
 }

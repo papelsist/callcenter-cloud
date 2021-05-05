@@ -1,8 +1,12 @@
-<ion-content class="ion-padding">
-  <ion-list-header>
-    <ion-label> Criterio de búsqueda </ion-label>
-  </ion-list-header>
+<ion-content class="ion-no-padding">
   <ion-grid>
+    <ion-row>
+      <ion-col>
+        <ion-list-header>
+          <ion-label> Criterio de búsqueda </ion-label>
+        </ion-list-header>
+      </ion-col>
+    </ion-row>
     <ion-row>
       <ion-col>
         <ion-item>
@@ -33,6 +37,28 @@
             [monthShortNames]="monthShortNames"
             [(ngModel)]="criteria.fechaFinal"
           ></ion-datetime>
+        </ion-item>
+      </ion-col>
+    </ion-row>
+    <ion-row>
+      <ion-col>
+        <div>
+          <ion-text color="primary"> Registros </ion-text>
+        </div>
+        <ion-item>
+          <ion-range
+            min="5"
+            max="100"
+            step="5"
+            pin="true"
+            ticks="true"
+            snaps="true"
+            ticks="false"
+            [(ngModel)]="criteria.registros"
+          >
+            <ion-icon size="small" slot="start" name="contrast"></ion-icon>
+            <ion-icon slot="end" name="contrast"></ion-icon>
+          </ion-range>
         </ion-item>
       </ion-col>
     </ion-row>

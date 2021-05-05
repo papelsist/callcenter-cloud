@@ -25,6 +25,7 @@ export class PedidosSearchComponent {
   @Input() storageKey = 'papx.pedidos-search-criteria';
   @Input() criteria: PedidosSearchCriteria = {
     ...Periodo.fromNow(10).toApiJSON(),
+    registros: 10,
   };
   @Output() citeriaChanged = new EventEmitter<PedidosSearchCriteria>();
   constructor(private modalController: ModalController) {}

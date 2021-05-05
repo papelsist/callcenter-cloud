@@ -33,7 +33,6 @@ export class ItemController {
     tipo: TipoDePedido,
     sucursal?: string
   ): Promise<Partial<PedidoDet> | null> {
-    console.log('Editando partida: ', item);
     // if (!item.producto.existencia) {
     //   const { id } = item.producto;
     //   const exis = await this.dataService.fetchExistencia(id);

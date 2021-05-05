@@ -85,10 +85,10 @@ export class ItemFormComponent extends BaseComponent implements OnInit {
 
   ngOnInit() {
     if (this.item) {
+      console.log('PTDA: ', this.item);
       const { producto, cantidad, precio, importe, corte } = this.item;
       this.form.patchValue({ producto, cantidad, precio, importe });
       if (corte) {
-        console.log('Corte: ', corte);
         this.form.get('corte').patchValue(corte);
       }
       this.updateExistenciasPanel();
@@ -151,8 +151,13 @@ export class ItemFormComponent extends BaseComponent implements OnInit {
 
   onSubmit() {
     if (this.form.valid) {
-      const item = buildPedidoItem(this.tipo, this.form.getRawValue());
-      this.save.emit(item);
+      if (this.item) {
+        const updated = { ...this.item, ...this.form.getRawValue() };
+        this.save.emit(updated);
+      } else {
+        const item = buildPedidoItem(this.tipo, this.form.getRawValue());
+        this.save.emit(item);
+      }
     }
   }
 

@@ -54,9 +54,12 @@ export class VentasDataService {
           const { fechaInicial, fechaFinal } = criteria;
           query = query
             .where('fecha', '>=', parseISO(fechaInicial))
-            .where('fecha', '<=', parseISO(fechaFinal));
+            .where('fecha', '<=', parseISO(fechaFinal))
+            .orderBy('fecha', 'desc')
+            .limit(criteria.registros);
+        } else {
+          query = query.orderBy('fecha', 'desc').limit(10);
         }
-        query = query.orderBy('fecha', 'desc').limit(20);
         return query;
       })
       .valueChanges({ idField: 'id' })
@@ -121,9 +124,12 @@ export class VentasDataService {
           const { fechaInicial, fechaFinal } = criteria;
           query = query
             .where('fecha', '>=', parseISO(fechaInicial))
-            .where('fecha', '<=', parseISO(fechaFinal));
+            .where('fecha', '<=', parseISO(fechaFinal))
+            .orderBy('fecha', 'desc')
+            .limit(criteria.registros);
+        } else {
+          query = query.orderBy('fecha', 'desc').limit(10);
         }
-        query = query.orderBy('fecha', 'desc').limit(20);
         return query;
       })
       .valueChanges({ idField: 'id' })
@@ -138,8 +144,8 @@ export class VentasDataService {
     return this.afs
       .collection<Pedido>('pedidos', (ref) =>
         ref
-          .where('status', 'in', ['POR_AUTORIZAR', 'CERRADO'])
-          .orderBy('folio', 'desc')
+          .where('status', 'in', ['POR_AUTORIZAR', 'CERRADO', 'EN_SUCURSAL'])
+          // .orderBy('folio', 'desc')
           .limit(20)
       )
       .valueChanges({ idField: 'id' })
@@ -213,6 +219,8 @@ export class VentasDataService {
         uid: user.uid,
         lastUpdated: firebase.firestore.Timestamp.now(),
       };
+      console.log('Actualizando pedido: ', payload);
+
       await this.afs
         .collection(this.PEDIDOS_COLLECTION)
         .doc(id)
@@ -224,9 +232,45 @@ export class VentasDataService {
     }
   }
 
-  async regresarPedido(id: string, user: User) {
-    const data: Partial<Pedido> = { status: 'COTIZACION' };
-    return this.updatePedido(id, data, user);
+  async cerrarPedido(pedido: Partial<Pedido>, user: User) {
+    try {
+      const status =
+        pedido.warnings && pedido.warnings.length ? 'POR_AUTORIZAR' : 'CERRADO';
+
+      const payload: Partial<Pedido> = {
+        status,
+        cerrado: new Date().toISOString(),
+        cierre: {
+          userUid: user.uid,
+          userName: user.displayName,
+          cerrado: firebase.firestore.Timestamp.now(),
+          replicado: null,
+        },
+      };
+
+      await this.afs
+        .collection(this.PEDIDOS_COLLECTION)
+        .doc(pedido.id)
+        .update(payload);
+      console.log('Pedido cerrado');
+    } catch (error: any) {
+      console.error('Error cerrando pedido: ', error);
+      throw new Error('Error actualizando pedido: ' + error.message);
+    }
+  }
+
+  async regresarPedido(pedido: Partial<Pedido>, user: User) {
+    // const data: Partial<Pedido> = { status: 'COTIZACION' };
+    // return this.updatePedido(id, data, user);
+    return this.afs.collection<any>('tasks_cc').doc().set({
+      pedidoId: pedido.id,
+      ventaId: pedido.venta,
+      pedidoFolio: pedido.folio,
+      tipo: 'REGRESAR_PEDIDO',
+      sucursal: pedido.sucursal,
+      sucursalId: pedido.sucursalId,
+      replicado: null,
+    });
   }
 
   async autorizarPedido(pedido: Pedido, comentario: string, user: User) {
@@ -249,9 +293,11 @@ export class VentasDataService {
     if (data.descuentoEspecial === null) {
       data.descuentoEspecial = 0.0;
     }
+
     const res: Partial<Pedido> = omitBy(
       data,
-      (value, _) => value === undefined || value === null
+      (value, _) => value === undefined
+      // (value, _) => value === undefined || value === null
     );
     if (data.envio === null) res.envio = null;
     return res;

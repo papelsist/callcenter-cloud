@@ -68,10 +68,11 @@ export class PendientesPage {
 
   async regresar(pedido: Pedido, user: User) {
     const res = await this.controller.regresar(pedido);
+
     if (res) {
       await this.controller.starLoading();
       try {
-        await this.dataService.regresarPedido(pedido.id, user);
+        await this.dataService.regresarPedido(pedido, user);
         await this.controller.stopLoading();
       } catch (error) {
         await this.controller.stopLoading();

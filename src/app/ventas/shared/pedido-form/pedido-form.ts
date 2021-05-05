@@ -39,6 +39,7 @@ export class PedidoForm extends FormGroup {
         subtotal: new FormControl(0.0, Validators.required),
         impuesto: new FormControl(0.0, Validators.required),
         total: new FormControl(0.0, Validators.required),
+        kilos: new FormControl(0.0),
         corteImporte: new FormControl(null),
       },
       {
