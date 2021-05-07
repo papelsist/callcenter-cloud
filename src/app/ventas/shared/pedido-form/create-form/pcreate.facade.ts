@@ -143,7 +143,7 @@ export class PcreateFacade {
   }
 
   setPedido(data: Partial<Pedido>) {
-    console.log('Registrando datos iniciales del pedido: ', data);
+    console.log('Registrando datos iniciales del pedido: 😅', data);
 
     if (data.id) {
       this.currentPedido = data as Pedido;
@@ -185,6 +185,7 @@ export class PcreateFacade {
         // }
 
         if (cte.credito) {
+          this.form.get('usoDeCfdi').setValue(cte.usoDeCfdi);
           this.recalcular();
         }
 

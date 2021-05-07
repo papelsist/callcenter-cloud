@@ -30,7 +30,7 @@ export class PedidoForm extends FormGroup {
         comprador: new FormControl(null, Validators.maxLength(50)),
         comentario: new FormControl(null, Validators.maxLength(250)),
         descuentoEspecial: new FormControl(null),
-        usoDeCfdi: new FormControl('G01', Validators.required),
+        usoDeCfdi: new FormControl(null, Validators.required),
         cfdiMail: new FormControl(null),
         envio: createEnvioForm(fb),
         importe: new FormControl(0.0, Validators.required),
