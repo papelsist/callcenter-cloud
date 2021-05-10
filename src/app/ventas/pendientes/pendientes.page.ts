@@ -7,9 +7,15 @@ import isEmty from 'lodash-es/isEmpty';
 
 import { VentasDataService } from '../@data-access';
 import { AuthService } from '@papx/auth';
-import { Pedido, User } from '@papx/models';
+import {
+  buildCriteria,
+  Pedido,
+  PedidosSearchCriteria,
+  User,
+} from '@papx/models';
 import { filtrarPedidos } from '../@data-access/+state';
 import { PendientesController } from './pendientes.controller';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-pendientes',
@@ -23,6 +29,7 @@ export class PendientesPage {
 
   pedidos$ = this.dataService.findPendientes();
   filteredPedidos$ = filtrarPedidos(this.pedidos$, this.textFilter$);
+  criteria: PedidosSearchCriteria = buildCriteria();
 
   vm$ = combineLatest([
     this.filtrarPorUsuario$,
@@ -41,7 +48,8 @@ export class PendientesPage {
   constructor(
     private dataService: VentasDataService,
     private auth: AuthService,
-    private controller: PendientesController
+    private controller: PendientesController,
+    private router: Router
   ) {}
 
   filtrarPorUsuario(val: boolean) {
@@ -67,18 +75,24 @@ export class PendientesPage {
   }
 
   async regresar(pedido: Pedido, user: User) {
-    const res = await this.controller.regresar(pedido);
+    if (['CERRADO', 'EN_SUCURSAL'].includes(pedido.status)) {
+      const res = await this.controller.regresar(pedido);
 
-    if (res) {
-      await this.controller.starLoading();
-      try {
-        await this.dataService.regresarPedido(pedido, user);
-        await this.controller.stopLoading();
-      } catch (error) {
-        await this.controller.stopLoading();
-        this.controller.handelError(error);
+      if (res) {
+        await this.controller.starLoading();
+        try {
+          await this.dataService.regresarPedido(pedido, user);
+          await this.controller.stopLoading();
+        } catch (error) {
+          await this.controller.stopLoading();
+          this.controller.handelError(error);
+        }
       }
     }
+  }
+
+  onConsultar(event: Partial<Pedido>) {
+    this.router.navigate(['', 'ventas', 'cotizaciones', 'view', event.id]);
   }
 
   getTitle(filtered: boolean) {

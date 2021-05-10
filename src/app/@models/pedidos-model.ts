@@ -5,6 +5,7 @@ import { Producto } from './producto';
 import { Transporte } from './transporte';
 
 import firebase from 'firebase/app';
+import { Periodo } from './periodo';
 
 export interface Pedido {
   id?: string;
@@ -68,6 +69,7 @@ export interface Pedido {
   updateUser?: string;
   updateUserId?: string;
   venta?: string;
+  solicitud?: number; // Solicitud de autorizacion de deposito vinculada
 }
 
 export interface PedidoDet {
@@ -275,6 +277,18 @@ export interface Warning {
 export interface PedidosSearchCriteria {
   fechaInicial: string;
   fechaFinal: string;
-  createUser?: string;
   registros: number;
+  createUser?: string;
 }
+
+export const buildCriteria = (
+  periodo: Periodo = Periodo.fromNow(3)
+): PedidosSearchCriteria => {
+  const { fechaInicial, fechaFinal } = periodo.toApiJSON();
+  const registros = 10;
+  return {
+    fechaInicial,
+    fechaFinal,
+    registros,
+  };
+};

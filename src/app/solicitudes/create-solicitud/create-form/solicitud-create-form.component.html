@@ -1,13 +1,7 @@
 <form [formGroup]="form">
   <ion-grid>
     <ion-row>
-      <ion-col>
-        <papx-sucursal-control
-          [floating]="true"
-          formControlName="sucursal"
-        ></papx-sucursal-control>
-      </ion-col>
-      <ion-col>
+      <ion-col size="4">
         <ion-item>
           <ion-label position="floating"> Pedido </ion-label>
           <ion-input
@@ -18,7 +12,28 @@
           ></ion-input>
         </ion-item>
       </ion-col>
+      <!-- <ion-col>
+        <ion-item>
+          <ion-label>Fecha </ion-label>
+        </ion-item>
+      </ion-col>
+      <ion-col>
+        <ion-item>
+          <ion-label>Total </ion-label>
+        </ion-item>
+      </ion-col>
+      <ion-col>
+        <ion-item>
+          <ion-label>Vendedor </ion-label>
+        </ion-item>
+      </ion-col>
+      <ion-col>
+        <ion-item>
+          <ion-label>Fomra de pago </ion-label>
+        </ion-item>
+      </ion-col> -->
     </ion-row>
+
     <ion-row *ngIf="pedido">
       <ion-col>
         <ion-item>

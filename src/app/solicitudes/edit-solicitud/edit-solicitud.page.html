@@ -1,0 +1,40 @@
+<ng-container *ngIf="vm$ | async as vm">
+  <ion-header>
+    <ion-toolbar>
+      <ion-buttons slot="start">
+        <ion-back-button
+          [defaultHref]="['/', 'solicitudes', 'rechazadas']"
+        ></ion-back-button>
+      </ion-buttons>
+      <ion-title>{{vm.title}} </ion-title>
+      <ion-buttons slot="end">
+        <ion-chip class="ion-hide-md-down">
+          <ion-label>
+            Creada: {{vm.solicitud.fecha | date:'dd/MM/yyyy: HH:mm'}}
+          </ion-label>
+        </ion-chip>
+      </ion-buttons>
+    </ion-toolbar>
+  </ion-header>
+
+  <ion-content>
+    <papx-rechazo-info [rechazo]="r" *ngIf="vm.solicitud.rechazo as r">
+    </papx-rechazo-info>
+    <papx-solicitud-edit-form
+      [solicitud]="vm.solicitud"
+      (save)="onSave(vm.solicitud, $event, vm.user)"
+    ></papx-solicitud-edit-form>
+    <div *ngIf="vm.solicitud.rechasosAnteriores as anteriores">
+      <ion-list>
+        <ion-list-header>
+          <ion-label class="ion-text-center"> Rechazos anteriores </ion-label>
+        </ion-list-header>
+        <papx-rechazo-info
+          [rechazo]="r"
+          color="light"
+          *ngFor="let r of anteriores"
+        ></papx-rechazo-info>
+      </ion-list>
+    </div>
+  </ion-content>
+</ng-container>

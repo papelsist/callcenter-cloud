@@ -25,12 +25,25 @@
 @import "~@ionic/angular/css/text-transformation.css";
 @import "~@ionic/angular/css/flex-utils.css";
 
+@import "../node_modules/ag-grid-community/dist/styles/ag-grid.css";
+@import "../node_modules/ag-grid-community/dist/styles/ag-theme-alpine.css";
+// @import "../node_modules/ag-grid-community/dist/styles/ag-theme-balham-dark.css";
+
+ag-grid-angular.ag-theme-alpine {
+  .ag-row .ag-cell ion-button {
+    margin: 0px;
+    padding: 0px;
+  }
+}
+
 .create-solicitud-custom-alert {
   --min-width: 70%;
 }
-// .solicitud-detail-modal {
-//   --width: 60%;
-// }
+
+.solicitud-detail-modal {
+  --width: 70%;
+}
+
 .banco-field-popup {
   --min-width: 70%;
   // --width

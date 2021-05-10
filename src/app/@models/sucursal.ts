@@ -4,4 +4,5 @@ export interface Sucursal {
   nombre: string;
   activa?: boolean;
   label?: string;
+  sort?: number;
 }

@@ -62,6 +62,14 @@ const routes: Routes = [
       ),
   },
   {
+    path: 'cotizaciones/view/:id',
+    data: { tipo: 'cotizacion' },
+    loadChildren: () =>
+      import('../pedido-view/pedido-view.module').then(
+        (m) => m.PedidoViewPageModule
+      ),
+  },
+  {
     path: 'pendientes/:id',
     data: { tipo: 'pedido' },
     loadChildren: () =>

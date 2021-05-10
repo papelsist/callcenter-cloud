@@ -17,40 +17,54 @@ export class CatalogosService {
 
   readonly sucursales: Sucursal[] = [
     {
-      id: '402880fc5e4ec411015e4ec64ce5012d',
-      clave: '10',
-      nombre: 'CALLE 4',
-      label: 'Calle 4',
-    },
-    {
-      id: '402880fc5e4ec411015e4ec64e70012e',
-      clave: '12',
-      nombre: 'TACUBA',
-      label: 'Tacuba',
+      id: '402880fc5e4ec411015e4ec64f8e0131',
+      clave: '3',
+      nombre: 'ANDRADE',
+      label: 'Andrade',
+      sort: 1,
     },
     {
       id: '402880fc5e4ec411015e4ec64f460130',
       clave: '5',
       nombre: 'BOLIVAR',
       label: 'Bolivar',
+      sort: 10,
     },
     {
-      id: '402880fc5e4ec411015e4ec64f8e0131',
-      clave: '3',
-      nombre: 'ANDRADE',
-      label: 'Andrade',
+      id: '402880fc5e4ec411015e4ec64ce5012d',
+      clave: '10',
+      nombre: 'CALLE 4',
+      label: 'Calle 4',
+      sort: 20,
     },
+    {
+      id: '402880fc5e4ec411015e4ec64e70012e',
+      clave: '12',
+      nombre: 'TACUBA',
+      label: 'Tacuba',
+      sort: 25,
+    },
+
     {
       id: '402880fc5e4ec411015e4ec650760134',
       clave: '13',
       nombre: 'CF5FEBRERO',
       label: '5 Febrero',
+      sort: 30,
     },
     {
       id: '402880fc5e4ec411015e4ec6512a0136',
       clave: '2',
       nombre: 'VERTIZ 176',
       label: 'Vertiz 176',
+      sort: 35,
+    },
+    {
+      id: '402880fc5e4ec411015e4ec64161012c',
+      clave: '1',
+      nombre: 'OFICINAS',
+      label: 'Oficinas',
+      sort: 0,
     },
   ];
 
@@ -59,4 +73,8 @@ export class CatalogosService {
     private fs: AngularFireStorage,
     private firestore: AngularFirestore
   ) {}
+
+  getSucursalByName(nombre: string): Sucursal {
+    return this.sucursales.find((item) => item.nombre === nombre);
+  }
 }

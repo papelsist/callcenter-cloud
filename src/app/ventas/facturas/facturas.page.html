@@ -6,7 +6,11 @@
   ></papx-ventas-header>
 
   <ion-content>
-    <ion-toolbar>
+    <papx-facturas-grid
+      [pedidos]="filteredFacturas$ | async"
+      (consultar)="onConsultar($event)"
+    ></papx-facturas-grid>
+    <!-- <ion-toolbar>
       <ion-searchbar
         #searchBar
         placeholder="Filtrar"
@@ -19,8 +23,8 @@
           (citeriaChanged)="onCriteriaChanged($event)"
         ></papx-pedidos-search>
       </ion-buttons>
-    </ion-toolbar>
-    <ion-list-header *ngIf="searchCriteria">
+    </ion-toolbar> -->
+    <!-- <ion-list-header *ngIf="searchCriteria">
       <ion-label>
         <span>Filtro por: </span>
         <span class="ion-padding-start">
@@ -35,6 +39,6 @@
     </ion-list-header>
     <papx-facturas-list
       [facturas]="filteredFacturas$ | async"
-    ></papx-facturas-list>
+    ></papx-facturas-list> -->
   </ion-content>
 </ng-container>

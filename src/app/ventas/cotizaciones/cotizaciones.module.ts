@@ -10,6 +10,8 @@ import { SharedVentasModule } from '../shared/shared-ventas.module';
 import { SharedPedidosListModule } from '../shared/pedidos-list';
 import { PedidosSearchModule } from '../shared/pedidos-search/pedidos-search.module';
 
+import { COMPONENTS } from './components';
+
 const routes: Routes = [
   {
     path: '',
@@ -26,6 +28,6 @@ const routes: Routes = [
     PedidosSearchModule,
     RouterModule.forChild(routes),
   ],
-  declarations: [CotizacionesPage],
+  declarations: [CotizacionesPage, ...COMPONENTS],
 })
 export class CotizacionesPageModule {}

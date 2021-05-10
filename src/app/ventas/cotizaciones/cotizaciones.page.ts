@@ -18,12 +18,19 @@ import { parseISO } from 'date-fns';
 
 import { AuthService } from '@papx/auth';
 import { BaseComponent } from '@papx/core';
-import { Pedido, PedidosSearchCriteria, User } from '@papx/models';
+import {
+  Pedido,
+  PedidosSearchCriteria,
+  User,
+  buildCriteria,
+} from '@papx/models';
 import { VentasDataService } from '../@data-access';
 import { PedidosFacade } from '../@data-access/+state';
 
 import { VentasController } from '../shared/ventas.controller';
 import { CotizacionesFacade } from './cotizaciones-facade';
+import { ReportsService } from '@papx/shared/reports/reports.service';
+import { LoadingService } from '@papx/common/ui-core';
 
 @Component({
   selector: 'app-cotizaciones',
@@ -36,7 +43,7 @@ export class CotizacionesPage extends BaseComponent implements OnInit {
 
   filtrarPorUsuario$ = new BehaviorSubject<boolean>(false);
   user$ = this.auth;
-  criteria$ = new BehaviorSubject<PedidosSearchCriteria>(null);
+  criteria$ = new BehaviorSubject<PedidosSearchCriteria>(buildCriteria());
   textFilter$ = new BehaviorSubject<string>('');
 
   vm$ = combineLatest([
@@ -80,13 +87,14 @@ export class CotizacionesPage extends BaseComponent implements OnInit {
   );
 
   constructor(
-    private facade: PedidosFacade,
     private router: Router,
     private ventasController: VentasController,
     private pedidosFacade: PedidosFacade,
     private alert: AlertController,
     private auth: AuthService,
-    private dataService: VentasDataService
+    private dataService: VentasDataService,
+    private reportService: ReportsService,
+    private loading: LoadingService
   ) {
     super();
   }
@@ -155,17 +163,26 @@ export class CotizacionesPage extends BaseComponent implements OnInit {
   }
 
   onSelection(event: Partial<Pedido>) {
-    this.facade.setCurrent(event as Pedido);
+    this.pedidosFacade.setCurrent(event as Pedido);
     this.router.navigate(['', 'ventas', 'cotizaciones', event.id]);
   }
 
   onEdit(event: Partial<Pedido>) {
-    this.facade.setCurrent(event as Pedido);
+    this.pedidosFacade.setCurrent(event as Pedido);
     this.router.navigate(['', 'ventas', 'cotizaciones', event.id]);
+  }
+
+  onConsultar(event: Partial<Pedido>) {
+    this.pedidosFacade.setCurrent(event as Pedido);
+    this.router.navigate(['', 'ventas', 'cotizaciones', 'view', event.id]);
   }
 
   async onCopiar(event: Partial<Pedido>, user: User) {
     await this.ventasController.generarCopiaPedido(event, user);
+  }
+
+  async onPrint(event: Partial<Pedido>, user: User) {
+    await this.reportService.imprimirPedido(event, user);
   }
 
   async onCerrar(event: Partial<Pedido>, user: User) {

@@ -3,9 +3,26 @@
     [title]="getTitle(vm.filtrar)"
     [filterActivated]="vm.filtrar"
     (filter)="filtrarPorUsuario($event)"
-  ></papx-ventas-header>
+    [criteria]="vm.criteria"
+  >
+    <papx-pedidos-search
+      [criteria]="vm.criteria"
+      (citeriaChanged)="onCriteriaChanged($event)"
+    ></papx-pedidos-search>
+  </papx-ventas-header>
 
   <ion-content>
+    <div class="grid-panel">
+      <papx-cotizaciones-grid
+        [cotizaciones]="filteredCotizaciones$ | async"
+        (editar)="onEdit($event)"
+        (consultar)="onConsultar($event)"
+        (cerrar)="onCerrar($event, vm.user)"
+        (copiar)="onCopiar($event, vm.user)"
+        (print)="onPrint($event, vm.user)"
+      ></papx-cotizaciones-grid>
+    </div>
+    <!--
     <ion-toolbar>
       <ion-searchbar
         #searchBar
@@ -41,6 +58,7 @@
       (cerrar)="onCerrar($event, vm.user)"
       [uid]="vm.user.uid"
     ></papx-pedidos-list>
+    -->
   </ion-content>
 
   <!-- fab placed to the top end -->

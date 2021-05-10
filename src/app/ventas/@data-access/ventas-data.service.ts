@@ -42,7 +42,7 @@ export interface VentasQueryParams {
 export class VentasDataService {
   PEDIDOS_COLLECTION = 'pedidos';
   readonly cotizaciones$ = this.fetchCotizacionesVigentes();
-  readonly porautorizar$ = this.fetchVentas('POR_AUTORIZAR');
+  // readonly porautorizar$ = this.fetchVentas('POR_AUTORIZAR');
 
   constructor(private afs: AngularFirestore) {}
 
@@ -144,7 +144,12 @@ export class VentasDataService {
     return this.afs
       .collection<Pedido>('pedidos', (ref) =>
         ref
-          .where('status', 'in', ['POR_AUTORIZAR', 'CERRADO', 'EN_SUCURSAL'])
+          .where('status', 'in', [
+            'POR_AUTORIZAR',
+            'CERRADO',
+            'EN_SUCURSAL',
+            'POR_FACTURAR',
+          ])
           // .orderBy('folio', 'desc')
           .limit(20)
       )

@@ -4,7 +4,7 @@ import { Cliente } from './cliente';
 import { CuentaDeBanco } from './cuenta-de-banco';
 import { Pedido } from './pedidos-model';
 
-import { User } from './user';
+import firebase from 'firebase/app';
 
 export interface SolicitudDeDeposito {
   id: string;
@@ -27,16 +27,21 @@ export interface SolicitudDeDeposito {
   total: number;
   dateCreated?: string;
   lastUpdated?: string;
-  createUser: Partial<User>;
-  updateUser: Partial<User>;
-  uid: string;
+  createUser?: string;
+  createUserUid?: string;
+  updateUser: string;
+  updateUserUid: string;
   autorizacion?: Autorizacion;
   rechazo?: AutorizacionRechazo;
   rechasosAnteriores?: AutorizacionRechazo[];
-  status: 'PENDIENTE' | 'AUTORIZADO' | 'RECHAZADO';
+  status: 'PENDIENTE' | 'AUTORIZADO' | 'RECHAZADO' | 'EN_SUCURSAL';
   retraso?: number;
-  pedidos?: Partial<Pedido>[];
+  pedido?: Partial<Pedido>;
   appVersion?: number;
+  log?: {
+    createTime: firebase.firestore.Timestamp;
+    updateTime: firebase.firestore.Timestamp;
+  };
 }
 
 export interface UpdateSolicitud {

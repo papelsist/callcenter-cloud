@@ -5,9 +5,10 @@ import { BehaviorSubject, combineLatest } from 'rxjs';
 import { map, switchMap } from 'rxjs/operators';
 
 import { AuthService } from '@papx/auth';
-import { PedidosSearchCriteria } from '@papx/models';
+import { Pedido, PedidosSearchCriteria } from '@papx/models';
 import { VentasDataService } from '../@data-access';
 import { filtrarPedidos } from '../@data-access/+state';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-facturas',
@@ -45,7 +46,8 @@ export class FacturasPage {
   constructor(
     private dataService: VentasDataService,
     private auth: AuthService,
-    private alert: AlertController
+    private alert: AlertController,
+    private router: Router
   ) {}
 
   filtrarPorUsuario(val: boolean) {
@@ -77,6 +79,10 @@ export class FacturasPage {
       ],
     });
     await al.present();
+  }
+
+  onConsultar(event: Partial<Pedido>) {
+    this.router.navigate(['', 'ventas', 'cotizaciones', 'view', event.id]);
   }
 
   getTitle(filtered: boolean) {

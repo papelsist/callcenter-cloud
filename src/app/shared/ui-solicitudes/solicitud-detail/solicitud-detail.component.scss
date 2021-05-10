@@ -1,5 +1,21 @@
 .container {
   display: grid;
   align-items: center;
-  grid-template-columns: repeat(auto-fill, minmax(330px, 1fr));
+  grid-template-columns: repeat(1, 1fr);
+}
+.row {
+  display: grid;
+  align-items: center;
+  grid-template-columns: repeat(auto-fill, minmax(33%, 1fr));
+}
+.row-2 {
+  display: grid;
+  align-items: center;
+  grid-template-columns: repeat(auto-fill, minmax(50%, 1fr));
+}
+
+.row-3 {
+  display: grid;
+  align-items: center;
+  grid-template-columns: repeat(3, 1fr);
 }

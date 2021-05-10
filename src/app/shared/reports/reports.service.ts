@@ -478,14 +478,24 @@ export class ReportsService {
   buildEntregaSection(pedido: Partial<Pedido>) {
     const { envio } = pedido;
     if (!envio) return '';
-    const text = `${envio.direccion.calle} # ${envio.direccion.numeroExterior},
-        ${envio.direccion.colonia},
-        ${envio.direccion.municipio}, ${envio.direccion.estado}
-        CP: ${envio.direccion.codigoPostal}
+    let direccion = envio.direccion;
+    if (direccion['direccion']) {
+      direccion = direccion['direccion'];
+    }
+    const text = `${direccion.calle} # ${direccion.numeroExterior},
+        ${direccion.colonia},
+        ${direccion.municipio}, ${direccion.estado}
+        CP: ${direccion.codigoPostal}
       `;
     const { tipo, contacto, horario, telefono } = envio;
+    let shorario =
+      horario === null
+        ? ''
+        : typeof horario === 'string'
+        ? horario
+        : `${horario['horaInicial']} - ${horario['horaFinal']}`;
     const extras = `Tipo: ${tipo} Contacto: ${contacto ?? 'ND'}
-      Horario: ${horario ?? ''} Tel: ${telefono ?? 'ND'}`;
+      Horario: ${shorario} Tel: ${telefono ?? 'ND'}`;
 
     return [
       { text, fontSize: 10, italics: true, bold: true, margin: [0, 2] },

@@ -2,8 +2,6 @@ import { Injectable } from '@angular/core';
 
 import { AngularFirestore } from '@angular/fire/firestore';
 
-import firebase from 'firebase/app';
-
 import { Observable, throwError } from 'rxjs';
 import { catchError, map, take } from 'rxjs/operators';
 
@@ -12,6 +10,7 @@ import { isSameDay, parseJSON } from 'date-fns';
 import { SolicitudDeDeposito, UpdateSolicitud } from '@papx/models';
 
 import { User } from '@papx/models';
+import fireabse from 'firebase/app';
 
 @Injectable({ providedIn: 'root' })
 export class SolicitudesService {
@@ -21,12 +20,14 @@ export class SolicitudesService {
 
   async createSolicitud(solicitud: Partial<SolicitudDeDeposito>, user: User) {
     try {
-      const payload = {
+      const payload: Partial<SolicitudDeDeposito> = {
         ...solicitud,
         callcenter: true,
         fecha: new Date().toISOString(),
-        uid: user.uid,
+        createUserUid: user.uid,
         createUser: user.displayName,
+        updateUserUid: user.uid,
+        updateUser: user.displayName,
         dateCreated: new Date().toISOString(),
         lastUpdated: new Date().toISOString(),
         appVersion: 2,
@@ -35,11 +36,11 @@ export class SolicitudesService {
       const folioRef = this.afs.doc('folios/solicitudes').ref;
       let folio = 1;
 
+      let pedidoRef = null;
+      if (payload.pedido) {
+        pedidoRef = this.afs.doc(`pedidos/${payload.pedido.id}`).ref;
+      }
       const solicitudRef = this.afs.collection(this.COLLECTION).doc().ref;
-
-      // Stats Data
-      const statsRef = this.afs.collection(this.COLLECTION).doc('--stats--')
-        .ref;
 
       return this.afs.firestore.runTransaction(async (transaction) => {
         const folioDoc = await transaction.get<any>(folioRef);
@@ -50,20 +51,18 @@ export class SolicitudesService {
         }
         folios[SUCURSAL] += 1;
         folio = folios[SUCURSAL];
-
-        const acumulados: { [key: string]: any } = {};
-        acumulados[SUCURSAL] = {
-          pendientes: {
-            count: firebase.firestore.FieldValue.increment(1),
-            total: firebase.firestore.FieldValue.increment(solicitud.total),
-          },
-        };
-
-        transaction
-          .set(folioRef, folios, { merge: true })
-          .set(solicitudRef, { ...payload, folio })
-          .set(statsRef, acumulados, { merge: true });
-        return folio;
+        if (pedidoRef != null) {
+          transaction
+            .set(folioRef, folios, { merge: true })
+            .set(solicitudRef, { ...payload, folio })
+            .update(pedidoRef, { solicitud: folio });
+          return folio;
+        } else {
+          transaction
+            .set(folioRef, folios, { merge: true })
+            .set(solicitudRef, { ...payload, folio });
+          return folio;
+        }
       });
     } catch (error: any) {
       console.error('Error salvando pedido: ', error);
@@ -71,29 +70,19 @@ export class SolicitudesService {
     }
   }
 
-  async update(command: UpdateSolicitud) {
+  async update(command: UpdateSolicitud, user: User) {
     try {
       const doc = this.afs.doc(`${this.COLLECTION}/${command.id}`);
-      const data = {
+      const data: Partial<SolicitudDeDeposito> = {
         ...command.changes,
-        lastUpdated: firebase.firestore.Timestamp.now(),
+        lastUpdated: new Date().toISOString(),
+        updateUserUid: user.uid,
+        updateUser: user.displayName,
       };
       await doc.ref.update(data);
     } catch (error) {
       throw new Error('Error actualizando solicitud :' + error.message);
     }
-  }
-
-  findPendientesByUser(uid: string) {
-    return this.afs
-      .collection<SolicitudDeDeposito>(this.COLLECTION, (ref) => {
-        let query = ref
-          .where('uid', '==', uid)
-          .where('status', '==', 'PENDIENTE');
-        return query.limit(20);
-      })
-      .valueChanges({ idField: 'id' })
-      .pipe(catchError((err) => throwError(err)));
   }
 
   findPendientes(max: number = 20): Observable<SolicitudDeDeposito[]> {
@@ -130,14 +119,6 @@ export class SolicitudesService {
       })
       .valueChanges({ idField: 'id' })
       .pipe(catchError((err) => throwError(err)));
-  }
-
-  findPendientesPorAutorizar(): Observable<SolicitudDeDeposito[]> {
-    return this.afs
-      .collection<SolicitudDeDeposito>(this.COLLECTION, (ref) =>
-        ref.where('status', '==', 'PENDIENTE')
-      )
-      .valueChanges({ idField: 'id' });
   }
 
   get(id: string) {

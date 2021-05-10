@@ -21,25 +21,29 @@ import { SolicitudesService } from '@papx/shared/solicitudes/@data-access/solici
 import toNumber from 'lodash-es/toNumber';
 import isNumber from 'lodash-es/isNumber';
 import { VentasDataService } from 'src/app/ventas/@data-access';
+import { CatalogosService } from '@papx/data-access';
 
 @Component({
-  selector: 'app-create-solicitud',
+  selector: 'papx-create-solicitud',
   templateUrl: './create-solicitud.page.html',
   styleUrls: ['./create-solicitud.page.scss'],
 })
 export class CreateSolicitudPage implements OnInit {
   cartera: Cartera = 'CON';
+  sucursal$ = this.auth.sucursal$.pipe(
+    map((nombre) => this.catalogosService.getSucursalByName(nombre))
+  );
 
-  vm$ = combineLatest([this.auth.userInfo$, this.auth.claims$]).pipe(
-    map(([user, claims]) => ({
+  vm$ = combineLatest([
+    this.auth.userInfo$,
+    this.auth.claims$,
+    this.sucursal$,
+  ]).pipe(
+    map(([user, claims, sucursal]) => ({
       user,
       claims,
-      sucursal: {
-        id: '402880fc5e4ec411015e4ec64ce5012d',
-        nombre: 'CALLE 4',
-      },
+      sucursal,
       creditoUser: !!claims.xpapCxcUser,
-      cartera: 'CON',
     }))
   );
 
@@ -47,23 +51,19 @@ export class CreateSolicitudPage implements OnInit {
 
   constructor(
     private service: SolicitudesService,
+    private catalogosService: CatalogosService,
     private pedidoDataService: VentasDataService,
     private auth: AuthService,
     private router: Router,
     private alertController: AlertController
   ) {}
 
-  ngOnInit() {
-    this.vm$
-      .pipe(take(1))
-      .subscribe((vm) => (this.cartera = vm.cartera as Cartera));
-  }
+  ngOnInit() {}
 
   async onSave(sol: Partial<SolicitudDeDeposito>, user: User) {
     try {
       sol.tipo = this.cartera;
       console.log('Crear solicitud: ', sol);
-      // console.log('User: ', user);
       const fol = await this.service.createSolicitud(sol, user);
       this.router.navigate(['solicitudes']);
     } catch (error) {
@@ -99,7 +99,12 @@ export class CreateSolicitudPage implements OnInit {
             this.handleError('Folio: ' + folio, 'Error', 'No existe el pedido');
             return;
           }
-          if (this.validarFormaDePago(found) && this.validarStatus(found)) {
+
+          if (
+            this.validarFormaDePago(found) &&
+            this.validarStatus(found) &&
+            this.validarExistente(found)
+          ) {
             this.pedido = found;
           }
         },
@@ -111,6 +116,19 @@ export class CreateSolicitudPage implements OnInit {
           )
       );
     }
+  }
+
+  private validarExistente(pedido: Partial<Pedido>) {
+    if (pedido.solicitud) {
+      this.handleError(
+        'El pedido ya se encuentra referenciado en la solicitud:: ' +
+          pedido.solicitud,
+        'Error',
+        'Pedido: ' + pedido.folio
+      );
+      return false;
+    }
+    return true;
   }
 
   private validarFormaDePago(pedido: Partial<Pedido>) {

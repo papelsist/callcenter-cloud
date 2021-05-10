@@ -86,8 +86,10 @@ export class CuentaFieldComponent implements OnInit, ControlValueAccessor {
   }
 
   private loadBancos() {
-    this.service.cuentas$.subscribe((data) => (this.cuentas = data));
-    this.cd.markForCheck();
+    this.service.cuentas$.subscribe((data) => {
+      this.cuentas = data;
+      this.cd.markForCheck();
+    });
   }
 
   writeValue(obj: any): void {

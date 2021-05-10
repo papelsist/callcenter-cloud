@@ -6,7 +6,12 @@
   ></papx-ventas-header>
 
   <ion-content>
-    <ion-toolbar>
+    <papx-pendientes-grid
+      [pedidos]="vm.pedidos"
+      (regresar)="regresar($event, vm.user)"
+      (consultar)="onConsultar($event)"
+    ></papx-pendientes-grid>
+    <!-- <ion-toolbar>
       <ion-searchbar
         #searchBar
         placeholder="Filtrar"
@@ -19,6 +24,6 @@
     <papx-pendientes-list
       [pedidos]="vm.pedidos"
       (regresar)="regresar($event, vm.user)"
-    ></papx-pendientes-list>
+    ></papx-pendientes-list> -->
   </ion-content>
 </ng-container>
