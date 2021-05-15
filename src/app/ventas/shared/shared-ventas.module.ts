@@ -10,6 +10,7 @@ import {
   WarningsComponent,
 } from './buttons';
 import { FilterVentasButtonComponent } from './buttons';
+import { CerrarPedidoComponent } from './cerrar-pedido/cerrar-pedido.component';
 import { VentasHeaderComponent } from './ventas-header/ventas-header.component';
 
 const COMPONENTS = [
@@ -20,6 +21,7 @@ const COMPONENTS = [
   ErrorsComponent,
   ErrorsButtonComponent,
   EmailTargetComponent,
+  CerrarPedidoComponent,
 ];
 
 @NgModule({

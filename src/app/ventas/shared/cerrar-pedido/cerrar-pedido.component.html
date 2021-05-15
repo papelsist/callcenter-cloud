@@ -1,0 +1,92 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title> Cerrar pedido {{ pedido.folio }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+<ion-content>
+  <ion-list-header>
+    <ion-label>{{ pedido.nombre }}</ion-label>
+  </ion-list-header>
+  <ion-grid>
+    <ion-row>
+      <ion-col size="6">
+        <ion-item>
+          <ion-label>
+            Sucursal:
+            <ion-text class="ion-padding-start" color="primary">
+              {{ pedido.sucursal }}
+            </ion-text>
+          </ion-label>
+        </ion-item>
+      </ion-col>
+      <ion-col size="6">
+        <ion-item>
+          <ion-label>
+            Fecha:
+            <ion-text class="ion-padding-start" color="primary">
+              {{ pedido.fecha.toDate() | date: "dd/MM/yyyy" }}
+            </ion-text>
+          </ion-label>
+        </ion-item>
+      </ion-col>
+    </ion-row>
+    <ion-row>
+      <ion-col>
+        <ion-item>
+          <ion-label>
+            Total:
+            <ion-text class="ion-padding-start" color="primary">
+              {{ pedido.total | currency }}
+            </ion-text>
+          </ion-label>
+        </ion-item>
+      </ion-col>
+      <ion-col>
+        <ion-item>
+          <ion-label>
+            Forma de pago:
+            <ion-text class="ion-padding-start" color="primary">
+              {{ pedido.formaDePago }}
+            </ion-text>
+          </ion-label>
+        </ion-item>
+      </ion-col>
+    </ion-row>
+    <ion-row *ngIf="solicitud">
+      <ion-col>
+        <ion-item>
+          <ion-label>
+            Depósito: {{ solicitud.folio }} Status: {{ solicitud.status }}
+          </ion-label>
+        </ion-item>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+  <div class="ion-padding" *ngIf="requiereAutorizacion()">
+    <ion-list-header color="danger">
+      <ion-label> Este pedido requiere autorizaciones </ion-label>
+    </ion-list-header>
+  </div>
+  <div class="ion-padding" *ngIf="requiereDeposito()">
+    <ion-list-header color="warning">
+      <ion-label>
+        ALERTA: Forma de pago {{ pedido.formaDePago }} requiere deposito
+        autorizado
+      </ion-label>
+    </ion-list-header>
+  </div>
+</ion-content>
+<ion-footer>
+  <ion-toolbar>
+    <ion-buttons slot="end">
+      <ion-button (click)="close()">
+        <ion-icon name="close" slot="start"></ion-icon>
+        <ion-label>Cancelar</ion-label>
+      </ion-button>
+      <ion-button (click)="submit()" color="primary" [disabled]="isDisabled()">
+        <ion-icon name="checkmark" slot="start"></ion-icon>
+        <ion-label>Aceptar</ion-label>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-footer>

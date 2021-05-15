@@ -55,7 +55,7 @@ export class SolicitudesService {
           transaction
             .set(folioRef, folios, { merge: true })
             .set(solicitudRef, { ...payload, folio })
-            .update(pedidoRef, { solicitud: folio });
+            .update(pedidoRef, { solicitud: { folio, id: solicitudRef.id } });
           return folio;
         } else {
           transaction

@@ -186,6 +186,10 @@ export class CotizacionesPage extends BaseComponent implements OnInit {
   }
 
   async onCerrar(event: Partial<Pedido>, user: User) {
+    await this.pedidosFacade.cerrarPedido(event, user);
+  }
+
+  async onCerrar1(event: Partial<Pedido>, user: User) {
     const modal = await this.alert.create({
       header: 'Cerrar pedido: ' + event.folio + ' ?',
       subHeader: event.autorizacionesRequeridas
@@ -212,7 +216,7 @@ export class CotizacionesPage extends BaseComponent implements OnInit {
     await modal.present();
     const { data } = await modal.onWillDismiss();
     if (data && data.cerrar) {
-      this.pedidosFacade.cerrarPedido(event.id, event, user);
+      this.pedidosFacade.cerrarPedido(event, user);
     }
   }
 

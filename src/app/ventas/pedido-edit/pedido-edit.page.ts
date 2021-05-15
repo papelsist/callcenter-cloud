@@ -54,8 +54,10 @@ export class PedidoEditPage implements OnInit, OnDestroy {
   }
 
   async onCerrar(id: string, pedido: Partial<Pedido>, user: User) {
-    await this.facade.cerrarPedido(id, pedido, user);
-    this.router.navigate(['/', 'ventas', 'cotizaciones']);
+    const ok = await this.facade.cerrarPedido(pedido, user);
+    if (ok) {
+      this.router.navigate(['/', 'ventas', 'cotizaciones']);
+    }
   }
 
   onErrors(event: any) {

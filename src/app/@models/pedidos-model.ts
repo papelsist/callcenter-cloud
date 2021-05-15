@@ -69,7 +69,10 @@ export interface Pedido {
   updateUser?: string;
   updateUserId?: string;
   venta?: string;
-  solicitud?: number; // Solicitud de autorizacion de deposito vinculada
+  solicitud?: {
+    folio: number; // Solicitud de autorizacion de deposito vinculada
+    id: string;
+  };
 }
 
 export interface PedidoDet {

@@ -15,6 +15,8 @@ import {
   take,
   tap,
 } from 'rxjs/operators';
+import { CerrarPedidoController } from '../../shared/cerrar-pedido/cerrar-pedido-controller';
+
 import { VentasDataService } from '../ventas-data.service';
 
 export interface PedidosState {
@@ -55,7 +57,8 @@ export class PedidosFacade {
     private reports: ReportsService,
     private mailService: MailService,
     private loading: LoadingService,
-    private alertController: AlertController
+    private alertController: AlertController,
+    private cerrarPedidoController: CerrarPedidoController
   ) {}
 
   setCurrent(pedido: Pedido) {
@@ -67,8 +70,18 @@ export class PedidosFacade {
     await this.dataService.updatePedido(id, pedido, user);
   }
 
-  async cerrarPedido(id: string, pedido: Partial<Pedido>, user: User) {
-    await this.dataService.cerrarPedido(pedido, user);
+  async cerrarPedido(pedido: Partial<Pedido>, user: User) {
+    const cerrar = await this.cerrarPedidoController.cerrar(pedido);
+    if (cerrar) {
+      try {
+        await this.dataService.cerrarPedido(pedido, user);
+        return true;
+      } catch (error) {
+        await this.handleError('Error cerrando pedido', error.message);
+      }
+    } else {
+      return false;
+    }
   }
 
   async saveCartState(state: Partial<Pedido>, user: User) {
