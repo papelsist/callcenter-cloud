@@ -1,4 +1,10 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import {
+  Component,
+  HostListener,
+  OnDestroy,
+  OnInit,
+  ViewChild,
+} from '@angular/core';
 import {
   ActivatedRoute,
   ActivatedRouteSnapshot,
@@ -13,6 +19,7 @@ import { catchError, finalize, map, switchMap, take } from 'rxjs/operators';
 import { VentasDataService } from '../@data-access';
 import { PedidosFacade } from '../@data-access/+state';
 import { EmailTargetComponent } from '../shared/buttons';
+import { PedidoCreateFormComponent } from '../shared/pedido-form';
 
 @Component({
   selector: 'app-pedido-edit',
@@ -32,12 +39,14 @@ export class PedidoEditPage implements OnInit, OnDestroy {
   // );
 
   vm$ = this.facade.vm$;
+  @ViewChild(PedidoCreateFormComponent) form: PedidoCreateFormComponent;
   constructor(
     public facade: PedidosFacade,
     private router: Router,
     private loading: LoadingService,
     private reports: ReportsService,
-    private popoverController: PopoverController
+    private popoverController: PopoverController,
+    private alertController: AlertController
   ) {}
 
   ngOnInit() {}
@@ -102,10 +111,79 @@ export class PedidoEditPage implements OnInit, OnDestroy {
     }
   }
 
+  async onDelete(pedido: Partial<Pedido>, user: User) {
+    const alert = await this.alertController.create({
+      animated: true,
+      header: 'Eliminar pedido',
+      subHeader: 'Folio: ' + pedido.folio,
+      message: 'Seguro que desea eliminar',
+      buttons: [
+        {
+          text: 'Cancelar',
+          role: 'cancel',
+        },
+        {
+          text: 'Aceptar',
+          handler: () => true,
+        },
+      ],
+    });
+    await alert.present();
+    const { data } = await alert.onWillDismiss();
+    if (data) {
+      await this.facade.deletePedido(pedido, user);
+      this.router.navigateByUrl('/ventas/cotizaciones');
+    } else {
+      console.log('No eliminar');
+    }
+  }
+
+  private doDelete(pedido: Partial<Pedido>, user: User) {
+    console.log('Eliminar pedido: ', pedido.folio);
+  }
+
   showMessage(message: string, header: string) {}
 
   async handleError(err: any) {
     console.log('Err: ', err);
   }
   showErrors(errrors: any) {}
+
+  /** Insert item */
+  @HostListener('document:keydown.meta.i', ['$event'])
+  async onHotKeyInsert(event: KeyboardEvent) {
+    event.stopPropagation();
+    await this.form.addItem();
+  }
+  @HostListener('document:keydown.insert', ['$event'])
+  async onHotKeyInsert2(event: KeyboardEvent) {
+    event.stopPropagation();
+    await this.form.addItem();
+  }
+
+  /** Show descuentos */
+  @HostListener('document:keydown.control.d', ['$event'])
+  async onHotKeyShowDescuentos(event: KeyboardEvent) {
+    console.log('Mostrar descuentos por volumen...');
+    await this.form.showDescuentos();
+  }
+
+  /** Cliente nuevo */
+  @HostListener('document:keydown.control.a', ['$event'])
+  async onHotKeyAltaDeCliente(event: KeyboardEvent) {
+    await this.form.onClienteNuevo();
+  }
+
+  @HostListener('document:keydown.control.shift.s', ['$event'])
+  onHotKeyCloseCart(event: KeyboardEvent) {
+    this.form.submit();
+  }
+
+  @HostListener('document:keydown.f2', ['$event'])
+  onHotKeyAltP(event: KeyboardEvent) {
+    console.log('Localizar producto...');
+    // this.productoServie
+    //   .openSelector()
+    //   .subscribe((prod) => this.facade.addCartItem(prod));
+  }
 }

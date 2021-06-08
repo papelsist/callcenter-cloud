@@ -10,6 +10,7 @@ export class Periodo {
 
   static fromNow(days: number): Periodo {
     const today = new Date();
+    // const today = addDays(new Date(), 1);
     const f1 = addDays(today, days * -1);
     return new Periodo(f1, today);
   }

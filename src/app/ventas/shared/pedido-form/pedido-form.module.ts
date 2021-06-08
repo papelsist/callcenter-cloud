@@ -23,6 +23,7 @@ import { SocioSelectorComponent } from './+sections/cliente/socio-selector.compo
 import { SharedClienteFormModule } from '@papx/shared/clientes/cliente-form/cliente-form.module';
 import { DescuentosModalComponent } from './options/descuentos-modal.component';
 import { ClienteControlModule } from './cliente-control/cliente-control.module';
+import { ShortcutsModalComponent } from './options/shortcuts-modal.component';
 
 const components = [
   PedidoCreateFormComponent,
@@ -39,6 +40,7 @@ const components = [
   ClienteSectionComponent,
   SocioSelectorComponent,
   DescuentosModalComponent,
+  ShortcutsModalComponent,
 ];
 
 @NgModule({

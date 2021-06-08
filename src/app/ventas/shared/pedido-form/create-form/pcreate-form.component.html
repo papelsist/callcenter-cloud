@@ -7,11 +7,13 @@
     <ion-title>{{ getHeaderLabel() }}</ion-title>
     <ion-buttons slot="end">
       <papx-pedido-options-button
+        #options
         [descuentos]="descuentos$ | async"
         (cerrar)="onCerrar()"
         (actualizarExistencias)="actualizarExistencias()"
         (print)="imprimirPedido()"
         (email)="enviarPedido()"
+        (delete)="delete.emit()"
       ></papx-pedido-options-button>
     </ion-buttons>
   </ion-toolbar>
@@ -44,9 +46,9 @@
           formControlName="formaDePago"
         ></papx-forma-pago-control>
       </ion-col>
-      <ion-col>
+      <!-- <ion-col>
         <papx-moneda-control formControlName="moneda"></papx-moneda-control>
-      </ion-col>
+      </ion-col> -->
     </ion-row>
   </ion-grid>
 

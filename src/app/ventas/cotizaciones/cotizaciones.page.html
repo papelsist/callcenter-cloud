@@ -14,7 +14,7 @@
   <ion-content>
     <div class="grid-panel">
       <papx-cotizaciones-grid
-        [cotizaciones]="filteredCotizaciones$ | async"
+        [cotizaciones]="cotizaciones$ | async"
         (editar)="onEdit($event)"
         (consultar)="onConsultar($event)"
         (cerrar)="onCerrar($event, vm.user)"

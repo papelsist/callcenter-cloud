@@ -288,7 +288,7 @@ export const buildCriteria = (
   periodo: Periodo = Periodo.fromNow(3)
 ): PedidosSearchCriteria => {
   const { fechaInicial, fechaFinal } = periodo.toApiJSON();
-  const registros = 10;
+  const registros = 20;
   return {
     fechaInicial,
     fechaFinal,

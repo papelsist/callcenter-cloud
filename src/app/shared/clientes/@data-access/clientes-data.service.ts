@@ -20,7 +20,11 @@ export class ClientesDataService {
     shareReplay()
   );
 
-  clientesCache$ = this.fetchClientesCache().pipe(shareReplay());
+  // clientesCache$ = this.fetchClientesCache().pipe(shareReplay());
+  clientesCache$ = this.fetchClientesCache().pipe(
+    map((clientes) => sortBy(clientes, 'nombre')),
+    shareReplay()
+  );
 
   constructor(
     private http: HttpClient,
@@ -175,8 +179,9 @@ export class ClientesDataService {
         sucursal: 'CALLCENTER',
         versionApp: 2,
       };
-      const docRef = this.afs.collection<Partial<Cliente>>('clientes').doc(id)
-        .ref;
+      const docRef = this.afs
+        .collection<Partial<Cliente>>('clientes')
+        .doc(id).ref;
       await docRef.set(data);
       const snap = await docRef.get();
       return snap.data();

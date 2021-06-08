@@ -1,4 +1,10 @@
-import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import {
+  Component,
+  HostListener,
+  OnDestroy,
+  OnInit,
+  ViewChild,
+} from '@angular/core';
 import { Router } from '@angular/router';
 import { AlertController, LoadingController } from '@ionic/angular';
 
@@ -81,7 +87,7 @@ export class PedidoCreatePage implements OnInit, OnDestroy {
       await this.dataService.createPedido(pedido, user);
       this._saveCart = false;
       await this.pedidoFacade.cleanCart(user);
-      this.router.navigate(['/', 'ventas', 'cotizaciones']);
+      this.router.navigateByUrl('/ventas/cotizaciones');
     } catch (error) {
       this.handleHerror(error);
     }
@@ -118,5 +124,43 @@ export class PedidoCreatePage implements OnInit, OnDestroy {
 
   async showErrors(errors: any) {
     console.log('Mostrar errores: ', errors);
+  }
+
+  /** Insert item */
+  @HostListener('document:keydown.meta.i', ['$event'])
+  async onHotKeyInsert(event: KeyboardEvent) {
+    event.stopPropagation();
+    await this.form.addItem();
+  }
+  @HostListener('document:keydown.insert', ['$event'])
+  async onHotKeyInsert2(event: KeyboardEvent) {
+    event.stopPropagation();
+    await this.form.addItem();
+  }
+
+  /** Show descuentos */
+  @HostListener('document:keydown.control.d', ['$event'])
+  async onHotKeyShowDescuentos(event: KeyboardEvent) {
+    console.log('Mostrar descuentos por volumen...');
+    await this.form.showDescuentos();
+  }
+
+  /** Cliente nuevo */
+  @HostListener('document:keydown.control.a', ['$event'])
+  async onHotKeyAltaDeCliente(event: KeyboardEvent) {
+    await this.form.onClienteNuevo();
+  }
+
+  @HostListener('document:keydown.control.shift.s', ['$event'])
+  onHotKeyCloseCart(event: KeyboardEvent) {
+    this.form.submit();
+  }
+
+  @HostListener('document:keydown.f2', ['$event'])
+  onHotKeyAltP(event: KeyboardEvent) {
+    console.log('Localizar producto...');
+    // this.productoServie
+    //   .openSelector()
+    //   .subscribe((prod) => this.facade.addCartItem(prod));
   }
 }

@@ -7,6 +7,7 @@ import {
   Input,
   ChangeDetectorRef,
   AfterViewInit,
+  ViewChild,
 } from '@angular/core';
 
 import {
@@ -44,7 +45,8 @@ import { LoadingService } from '@papx/common/ui-core';
 })
 export class PedidoCreateFormComponent
   extends BaseComponent
-  implements OnInit, AfterViewInit {
+  implements OnInit, AfterViewInit
+{
   @Input() data: Partial<Pedido> = {};
   @Output() save = new EventEmitter<Partial<Pedido>>();
   @Output() cerrarPedido = new EventEmitter<Partial<Pedido>>();
@@ -52,6 +54,7 @@ export class PedidoCreateFormComponent
   @Output() email = new EventEmitter<Partial<Cliente>>();
   @Output() errors = new EventEmitter();
   @Output() warnings = new EventEmitter();
+  @Output() delete = new EventEmitter();
 
   form = this.facade.form;
   partidas$ = this.facade.partidas$;
@@ -64,6 +67,8 @@ export class PedidoCreateFormComponent
   hasErrors$ = this.facade.errors$.pipe(map((errors) => errors.length > 0));
 
   descuentos$ = this.facade.descuentos$;
+
+  @ViewChild('options') options: any;
 
   constructor(
     private facade: PcreateFacade,
@@ -346,5 +351,13 @@ export class PedidoCreateFormComponent
 
   getCartState() {
     return this.facade.resolvePedidoData();
+  }
+
+  getFacade() {
+    return this.facade;
+  }
+
+  showDescuentos() {
+    this.options.showDescuentos();
   }
 }

@@ -205,6 +205,7 @@ export class CotizacionesGridComponent implements OnInit {
 
         valueGetter: (params) => params.data.updateUser,
       },
+      /*
       {
         headerName: 'Copiar',
         colId: 'copiar',
@@ -219,8 +220,9 @@ export class CotizacionesGridComponent implements OnInit {
           },
         },
       },
+      */
       {
-        headerName: 'C',
+        headerName: 'Cerrar',
         colId: 'cerrar',
         pinned: 'right',
         minWidth: 80,

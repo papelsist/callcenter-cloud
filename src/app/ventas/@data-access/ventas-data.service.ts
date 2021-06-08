@@ -19,7 +19,13 @@ import { catchError, map, take } from 'rxjs/operators';
 import firebase from 'firebase/app';
 import omitBy from 'lodash-es/omitBy';
 
-import { addBusinessDays, parseISO } from 'date-fns';
+import {
+  addBusinessDays,
+  parseISO,
+  parseJSON,
+  startOfDay,
+  endOfDay,
+} from 'date-fns';
 import { Periodo } from 'src/app/@models/periodo';
 
 /**
@@ -47,18 +53,22 @@ export class VentasDataService {
   constructor(private afs: AngularFirestore) {}
 
   findCotizaciones(criteria: PedidosSearchCriteria) {
+    const inicial = startOfDay(parseJSON(criteria.fechaInicial));
+    const final = endOfDay(parseJSON(criteria.fechaFinal));
     return this.afs
       .collection<Pedido>(this.PEDIDOS_COLLECTION, (ref) => {
         let query = ref.where('status', '==', 'COTIZACION');
         if (criteria) {
           const { fechaInicial, fechaFinal } = criteria;
           query = query
-            .where('fecha', '>=', parseISO(fechaInicial))
-            .where('fecha', '<=', parseISO(fechaFinal))
+            .where('fecha', '>=', inicial)
+            .where('fecha', '<=', final)
+            // .where('fecha', '>=', parseISO(fechaInicial))
+            // .where('fecha', '<=', parseISO(fechaFinal))
             .orderBy('fecha', 'desc')
             .limit(criteria.registros);
         } else {
-          query = query.orderBy('fecha', 'desc').limit(10);
+          query = query.orderBy('fecha', 'desc').limit(40);
         }
         return query;
       })
@@ -334,6 +344,10 @@ export class VentasDataService {
 
   deleteCart(uid: string) {
     return this.afs.collection('cart').doc(uid).delete();
+  }
+
+  deletePedido(id: string) {
+    return this.afs.collection(this.PEDIDOS_COLLECTION).doc(id).delete();
   }
 
   getCart(uid: string) {

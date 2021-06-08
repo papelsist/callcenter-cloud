@@ -112,6 +112,11 @@ export class PedidosFacade {
     this.reports.imprimirPedido(pedido, user);
   }
 
+  async deletePedido(pedido: Partial<Pedido>, user: User) {
+    await this.dataService.deletePedido(pedido.id);
+    await this.dataService.deleteCart(user.uid);
+  }
+
   sendFacturaByEmail(
     pedido: Partial<Pedido>,
     target: string,

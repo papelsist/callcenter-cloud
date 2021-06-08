@@ -17,6 +17,7 @@ import { TipoDePedido, DescuentoPorVolumen } from '@papx/models';
 import { PcreateFacade } from '../create-form/pcreate.facade';
 import { DescuentosModalComponent } from './descuentos-modal.component';
 import { PedidoOptionsComponent } from './pedido-options.component';
+import { ShortcutsModalComponent } from './shortcuts-modal.component';
 
 @Component({
   selector: 'papx-pedido-options-button',
@@ -37,6 +38,7 @@ export class PedidoOptionsButtonComponent implements OnInit {
   @Output() actualizarExistencias = new EventEmitter();
   @Output() print = new EventEmitter();
   @Output() email = new EventEmitter();
+  @Output() delete = new EventEmitter();
   @Input() descuentos: DescuentoPorVolumen[] = [];
 
   constructor(
@@ -75,6 +77,7 @@ export class PedidoOptionsButtonComponent implements OnInit {
     if (this.facade.tipo !== TipoDePedido.CREDITO) {
       options.push(this.buildDescuentosPorVolumenOption());
     }
+    options.push(this.buildShortcutsOption());
     return options;
   }
 
@@ -101,6 +104,14 @@ export class PedidoOptionsButtonComponent implements OnInit {
       text: 'Descuentos (Vol)',
       icon: 'archive',
       handler: () => this.showDescuentos(),
+    };
+  }
+
+  private buildShortcutsOption() {
+    return {
+      text: 'Accesos Rápidos',
+      icon: 'color-wand',
+      handler: () => this.showShortcuts(),
     };
   }
 
@@ -146,7 +157,7 @@ export class PedidoOptionsButtonComponent implements OnInit {
         text: 'Eliminar pedido',
         role: 'destructive',
         icon: 'trash',
-        handler: () => console.log('Eliminar'),
+        handler: () => this.delete.emit(),
       },
     ];
   }
@@ -203,6 +214,17 @@ export class PedidoOptionsButtonComponent implements OnInit {
     */
     const modal = await this.popoverController.create({
       component: DescuentosModalComponent,
+      componentProps: { descuentos: this.descuentos },
+      animated: true,
+      mode: 'md',
+      cssClass: 'menu',
+    });
+    await modal.present();
+  }
+
+  async showShortcuts() {
+    const modal = await this.popoverController.create({
+      component: ShortcutsModalComponent,
       componentProps: { descuentos: this.descuentos },
       animated: true,
       mode: 'md',
