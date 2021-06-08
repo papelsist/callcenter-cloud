@@ -45,6 +45,13 @@ const routes: Routes = [
         (m) => m.PedidoCreatePageModule
       ),
   },
+  {
+    path: 'cotizaciones/new',
+    loadChildren: () =>
+      import(
+        '../../features/pedidos/xpedido-create/xpedido-create.module'
+      ).then((m) => m.XPedidosCreateModule),
+  },
 
   {
     path: 'cotizaciones/create/item',
