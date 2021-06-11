@@ -2,7 +2,14 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
 import { Observable, throwError } from 'rxjs';
-import { catchError, map, shareReplay, switchMap } from 'rxjs/operators';
+import {
+  catchError,
+  map,
+  shareReplay,
+  switchMap,
+  take,
+  tap,
+} from 'rxjs/operators';
 
 import { DescuentoPorVolumen, Sucursal, Transporte } from '@papx/models';
 import { AngularFirestore } from '@angular/fire/firestore';
@@ -76,5 +83,30 @@ export class CatalogosService {
 
   getSucursalByName(nombre: string): Sucursal {
     return this.sucursales.find((item) => item.nombre === nombre);
+  }
+
+  buscarSucursalPorZip(
+    codigoPostal: string
+  ): Observable<Partial<Sucursal> | null> {
+    console.log('Buscando sucursal para zip: ', codigoPostal);
+    const zip = +codigoPostal;
+    return this.firestore
+      .collection('zonas', (rf) => {
+        return rf.where('cp_ini', '<', zip).orderBy('cp_ini', 'desc');
+      })
+      .valueChanges()
+      .pipe(
+        map((rows) => rows.filter((item) => item['cp_fin'] > zip)),
+        tap((rows) => console.log('rows: ', rows)),
+        map((rows: any[]) => {
+          if (rows && rows.length > 0) {
+            const row = rows[0];
+            return { id: row.sucursalId, nombre: row.sucursal };
+          } else {
+            return null;
+          }
+        }),
+        take(1)
+      );
   }
 }

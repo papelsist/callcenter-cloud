@@ -94,7 +94,8 @@ import { DireccionController } from '@papx/shared/direccion';
   ],
 })
 export class EnvioDireccionComponent
-  implements OnInit, ControlValueAccessor, OnChanges {
+  implements OnInit, ControlValueAccessor, OnChanges
+{
   disabled = false;
   value: any;
   onChange: any;
@@ -133,7 +134,6 @@ export class EnvioDireccionComponent
   }
 
   compareWith(currentValue: any, compareValue: any) {
-    console.log('Comparing: ', currentValue, compareValue);
     if (!currentValue || !compareValue) {
       return false;
     }
@@ -141,7 +141,6 @@ export class EnvioDireccionComponent
   }
 
   onSelection({ detail: { value } }: any) {
-    console.log('Value:', value);
     if (value) {
       this.value = value;
       this.onChange(value);
@@ -154,6 +153,7 @@ export class EnvioDireccionComponent
   ngOnInit() {}
 
   async addDireccion() {
+    console.log('Nueva direccion de entrega....');
     const direccion: Direccion = await this.direccionController.addDireccion();
     if (direccion) {
       const de: ClienteDireccion = {
