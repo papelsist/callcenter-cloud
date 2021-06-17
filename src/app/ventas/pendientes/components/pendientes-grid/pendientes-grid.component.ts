@@ -68,7 +68,7 @@ export class PendientesGridComponent implements OnInit {
 
   onFirstDataRendered(params: FirstDataRenderedEvent) {
     // console.log('Data: ', this.cotizaciones);
-    params.columnApi.autoSizeAllColumns();
+    // params.columnApi.autoSizeAllColumns();
   }
 
   rowClicked(event: RowClickedEvent) {}
@@ -173,6 +173,15 @@ export class PendientesGridComponent implements OnInit {
         headerName: 'Comentario',
         field: 'comentario',
         width: 200,
+      },
+      {
+        headerName: 'Puesto',
+        field: 'puesto',
+        width: 120,
+        valueGetter: (params) =>
+          params.data.puesto
+            ? this.format.formatDate(params.data.puesto.fecha.toDate())
+            : '',
       },
       {
         headerName: 'Modificado',

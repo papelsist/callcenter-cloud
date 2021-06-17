@@ -39,6 +39,8 @@ export class PedidoEditPage implements OnInit, OnDestroy {
   // );
 
   vm$ = this.facade.vm$;
+  descuentEspecial = 0.0;
+
   @ViewChild(PedidoCreateFormComponent) form: PedidoCreateFormComponent;
   constructor(
     public facade: PedidosFacade,
@@ -75,6 +77,10 @@ export class PedidoEditPage implements OnInit, OnDestroy {
 
   onWarnings(warnings: any[]) {
     this.warnings = warnings;
+  }
+
+  onDescuentoEspecial(descuento: number) {
+    this.descuentEspecial = descuento;
   }
 
   async onPrint(event: Pedido, user: User) {

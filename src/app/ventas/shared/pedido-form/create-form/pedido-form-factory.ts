@@ -4,7 +4,7 @@ export function createEnvioForm(fb: FormBuilder) {
   return fb.group(
     {
       tipo: ['ENVIO', [Validators.required]],
-      transporte: [{ value: null, disabled: false }],
+      transporte: [{ value: null, disabled: true }],
       contacto: [
         null,
         {

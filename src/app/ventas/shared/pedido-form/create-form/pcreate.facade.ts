@@ -110,7 +110,11 @@ export class PcreateFacade {
 
   nextDescuento$ = this.partidas$.pipe(
     map((items: PedidoDet[]) =>
-      this.isCredito() ? 0.0 : cartUtils.calcularImporteBruto(items)
+      this.isCredito()
+        ? 0.0
+        : this.descuentoEspecial <= 0.0
+        ? cartUtils.calcularImporteBruto(items)
+        : 0.0
     ),
     switchMap((neto) =>
       this.catalogos.descuentos$.pipe(

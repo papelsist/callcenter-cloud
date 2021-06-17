@@ -186,7 +186,31 @@ export class CotizacionesPage extends BaseComponent implements OnInit {
   }
 
   async onCerrar(event: Partial<Pedido>, user: User) {
-    await this.pedidosFacade.cerrarPedido(event, user);
+    console.log('Cerrando pedido: ', event);
+    if (event.autorizacionesRequeridas) {
+      await this.autorizar(event, user);
+    } else {
+      await this.pedidosFacade.cerrarPedido(event, user);
+    }
+  }
+
+  async autorizar(pedido: Partial<Pedido>, user: User) {
+    const { autorizar, comentario } = await this.pedidosFacade.autorizar(
+      pedido
+    );
+    console.log('Autorizar: ', autorizar);
+    console.log('Comentario: ', comentario);
+
+    // if (autorizar && !isEmty(comentario)) {
+    //   await this.controller.starLoading();
+    //   try {
+    //     await this.dataService.autorizarPedido(pedido, comentario, user);
+    //     await this.controller.stopLoading();
+    //   } catch (error) {
+    //     await this.controller.stopLoading();
+    //     this.controller.handelError(error);
+    //   }
+    // }
   }
 
   async onCerrar1(event: Partial<Pedido>, user: User) {

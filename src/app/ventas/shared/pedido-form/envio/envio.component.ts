@@ -86,9 +86,7 @@ export class EnvioComponent extends BaseComponent implements OnInit {
     this.setControls();
     this.setupHorarioControl();
     this.registerContactoListener();
-    this.registerTipoListener();
     this.registerDireccionListener();
-    // this.registerClienteListener();
     this.direcciones$ = this.parent.get('cliente').valueChanges.pipe(
       map((cte) => findDirecciones(cte)),
       takeUntil(this.destroy$)
@@ -129,17 +127,6 @@ export class EnvioComponent extends BaseComponent implements OnInit {
           { emitEvent: false, onlySelf: true }
         );
       });
-  }
-
-  private registerTipoListener() {
-    this.tipo.valueChanges
-      .pipe(
-        map((t) => t === 'FORANEO' || t === 'OCURRE'),
-        takeUntil(this.destroy$)
-      )
-      .subscribe((valid) =>
-        valid ? this.transporte.enable() : this.transporte.disable()
-      );
   }
 
   private registerDireccionListener() {

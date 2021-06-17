@@ -168,4 +168,49 @@ export class PedidosFacade {
     });
     await alert.present();
   }
+
+  async autorizar(pedido: Partial<Pedido>) {
+    console.log('Evaluando pedido: ', pedido);
+    const inputs = pedido.warnings.map((it) => ({
+      disabled: true,
+      value: it.descripcion,
+    }));
+    const alert = await this.alertController.create({
+      header: 'Autorizar pedido: ' + pedido.folio,
+      subHeader: pedido.nombre,
+      message: `Total: ${pedido.total} (Vend: ${pedido.updateUser})`,
+      animated: true,
+      cssClass: 'autorizacion-de-pedido-alert',
+      inputs: [
+        ...inputs,
+        {
+          type: 'text',
+          placeholder: 'Comentario',
+          name: 'comentario',
+          handler: (value) => ({ comentario: value }),
+        },
+      ],
+      //inputs: [pedido.warnings.map( w => ({}))],
+      buttons: [
+        {
+          text: 'Cancelar',
+          role: 'cancel',
+          handler: () => ({ autorizar: false }),
+        },
+        {
+          text: 'Aceptar',
+          role: 'accept',
+          handler: () => ({ autorizar: true }),
+        },
+      ],
+    });
+    await alert.present();
+    const {
+      data: {
+        autorizar,
+        values: { comentario },
+      },
+    } = await alert.onDidDismiss();
+    return { autorizar, comentario };
+  }
 }

@@ -52,7 +52,7 @@ export interface Pedido {
   cerrado?: string;
   cierre?: PedidoCierre;
   appVersion?: number;
-  vigencia?: Date;
+  vigencia?: firebase.firestore.Timestamp;
   warnings?: Warning[];
   envioPorCorreo?: boolean;
   solicitarConfirmacion?: boolean;

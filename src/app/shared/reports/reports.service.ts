@@ -10,18 +10,24 @@ import pdfFonts from 'pdfmake/build/vfs_fonts';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 import { FormatService } from '@papx/core';
-import { Pedido, User } from '@papx/models';
+import { Cliente, Pedido, User } from '@papx/models';
+import { ClientesDataService } from '../clientes/@data-access/clientes-data.service';
 
 @Injectable({ providedIn: 'root' })
 export class ReportsService {
   constructor(
     private format: FormatService,
-    private aff: AngularFireFunctions
+    private aff: AngularFireFunctions,
+    private clienteService: ClientesDataService
   ) {}
 
   async generarPedidoGenerator(pedido: Partial<Pedido>, user: User) {
     console.log('Imprimiendo pedido: ', pedido);
-    const { cliente, fecha } = pedido;
+    const cliente = await this.clienteService
+      .findById(pedido.cliente.id)
+      .toPromise();
+    // console.log('Cliente: ', cliente);
+    const { fecha } = pedido;
     let sfecha: any = fecha;
     if (sfecha instanceof firebase.firestore.Timestamp) {
       sfecha = (sfecha as firebase.firestore.Timestamp).toDate().toISOString();
@@ -115,10 +121,10 @@ export class ReportsService {
       content: [
         { text: 'PAPEL S.A. de C.V.', style: 'header' },
         {
-          text: 'Solicitud de venta (PEDIDO) CallCenter - BOLIVAR',
+          text: 'Solicitud de venta (PEDIDO) CallCenter ' + pedido.sucursal,
           style: 'subheader',
         },
-        this.buildParaametrosRow(pedido),
+        this.buildParaametrosRow(pedido, cliente),
         {
           style: 'tableExample',
           layout: 'lightHorizontalLines',
@@ -205,9 +211,9 @@ export class ReportsService {
   }
 
   async getPapelLogo(): Promise<string> {
-    const jpgImageBytes = await fetch(
-      'assets/images/papel-logo.jpg'
-    ).then((res) => res.arrayBuffer());
+    const jpgImageBytes = await fetch('assets/images/papel-logo.jpg').then(
+      (res) => res.arrayBuffer()
+    );
     const base64 = this.arrayBufferToBase64(jpgImageBytes);
     const res = 'data:image/jpg;base64,' + base64;
     return res;
@@ -223,8 +229,8 @@ export class ReportsService {
     return window.btoa(binary);
   }
 
-  buildParaametrosRow(pedido: Partial<Pedido>) {
-    const { cliente, fecha } = pedido;
+  buildParaametrosRow(pedido: Partial<Pedido>, cliente: Partial<Cliente>) {
+    const { fecha } = pedido;
     let sfecha: any = fecha;
     if (sfecha instanceof firebase.firestore.Timestamp) {
       sfecha = (sfecha as firebase.firestore.Timestamp).toDate().toISOString();
@@ -271,7 +277,7 @@ export class ReportsService {
             columns: [
               { text: 'Nombre:', width: '20%', fontSize: 12 },
               {
-                text: 'LARA IBARRA FRANCISCO',
+                text: pedido.nombre,
                 alignment: 'left',
                 fontSize: 12,
                 bold: true,
@@ -302,7 +308,7 @@ export class ReportsService {
             columns: [
               { text: 'Calle:', width: '20%', fontSize: 12 },
               {
-                text: 'NORTE 76 A 5424',
+                text: cliente.direccion.calle,
                 alignment: 'left',
                 fontSize: 12,
                 bold: true,
@@ -333,7 +339,7 @@ export class ReportsService {
             columns: [
               { text: 'Colonia:', width: '20%', fontSize: 12 },
               {
-                text: 'AMP. EMILIANO ZAPAT C.P: 07858',
+                text: `${cliente.direccion.colonia} CP: ${cliente.direccion.codigoPostal}`, // 'AMP. EMILIANO ZAPAT C.P: 07858',
                 alignment: 'left',
                 fontSize: 12,
                 bold: true,
@@ -364,7 +370,7 @@ export class ReportsService {
             columns: [
               { text: 'Delegación:', width: '25%', fontSize: 12 },
               {
-                text: 'Gustavo A. Madero',
+                text: cliente.direccion.municipio,
                 alignment: 'left',
                 fontSize: 12,
                 bold: true,
@@ -381,7 +387,12 @@ export class ReportsService {
             columns: [
               { text: 'Teléfonos:', width: '25%', fontSize: 12 },
               {
-                text: '[5751-2119]',
+                text: cliente.medios
+                  ? cliente.medios
+                      .filter((item) => item.tipo === 'TEL')
+                      .map((item) => item.descripcion)
+                      .join(',')
+                  : '',
                 alignment: 'left',
                 fontSize: 12,
                 bold: true,
@@ -415,6 +426,11 @@ export class ReportsService {
       },
       {
         text: 'Elaboro: ' + pedido.createUser,
+      },
+      {
+        text: pedido.vigencia
+          ? 'Vigencia: ' + this.format.formatDate(pedido.vigencia.toDate())
+          : '',
       },
       {
         columns: [

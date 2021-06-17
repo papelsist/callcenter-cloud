@@ -14,7 +14,8 @@ import { Almacen, Producto } from '@papx/models';
 
 @Injectable({ providedIn: 'root' })
 export class ProductoService {
-  productos$ = this.fetchZipProducts().pipe(shareReplay());
+  // productos$ = this.fetchZipProducts().pipe(shareReplay());
+  productos$ = this.http.get<Producto[]>('assets/data/productos-all.json');
 
   productosMap$: Observable<{ [key: string]: Producto }> = this.productos$.pipe(
     map((productos) => keyBy(productos, 'id'))

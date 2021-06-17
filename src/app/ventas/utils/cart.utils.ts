@@ -137,6 +137,12 @@ export function recalcularPartidas(
       descuento = descuento - 1;
     }
   }
+  // if (fpago === FormaDePago.TARJETA_CRE && descuento > 2) {
+  //   descuento = descuento - 2;
+  // }
+  // if (fpago === FormaDePago.TARJETA_DEB && descuento > 1) {
+  //   descuento = descuento - 1;
+  // }
 
   console.log('Dscto aplicado: ', descuento);
 

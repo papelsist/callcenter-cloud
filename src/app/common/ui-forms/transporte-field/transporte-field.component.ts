@@ -14,10 +14,7 @@ import { take } from 'rxjs/operators';
 @Component({
   selector: 'papx-transporte-field',
   template: `
-    <ion-item
-      [formGroup]="parent"
-      [disabled]="parent.get('transporte').disabled"
-    >
+    <ion-item [formGroup]="parent" [disabled]="disabled">
       <ion-icon slot="start" color="dark" name="trail-sign"></ion-icon>
       <ion-label position="floating">{{ label }}</ion-label>
       <ion-select
@@ -34,12 +31,13 @@ import { take } from 'rxjs/operators';
       </ion-select>
     </ion-item>
   `,
-  changeDetection: ChangeDetectionStrategy.OnPush,
+  // changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TransporteFieldComponent implements OnInit {
   @Input() parent: FormGroup;
   @Input() property = 'transporte';
   @Input() label = 'Transporte';
+  @Input() disabled = true;
 
   transportes$ = this.afs
     .collection<Transporte>('transportes', (ref) => ref.orderBy('nombre'))
@@ -58,7 +56,18 @@ export class TransporteFieldComponent implements OnInit {
 
   constructor(private afs: AngularFirestore) {}
 
-  ngOnInit() {}
+  ngOnInit() {
+    this.parent
+      .get('tipo')
+      .valueChanges.pipe(take(1))
+      .subscribe((value) => {
+        if (value === 'FORANEO' || value === 'OCURRE') {
+          this.disabled = false;
+        } else {
+          this.disabled = true;
+        }
+      });
+  }
 
   compareWith(currentValue: any, compareValue: any) {
     if (!compareValue) {

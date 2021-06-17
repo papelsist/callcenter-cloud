@@ -85,7 +85,6 @@ export class ItemFormComponent extends BaseComponent implements OnInit {
 
   ngOnInit() {
     if (this.item) {
-      console.log('PTDA: ', this.item);
       const { producto, cantidad, precio, importe, corte } = this.item;
       this.form.patchValue({ producto, cantidad, precio, importe });
       if (corte) {
@@ -103,7 +102,6 @@ export class ItemFormComponent extends BaseComponent implements OnInit {
   }
 
   findProductByClave(clave: any) {
-    // console.log('Buscando por clave: ', clave);
     this.productoController.findByClave(clave).subscribe(async (p) => {
       // console.log('Found: ', p);
       if (p) {
@@ -120,6 +118,10 @@ export class ItemFormComponent extends BaseComponent implements OnInit {
     if (producto) {
       this.findProductByClave(producto.clave);
     }
+  }
+
+  async selectProducto(prod: Partial<Producto>) {
+    this.findProductByClave(prod.clave);
   }
 
   selectNewProduct(prod: Partial<Producto>) {

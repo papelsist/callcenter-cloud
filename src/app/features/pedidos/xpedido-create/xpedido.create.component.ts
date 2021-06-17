@@ -15,7 +15,7 @@ import { Router } from '@angular/router';
         </ion-toolbar>
       </ion-header>
       <ion-content>
-        <h1>Aqui la forma</h1>
+        <papx-xcreate-pedido-form></papx-xcreate-pedido-form>
       </ion-content>
       <ion-footer>
         <ion-toolbar>

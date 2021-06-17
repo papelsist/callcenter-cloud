@@ -190,7 +190,9 @@ export class VentasDataService {
       const payload: Partial<Pedido> = {
         ...cleanData,
         fecha,
-        vigencia: addBusinessDays(fecha.toDate(), 10),
+        vigencia: firebase.firestore.Timestamp.fromDate(
+          addBusinessDays(fecha.toDate(), 10)
+        ),
         dateCreated: firebase.firestore.Timestamp.now(),
         lastUpdated: firebase.firestore.Timestamp.now(),
         createUser: user.displayName,

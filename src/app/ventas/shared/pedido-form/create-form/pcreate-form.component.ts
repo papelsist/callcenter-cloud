@@ -55,6 +55,7 @@ export class PedidoCreateFormComponent
   @Output() errors = new EventEmitter();
   @Output() warnings = new EventEmitter();
   @Output() delete = new EventEmitter();
+  @Output() descuentEspecial = new EventEmitter();
 
   form = this.facade.form;
   partidas$ = this.facade.partidas$;
@@ -83,6 +84,7 @@ export class PedidoCreateFormComponent
   ngOnInit() {
     // this.form.disable({ onlySelf: true, emitEvent: true });
     this.facade.setPedido(this.data);
+    this.descuentEspecial.emit(this.data.descuentoEspecial);
     this.addListeners();
     this.facade.actualizarValidaciones();
 
@@ -184,6 +186,7 @@ export class PedidoCreateFormComponent
     this.sucursalListener();
     this.errorsListener();
     this.clienteListener();
+    this.descuentoEspecialListener();
   }
 
   recalculoListener() {
@@ -238,6 +241,17 @@ export class PedidoCreateFormComponent
         takeUntil(this.destroy$),
         distinctUntilChanged(),
         tap((cte) => this.ajustarTipo(cte))
+      )
+      .subscribe(() => {});
+  }
+
+  private descuentoEspecialListener() {
+    this.form
+      .get('descuentoEspecial')
+      .valueChanges.pipe(
+        takeUntil(this.destroy$),
+        distinctUntilChanged(),
+        tap((value) => this.descuentEspecial.emit(value))
       )
       .subscribe(() => {});
   }
