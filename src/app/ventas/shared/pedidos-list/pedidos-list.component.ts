@@ -21,6 +21,7 @@ export class PedidosListComponent implements OnInit {
   @Output() selection = new EventEmitter<Partial<Pedido>>();
   @Output() copiar = new EventEmitter<Partial<Pedido>>();
   @Output() cerrar = new EventEmitter<Partial<Pedido>>();
+  @Output() editar = new EventEmitter<Partial<Pedido>>();
   constructor() {}
 
   ngOnInit() {}

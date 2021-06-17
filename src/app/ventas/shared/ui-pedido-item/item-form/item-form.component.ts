@@ -13,11 +13,18 @@ import { FormBuilder, FormGroup } from '@angular/forms';
 import { IonInput } from '@ionic/angular';
 import { BaseComponent } from '@papx/core';
 
-import { PedidoDet, Producto, TipoDePedido, PedidoSummary } from '@papx/models';
+import {
+  PedidoDet,
+  Producto,
+  TipoDePedido,
+  PedidoSummary,
+  Almacen,
+} from '@papx/models';
 import { ProductoController } from '@papx/shared/productos/producto-selector';
 
 // import { isString } from 'lodash-es';
 import toNumber from 'lodash-es/toNumber';
+
 import { combineLatest, Observable } from 'rxjs';
 import {
   debounceTime,
@@ -39,7 +46,7 @@ export class ItemFormComponent extends BaseComponent implements OnInit {
   @Input() tipo: TipoDePedido;
   @Input() sucursal: string;
   @Output() save = new EventEmitter<Partial<PedidoDet>>();
-  existencia = {};
+  existencia: { [key: string]: Almacen } = {};
   warning: any;
 
   form: FormGroup = buildForm(this.fb);
@@ -77,12 +84,10 @@ export class ItemFormComponent extends BaseComponent implements OnInit {
   }
 
   ngOnInit() {
-    console.log('Editando: ', this.item);
     if (this.item) {
       const { producto, cantidad, precio, importe, corte } = this.item;
       this.form.patchValue({ producto, cantidad, precio, importe });
       if (corte) {
-        console.log('Corte: ', corte);
         this.form.get('corte').patchValue(corte);
       }
       this.updateExistenciasPanel();
@@ -97,7 +102,6 @@ export class ItemFormComponent extends BaseComponent implements OnInit {
   }
 
   findProductByClave(clave: any) {
-    // console.log('Buscando por clave: ', clave);
     this.productoController.findByClave(clave).subscribe(async (p) => {
       // console.log('Found: ', p);
       if (p) {
@@ -113,8 +117,11 @@ export class ItemFormComponent extends BaseComponent implements OnInit {
     const producto = await this.productoController.findProducto();
     if (producto) {
       this.findProductByClave(producto.clave);
-      // this.selectNewProduct(producto);
     }
+  }
+
+  async selectProducto(prod: Partial<Producto>) {
+    this.findProductByClave(prod.clave);
   }
 
   selectNewProduct(prod: Partial<Producto>) {
@@ -127,8 +134,10 @@ export class ItemFormComponent extends BaseComponent implements OnInit {
   }
 
   updateExistenciasPanel() {
-    this.existencia = this.producto.existencia;
-    this.cd.markForCheck();
+    if (this.producto && this.producto.existencia) {
+      this.existencia = this.producto.existencia;
+      this.cd.markForCheck();
+    }
   }
 
   get producto(): Partial<Producto> {
@@ -144,8 +153,13 @@ export class ItemFormComponent extends BaseComponent implements OnInit {
 
   onSubmit() {
     if (this.form.valid) {
-      const item = buildPedidoItem(this.tipo, this.form.getRawValue());
-      this.save.emit(item);
+      if (this.item) {
+        const updated = { ...this.item, ...this.form.getRawValue() };
+        this.save.emit(updated);
+      } else {
+        const item = buildPedidoItem(this.tipo, this.form.getRawValue());
+        this.save.emit(item);
+      }
     }
   }
 
@@ -178,36 +192,24 @@ export class ItemFormComponent extends BaseComponent implements OnInit {
   }
 
   getDisponible(): number {
-    if (this.producto && this.producto.existencia) {
-      // if (this.sucursal) {
-      //   let disp = this.producto.existencia[this.sucursal.toLowerCase()]
-      //     .cantidad;
-      //   if (isString(disp)) disp = parseFloat(disp);
-      //   return disp;
-      // }
-      const disponible = Object.keys(this.producto.existencia).reduce(
-        (p, c) => p + toNumber(this.producto.existencia[c].cantidad),
-        0.0
-      );
-      return disponible;
+    if (this.existencia) {
+      const almacen = this.existencia[this.sucursal.toLowerCase()];
+      if (almacen) {
+        return toNumber(almacen.cantidad);
+      }
+      // const disponible = Object.keys(this.existencia).reduce(
+      //   (p, c) => p + toNumber(this.existencia[c].cantidad),
+      //   0.0
+      // );
+      // return disponible;
     }
     return 0;
   }
 
   private resolverFaltante() {
-    if (this.producto && this.producto.existencia) {
-      const can = this.cantidad;
-      const dis = this.getDisponible();
-      const faltante = dis > can ? 0 : can - dis;
-      return faltante;
-    }
-    return 0.0;
+    const can = this.cantidad;
+    const dis = this.getDisponible();
+    const faltante = dis > can ? 0 : can - dis;
+    return faltante;
   }
-
-  // getSucursalName(key: any) {
-  //   if (key === 'cf5febrero') return '5 FEBRERO';
-  //   if (key === 'vertiz176') return 'VERTIZ 176';
-  //   if (key === 'calle4') return 'CALLE 4';
-  //   return key.toLocaleUpperCase();
-  // }
 }

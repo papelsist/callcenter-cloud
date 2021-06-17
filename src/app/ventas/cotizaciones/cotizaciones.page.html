@@ -2,18 +2,63 @@
   <papx-ventas-header
     [title]="getTitle(vm.filtrar)"
     [filterActivated]="vm.filtrar"
-    (filter)="onFilter($event)"
-  ></papx-ventas-header>
+    (filter)="filtrarPorUsuario($event)"
+    [criteria]="vm.criteria"
+  >
+    <papx-pedidos-search
+      [criteria]="vm.criteria"
+      (citeriaChanged)="onCriteriaChanged($event)"
+    ></papx-pedidos-search>
+  </papx-ventas-header>
 
   <ion-content>
-    <ion-searchbar></ion-searchbar>
+    <div class="grid-panel">
+      <papx-cotizaciones-grid
+        [cotizaciones]="cotizaciones$ | async"
+        (editar)="onEdit($event)"
+        (consultar)="onConsultar($event)"
+        (cerrar)="onCerrar($event, vm.user)"
+        (copiar)="onCopiar($event, vm.user)"
+        (print)="onPrint($event, vm.user)"
+      ></papx-cotizaciones-grid>
+    </div>
+    <!--
+    <ion-toolbar>
+      <ion-searchbar
+        #searchBar
+        placeholder="Filtrar"
+        searchIcon=""
+        (ionChange)="onFilter(searchBar.value)"
+        debounce="600"
+      ></ion-searchbar>
+      <ion-buttons slot="end">
+        <papx-pedidos-search
+          (citeriaChanged)="onCriteriaChanged($event)"
+        ></papx-pedidos-search>
+      </ion-buttons>
+    </ion-toolbar>
+    <ion-list-header *ngIf="searchCriteria">
+      <ion-label>
+        <span>Filtro por: </span>
+        <span class="ion-padding-start">
+          Del: {{searchCriteria.fechaInicial | date: 'dd/MM/yyyy'}} al
+          {{searchCriteria.fechaFinal | date: 'dd/MM/yyyy'}}
+        </span>
+      </ion-label>
+      <ion-button (click)="deleteCriteria()">
+        <ion-label> Quitar </ion-label>
+        <ion-icon name="close" slot="end"></ion-icon>
+      </ion-button>
+    </ion-list-header>
+
     <papx-pedidos-list
-      [pedidos]="cotizaciones$ | async"
+      [pedidos]="filteredCotizaciones$ | async"
       (selection)="onSelection($event)"
       (copiar)="onCopiar($event, vm.user)"
       (cerrar)="onCerrar($event, vm.user)"
       [uid]="vm.user.uid"
     ></papx-pedidos-list>
+    -->
   </ion-content>
 
   <!-- fab placed to the top end -->
@@ -21,5 +66,8 @@
     <ion-fab-button routerLink="create">
       <ion-icon name="add"></ion-icon>
     </ion-fab-button>
+    <!-- <ion-fab-button routerLink="new" color="tertiary">
+      <ion-icon name="add"></ion-icon>
+    </ion-fab-button> -->
   </ion-fab>
 </ng-container>

@@ -36,6 +36,7 @@ export class PedidoItemListComponent implements OnInit {
   ngOnInit() {}
 
   onSelection(index: number, item: Partial<PedidoDet>) {
+    console.log('Editando partida: ', item);
     this.facade.editItem(index, item);
   }
 

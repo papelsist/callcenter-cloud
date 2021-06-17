@@ -39,7 +39,7 @@ export class AutorizadasPage implements OnInit {
     ]).pipe(
       map(([solicitudes, filtrar, user]) => {
         return filtrar
-          ? solicitudes.filter((item) => item.uid === user.uid)
+          ? solicitudes.filter((item) => item.updateUserUid === user.uid)
           : solicitudes;
       })
     );

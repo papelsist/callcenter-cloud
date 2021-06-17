@@ -5,8 +5,12 @@
       [data]="vm.pedido"
       (save)="onSave(vm.pedido.id, $event, vm.user)"
       (cerrarPedido)="onCerrar(vm.pedido.id, $event, vm.user)"
+      (imprimir)="onPrint(vm.pedido, vm.user)"
+      (email)="onEmail($event, vm.pedido, vm.user)"
+      (delete)="onDelete(vm.pedido, vm.user)"
       (errors)="onErrors($event)"
       (warnings)="onWarnings($event)"
+      (descuentEspecial)="onDescuentoEspecial($event)"
     ></papx-pedido-form>
   </ion-content>
 
@@ -28,6 +32,11 @@
       </ion-buttons>
       <ion-title class="ion-text-center" color="success">
         Total: {{ summary['total'] | currency}}
+        <ion-text color="warning">
+          <small class="ion-padding-start" *ngIf="descuentEspecial > 0">
+            (Dscto especial: {{descuentEspecial / 100 | percent}})
+          </small>
+        </ion-text>
       </ion-title>
       <ion-buttons slot="end">
         <ion-button [disabled]="!form.canSubmit" (click)="form.submit()">

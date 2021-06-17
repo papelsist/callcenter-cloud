@@ -1,5 +1,5 @@
 import { Cliente, Pedido, PedidoDet } from '@papx/models';
-
+import firebase from 'firebase/app';
 export function copiarPedido(source: Partial<Pedido>): Pedido {
   const {
     importe,
@@ -24,7 +24,7 @@ export function copiarPedido(source: Partial<Pedido>): Pedido {
   return {
     appVersion: 2,
     status: 'COTIZACION',
-    fecha: new Date().toISOString(),
+    fecha: firebase.firestore.Timestamp.now(),
     sucursal: source.sucursal,
     sucursalId: source.sucursalId,
     cliente: source.cliente,

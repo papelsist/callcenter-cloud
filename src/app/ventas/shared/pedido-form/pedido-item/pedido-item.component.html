@@ -40,36 +40,13 @@
               {{ item.descuentoImporte | currency }}
             </span>
           </ion-col>
-          <ion-col
-            *ngIf="item.importeCortes > 0.0"
-            size-sm="6"
-            size-md="12"
-            size-lg="3"
-          >
-            <span> Cortes: {{ item.importeCortes | currency }} </span>
+          <ion-col size-sm="6" size-md="12" size-lg="3">
+            <span *ngIf="item.importeCortes > 0.0">
+              Cortes: {{ item.importeCortes | currency }}
+            </span>
           </ion-col>
         </ion-row>
       </ion-grid>
-      <!--
-      <div class="precios">
-        <p class="ion-hide-sm-up">Cant: {{ item.cantidad | number: "1.0" }}</p>
-        <p>
-          <span>Precio:</span>
-          <span>{{ item.precio | currency }}</span>
-        </p>
-        <p>
-          <span>Imp:</span>
-          <span>{{ item.importe | currency }}</span>
-        </p>
-        <p>
-          <span>Desc:</span>
-          <span>
-            ({{ item.descuento / 100 | percent }})
-            {{ item.descuentoImporte | currency }}
-          </span>
-        </p>
-      </div>
-       -->
     </ion-label>
 
     <div slot="start" class="ion-hide-sm-down cantidad">
@@ -78,9 +55,17 @@
       </ion-text>
     </div>
     <ion-chip color="warning" *ngIf="item.faltante > 0">
-      <ion-icon name="navigate-circle"></ion-icon>
-      <ion-label> Falta material </ion-label>
+      <ion-icon name="alert-circle"></ion-icon>
+      <ion-label> Falta: {{ item.faltante | number: "1.0-0" }} </ion-label>
     </ion-chip>
+    <ion-icon
+      name="checkmark-done"
+      size="small"
+      color="success"
+      *ngIf="item.faltante <= 0"
+    ></ion-icon>
+    <!-- <ion-chip color="success" *ngIf="item.faltante <= 0" >
+    </ion-chip> -->
     <ion-chip color="primary" slot="end">
       {{ item.subtotal | currency }}
     </ion-chip>

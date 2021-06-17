@@ -1,11 +1,11 @@
-<ng-container *ngIf="user$ | async as user">
+<ng-container *ngIf="vm$ | async as vm">
   <ion-content>
     <papx-pedido-form
       #form
-      (save)="onSave($event, user)"
+      (save)="onSave($event, vm.user)"
       (errors)="onErrors($event)"
       (warnings)="onWarnings($event)"
-      [data]="data"
+      [data]="vm.cart"
     ></papx-pedido-form>
   </ion-content>
 

@@ -1,17 +1,37 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { catchError, take } from 'rxjs/operators';
+import { AngularFirestore } from '@angular/fire/firestore';
 
 @Injectable({ providedIn: 'root' })
 export class CodigoPostalService {
-  apiUrl = 'https://api-sepomex.hckdrk.mx/query/info_cp';
-  constructor(private http: HttpClient) {}
+  apiUrl2 = 'https://api-sepomex.hckdrk.mx/query/info_cp';
+  apiUrl = 'http://api.papelsa.mobi:8000/api/buscar-cp';
+  constructor(private http: HttpClient, private afs: AngularFirestore) {}
 
-  fetchData(zip: string): Observable<any[]> {
+  fetchData2(zip: string): Observable<any[]> {
     const url = `${this.apiUrl}/${zip}`;
     return this.http
       .get<any>(url)
       .pipe(catchError((error: any) => throwError(error)));
+  }
+
+  fetchData3(zip: string): Observable<any[]> {
+    const params = new HttpParams().set('cp', zip);
+    return this.http
+      .get<any>(this.apiUrl, { params })
+      .pipe(catchError((error: any) => throwError(error)));
+  }
+
+  fetchData(zip: string): Observable<any> {
+    return this.afs
+      .collection('codigos_postales')
+      .doc(zip)
+      .valueChanges()
+      .pipe(
+        take(1),
+        catchError((error: any) => throwError(error))
+      );
   }
 }

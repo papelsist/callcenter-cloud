@@ -1,0 +1,23 @@
+.producto-field {
+  width: 100%;
+}
+.mat-option {
+  height: 30px;
+  line-height: 35px;
+}
+.producto-panel {
+  display: flex;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  .clave {
+    flex-basis: 25%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .descripcion {
+    flex-basis: 75%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}

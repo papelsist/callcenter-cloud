@@ -15,6 +15,7 @@ import { ItemModalComponent } from './item-modal/item-modal.component';
 
 import { ItemController } from './item.controller';
 import { ITEM_FORM_FIELDS } from './item-form';
+import { ProductoControlModule } from '@papx/shared/productos/producto-control/producto-control.module';
 
 @NgModule({
   imports: [
@@ -26,6 +27,7 @@ import { ITEM_FORM_FIELDS } from './item-form';
     MatIconModule,
     MatSelectModule,
     MatAutocompleteModule,
+    ProductoControlModule,
   ],
   exports: [],
   declarations: [ItemModalComponent, ItemFormComponent, ...ITEM_FORM_FIELDS],

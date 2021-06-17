@@ -52,23 +52,21 @@ import { DireccionController } from '@papx/shared/direccion';
     <ion-item *ngIf="!!value">
       <address>
         <span
-          >Calle: {{ value.direccion.calle }} Número:
-          {{ value.direccion.numeroExterior }}
-          <span *ngIf="value.direccion.numeroInterior"
-            >Int: {{ value.direccion.numeroInterior }}</span
+          >Calle: {{ value.calle }} Número:
+          {{ value.numeroExterior }}
+          <span *ngIf="value.numeroInterior"
+            >Int: {{ value.numeroInterior }}</span
           >
         </span>
         <div>
-          <span>Colonia: {{ value.direccion.colonia }}</span>
+          <span>Colonia: {{ value.colonia }}</span>
         </div>
         <div>
-          <span>Municipio: {{ value.direccion.municipio }}</span>
-          <span class="ion-padding-start"
-            >Estado: {{ value.direccion.estado }}</span
-          >
+          <span>Municipio: {{ value.municipio }}</span>
+          <span class="ion-padding-start">Estado: {{ value.estado }}</span>
         </div>
         <ion-text color="warning">
-          <div>CP: {{ value.direccion.codigoPostal }}</div>
+          <div>CP: {{ value.codigoPostal }}</div>
         </ion-text>
       </address>
     </ion-item>
@@ -96,7 +94,8 @@ import { DireccionController } from '@papx/shared/direccion';
   ],
 })
 export class EnvioDireccionComponent
-  implements OnInit, ControlValueAccessor, OnChanges {
+  implements OnInit, ControlValueAccessor, OnChanges
+{
   disabled = false;
   value: any;
   onChange: any;
@@ -135,7 +134,6 @@ export class EnvioDireccionComponent
   }
 
   compareWith(currentValue: any, compareValue: any) {
-    console.log('Comparing: ', currentValue, compareValue);
     if (!currentValue || !compareValue) {
       return false;
     }
@@ -143,7 +141,6 @@ export class EnvioDireccionComponent
   }
 
   onSelection({ detail: { value } }: any) {
-    console.log('Value:', value);
     if (value) {
       this.value = value;
       this.onChange(value);
@@ -156,6 +153,7 @@ export class EnvioDireccionComponent
   ngOnInit() {}
 
   async addDireccion() {
+    console.log('Nueva direccion de entrega....');
     const direccion: Direccion = await this.direccionController.addDireccion();
     if (direccion) {
       const de: ClienteDireccion = {

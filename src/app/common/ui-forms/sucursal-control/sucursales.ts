@@ -37,22 +37,22 @@ export const SUCURSALES: Partial<Sucursal[]> = [
     nombre: 'VERTIZ 176',
     activa: true,
   },
-  {
-    id: '402880fc5e4ec411015e4ec651990137',
-    clave: '51',
-    nombre: 'ALESA',
-    activa: true,
-  },
-  {
-    id: '402880fc5e4ec411015e4ec652050138',
-    clave: '52',
-    nombre: 'BELLAVISTA',
-    activa: false,
-  },
-  {
-    id: '402880fc5e4ec411015e4ec652710139',
-    clave: '14',
-    nombre: 'SOLIS',
-    activa: true,
-  },
+  // {
+  //   id: '402880fc5e4ec411015e4ec651990137',
+  //   clave: '51',
+  //   nombre: 'ALESA',
+  //   activa: true,
+  // },
+  // {
+  //   id: '402880fc5e4ec411015e4ec652050138',
+  //   clave: '52',
+  //   nombre: 'BELLAVISTA',
+  //   activa: false,
+  // },
+  // {
+  //   id: '402880fc5e4ec411015e4ec652710139',
+  //   clave: '14',
+  //   nombre: 'SOLIS',
+  //   activa: true,
+  // },
 ];

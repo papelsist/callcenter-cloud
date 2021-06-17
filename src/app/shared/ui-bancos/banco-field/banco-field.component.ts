@@ -67,12 +67,15 @@ export class BancoFieldComponent implements OnInit, ControlValueAccessor {
   }
 
   private loadBancos() {
-    this.service.bancos$.subscribe((data) => (this.bancos = data));
-    this.cd.markForCheck();
+    this.service.bancos$.subscribe((data) => {
+      this.bancos = data;
+      this.cd.markForCheck();
+    });
   }
 
   writeValue(obj: any): void {
     this.value = obj;
+    this.cd.markForCheck();
   }
 
   registerOnChange(fn: any): void {

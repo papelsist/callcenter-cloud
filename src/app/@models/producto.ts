@@ -38,7 +38,7 @@ export interface Producto {
 }
 
 export interface Almacen {
-  cantidad: number | string;
+  cantidad: number;
   apartado: number;
   lastUpdated: firebase.firestore.Timestamp;
 }

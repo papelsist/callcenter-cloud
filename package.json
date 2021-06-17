@@ -1,6 +1,6 @@
 {
   "name": "sx-callcenter-pwa",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "author": "Ionic Framework",
   "homepage": "https://ionicframework.com/",
   "scripts": {
@@ -25,9 +25,12 @@
     "@angular/router": "~11.0.5",
     "@capacitor/core": "2.4.6",
     "@ionic/angular": "^5.5.2",
-    "date-fns": "^2.17.0",
+    "ag-grid-angular": "^25.2.0",
+    "ag-grid-community": "^25.2.1",
+    "date-fns": "2.16.1",
     "firebase": "^7.0 || ^8.0",
     "lodash-es": "^4.17.20",
+    "pdfmake": "^0.1.71",
     "rxjs": "~6.6.0",
     "tslib": "^2.0.0",
     "zone.js": "~0.10.2"

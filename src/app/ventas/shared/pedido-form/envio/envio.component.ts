@@ -14,7 +14,13 @@ import words from 'lodash-es/words';
 import { differenceInHours } from 'date-fns';
 
 import { BaseComponent } from '@papx/core';
-import { Cliente, ClienteDireccion, buildDireccionKey } from '@papx/models';
+import {
+  Cliente,
+  ClienteDireccion,
+  buildDireccionKey,
+  Direccion,
+} from '@papx/models';
+import { CatalogosService } from '@papx/data-access';
 
 const hourToDate = (value: string): Date => {
   const [hours, minutes] = value.split(':').map((item) => parseFloat(item));
@@ -30,16 +36,23 @@ const HorarioValidator = (
   control: AbstractControl
 ): ValidationErrors | null => {
   const horario = control.value;
-  const horaInicial = hourToDate(horario.horaInicial);
-  const horaFinal = hourToDate(horario.horaFinal);
-  const diff = differenceInHours(horaFinal, horaInicial);
-  return diff < 1 ? { tooEarly: true } : null;
+  if (typeof horario == 'string') {
+    return null;
+  }
+  if (horario) {
+    const horaInicial = hourToDate(horario.horaInicial);
+    const horaFinal = hourToDate(horario.horaFinal);
+    const diff = differenceInHours(horaFinal, horaInicial);
+    return diff < 1 ? { tooEarly: true } : null;
+  }
+  return null;
 };
 
 const findDirecciones = (cliente: Partial<Cliente>): ClienteDireccion[] => {
   if (cliente.rfc === 'XAXX010101000') return [];
-  if (cliente.direcciones) return cliente.direcciones;
-  else {
+  if (cliente.direcciones) {
+    return cliente.direcciones;
+  } else {
     return [
       {
         direccion: cliente.direccion,
@@ -64,7 +77,7 @@ export class EnvioComponent extends BaseComponent implements OnInit {
   direcciones$: Observable<ClienteDireccion[]>;
   direcciones: ClienteDireccion[] = [];
 
-  constructor() {
+  constructor(private catalogos: CatalogosService) {
     super();
   }
 
@@ -73,8 +86,7 @@ export class EnvioComponent extends BaseComponent implements OnInit {
     this.setControls();
     this.setupHorarioControl();
     this.registerContactoListener();
-    this.registerTipoListener();
-    // this.registerClienteListener();
+    this.registerDireccionListener();
     this.direcciones$ = this.parent.get('cliente').valueChanges.pipe(
       map((cte) => findDirecciones(cte)),
       takeUntil(this.destroy$)
@@ -117,15 +129,23 @@ export class EnvioComponent extends BaseComponent implements OnInit {
       });
   }
 
-  private registerTipoListener() {
-    this.tipo.valueChanges
-      .pipe(
-        map((t) => t === 'FORANEO' || t === 'OCURRE'),
-        takeUntil(this.destroy$)
-      )
-      .subscribe((valid) =>
-        valid ? this.transporte.enable() : this.transporte.disable()
-      );
+  private registerDireccionListener() {
+    this.form
+      .get('direccion')
+      .valueChanges.pipe(takeUntil(this.destroy$))
+      .subscribe((value: ClienteDireccion) => {
+        if (value) {
+          const { codigoPostal } = value.direccion;
+          this.catalogos.buscarSucursalPorZip(codigoPostal).subscribe((val) => {
+            if (val) {
+              const rootForm = this.form.parent;
+              if (rootForm) {
+                rootForm.get('sucursalEntity').setValue(val);
+              }
+            }
+          });
+        }
+      });
   }
 
   setEnvio({ detail: { checked } }: any) {

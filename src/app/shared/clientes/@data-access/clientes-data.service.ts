@@ -9,6 +9,7 @@ import { AngularFirestore } from '@angular/fire/firestore';
 
 import { AngularFireStorage } from '@angular/fire/storage';
 import sortBy from 'lodash-es/sortBy';
+import { environment } from '@papx/environment/environment';
 
 @Injectable({
   providedIn: 'root',
@@ -19,7 +20,11 @@ export class ClientesDataService {
     shareReplay()
   );
 
-  clientesCache$ = this.fetchClientesCache().pipe(shareReplay());
+  // clientesCache$ = this.fetchClientesCache().pipe(shareReplay());
+  clientesCache$ = this.fetchClientesCache().pipe(
+    map((clientes) => sortBy(clientes, 'nombre')),
+    shareReplay()
+  );
 
   constructor(
     private http: HttpClient,
@@ -36,6 +41,9 @@ export class ClientesDataService {
   }
 
   fetchClientesCache(): Observable<ClienteDto[]> {
+    if (environment.useEmulators) {
+      return this.loadClientesFileForEmulator();
+    }
     const ref = this.fs.ref('catalogos/ctes-all.json');
     return ref.getDownloadURL().pipe(
       switchMap((url) =>
@@ -56,6 +64,29 @@ export class ClientesDataService {
             throwError('Error descargando clientes ', err.message)
           )
         )
+      )
+    );
+  }
+
+  private loadClientesFileForEmulator() {
+    const url =
+      'https://firebasestorage.googleapis.com/v0/b/papx-ws-dev.appspot.com/o/catalogos%2Fctes-all.json?alt=media&token=6c6b0dfa-b3ad-4e9a-8886-431e5950b675';
+
+    return this.http.get<any[]>(url).pipe(
+      map((rows) =>
+        rows.map((i) => {
+          const res: ClienteDto = {
+            id: i.i,
+            nombre: i.n,
+            rfc: i.r,
+            clave: i.cv,
+            credito: !!i.cr,
+          };
+          return res;
+        })
+      ),
+      catchError((err) =>
+        throwError('Error descargando clientes ', err.message)
       )
     );
   }
@@ -148,8 +179,9 @@ export class ClientesDataService {
         sucursal: 'CALLCENTER',
         versionApp: 2,
       };
-      const docRef = this.afs.collection<Partial<Cliente>>('clientes').doc(id)
-        .ref;
+      const docRef = this.afs
+        .collection<Partial<Cliente>>('clientes')
+        .doc(id).ref;
       await docRef.set(data);
       const snap = await docRef.get();
       return snap.data();

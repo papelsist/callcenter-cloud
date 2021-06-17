@@ -7,13 +7,14 @@ import { SharedVentasModule } from '../shared/shared-ventas.module';
 import { SharedUiPedidoItemModule } from '../shared/ui-pedido-item';
 
 import { PedidoEditPage } from './pedido-edit.page';
-import { PedidoExistsGuard } from './pedido.exists.guard';
+import { PedidoExistsGuard } from '../@data-access/guards/pedido.exists.guard';
 
 const routes: Routes = [
   {
     path: '',
     component: PedidoEditPage,
     canActivate: [PedidoExistsGuard],
+    // resolve: { current: PedidoResolver },
   },
 ];
 

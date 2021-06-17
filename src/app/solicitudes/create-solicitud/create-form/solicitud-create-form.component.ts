@@ -223,15 +223,15 @@ export class SolicitudCreateFormComponent implements OnInit, OnDestroy {
         status: 'PENDIENTE',
       };
       if (this.pedido) {
-        payload.pedidos = [this.pedido];
+        payload.pedido = this.pedido;
       }
       this.save.emit(payload);
     }
   }
 
   getCliente(): Partial<Cliente> {
-    const { id, clave, nombre } = this.form.get('cliente').value;
-    return { id, clave, nombre };
+    const { id, clave, nombre, rfc } = this.form.get('cliente').value;
+    return { id, clave, nombre, rfc };
   }
 
   getCuenta(): Partial<CuentaDeBanco> {

@@ -1,12 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 
 import { BehaviorSubject, Observable, combineLatest } from 'rxjs';
-import { map, switchMap } from 'rxjs/operators';
+import { map } from 'rxjs/operators';
 
-import { SolicitudDeDeposito, User, UserInfo } from '@papx/models';
+import { SolicitudDeDeposito } from '@papx/models';
 
 import { AuthService } from '@papx/auth';
 import { SolicitudesService } from '@papx/shared/solicitudes/@data-access/solicitudes.service';
+import { ModalController } from '@ionic/angular';
+import { SolicitudDetailModalComponent } from '@papx/shared/ui-solicitudes/solicitud-detail-modal/solicitud-detail-modal.component';
 
 @Component({
   selector: 'papx-solicitudes-pendientes',
@@ -14,19 +16,21 @@ import { SolicitudesService } from '@papx/shared/solicitudes/@data-access/solici
   styleUrls: ['./pendientes.page.scss'],
 })
 export class PendientesPage implements OnInit {
-  STORAGE_KEY = 'sx-depositos-pwa.solicitudes.pendientes';
+  filtrar$ = new BehaviorSubject<boolean>(false);
 
-  filtrar$ = new BehaviorSubject<boolean>(true);
+  pendientes$ = this.service.findPendientes();
 
-  pendientes$ = combineLatest([this.filtrar$, this.authService.userInfo$]).pipe(
-    switchMap(([filtrar, user]) =>
+  pedidosFiltrados$ = combineLatest([
+    this.pendientes$,
+    this.filtrar$,
+    this.authService.userInfo$,
+  ]).pipe(
+    map(([pendientes, filtrar, user]) =>
       filtrar
-        ? this.service.findPendientesByUser(user.uid)
-        : this.service.findPendientes()
+        ? pendientes.filter((item) => item.createUserUid === user.uid)
+        : pendientes
     )
   );
-
-  // pendientes$ = this.service.findAutorizadas();
 
   filtroBtnColor$: Observable<string> = this.filtrar$.pipe(
     map((value) => (value ? 'primary' : ''))
@@ -34,7 +38,7 @@ export class PendientesPage implements OnInit {
 
   vm$ = combineLatest([
     this.filtrar$,
-    this.pendientes$,
+    this.pedidosFiltrados$,
     this.filtroBtnColor$,
     this.authService.userInfo$,
   ]).pipe(
@@ -48,16 +52,21 @@ export class PendientesPage implements OnInit {
 
   constructor(
     private service: SolicitudesService,
-    private authService: AuthService
+    private authService: AuthService,
+    private modalController: ModalController
   ) {}
 
-  ngOnInit() {
-    const value = localStorage.getItem(this.STORAGE_KEY) || 'true';
-    this.filtrar$.next(value === 'true');
-  }
+  ngOnInit() {}
 
   filtrar(value: boolean) {
     this.filtrar$.next(!value);
-    localStorage.setItem(this.STORAGE_KEY, value.toString());
+  }
+
+  async onView(solicitud: Partial<SolicitudDeDeposito>) {
+    const modal = await this.modalController.create({
+      component: SolicitudDetailModalComponent,
+      animated: true,
+    });
+    await modal.present();
   }
 }

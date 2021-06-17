@@ -8,6 +8,9 @@ import { CotizacionesPage } from './cotizaciones.page';
 import { SharedVentasModule } from '../shared/shared-ventas.module';
 
 import { SharedPedidosListModule } from '../shared/pedidos-list';
+import { PedidosSearchModule } from '../shared/pedidos-search/pedidos-search.module';
+
+import { COMPONENTS } from './components';
 
 const routes: Routes = [
   {
@@ -22,8 +25,9 @@ const routes: Routes = [
     CommonUiForms,
     SharedVentasModule,
     SharedPedidosListModule,
+    PedidosSearchModule,
     RouterModule.forChild(routes),
   ],
-  declarations: [CotizacionesPage],
+  declarations: [CotizacionesPage, ...COMPONENTS],
 })
 export class CotizacionesPageModule {}

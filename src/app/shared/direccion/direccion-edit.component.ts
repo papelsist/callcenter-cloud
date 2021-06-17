@@ -200,13 +200,10 @@ export class DireccionEditComponent extends BaseComponent implements OnInit {
 
   buscar(zip: any) {
     this.service.fetchData(zip).subscribe(
-      (res) => {
-        const data = res.map((item) => item.response);
-        if (data && data.length > 0) {
-          const { estado, municipio } = data[0];
-          this.form.patchValue({ estado, municipio });
-          this.colonias$.next(data.map((x) => x.asentamiento));
-        }
+      (res: any) => {
+        const { estado, municipio, colonias } = res;
+        this.form.patchValue({ estado, municipio });
+        this.colonias$.next(colonias);
       },
       (err) => console.log('Error obteniendo Zip Data', err)
     );

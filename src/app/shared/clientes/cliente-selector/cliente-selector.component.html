@@ -18,6 +18,7 @@
       (ionChange)="onSearch($event)"
       (ionCancel)="close()"
       (keyup.enter)="onEnter(search.value)"
+      (keyup.arrowdown)="firstItem($event)"
       inputmode="search"
       enterkeyhint="search"
       debounce="400"
@@ -26,7 +27,13 @@
     ></ion-searchbar>
   </ion-list-header>
   <ion-list lines="full">
-    <ion-item *ngFor="let c of clientes$ | async" (click)="select(c)" button>
+    <ion-item
+      *ngFor="let c of clientes$ | async; index as idx; first as fst"
+      (click)="select(c)"
+      (keyup.arrowdown)="nextItem(idx, $event)"
+      (keyup.arrowup)="previousItem(idx, $event)"
+      button
+    >
       <ion-label class="ion-text-wrap">
         <ion-text>
           {{ c.nombre }}

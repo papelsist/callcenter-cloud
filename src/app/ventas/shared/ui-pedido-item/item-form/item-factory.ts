@@ -69,6 +69,7 @@ export function buildForm(builder: FormBuilder): FormGroup {
  */
 export function extractData(producto: Producto): Partial<PedidoDet> {
   const {
+    id,
     clave,
     descripcion,
     unidad,
@@ -85,6 +86,7 @@ export function extractData(producto: Producto): Partial<PedidoDet> {
     gramos,
     nacional,
     modoVenta,
+    productoId: id,
     producto: reduceProducto(producto),
   };
 }
@@ -101,6 +103,7 @@ export function reduceProducto(producto: Producto) {
     gramos,
     modoVenta,
     presentacion,
+    nacional,
   } = producto;
   return {
     id,
@@ -113,6 +116,7 @@ export function reduceProducto(producto: Producto) {
     gramos,
     modoVenta,
     presentacion,
+    nacional,
   };
 }
 

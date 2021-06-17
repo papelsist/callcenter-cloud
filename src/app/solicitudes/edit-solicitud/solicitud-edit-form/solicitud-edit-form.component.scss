@@ -1,0 +1,20 @@
+@mixin responsive-row($defaultWidth: 240px) {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax($defaultWidth, 1fr));
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+}
+.row {
+  padding: 5px 0px;
+}
+
+.row-bancos {
+  @include responsive-row(300px);
+}
+.row-importes {
+  @include responsive-row(200px);
+}
+.row-fechas {
+  @include responsive-row(300px);
+}

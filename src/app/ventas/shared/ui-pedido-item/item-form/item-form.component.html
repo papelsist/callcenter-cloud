@@ -28,10 +28,14 @@
   </ion-row>
   <ion-row>
     <ion-col>
-      <papx-item-producto-field
+      <!-- <papx-item-producto-field
         [producto]="producto"
         (selection)="findProducto()"
-      ></papx-item-producto-field>
+      ></papx-item-producto-field> -->
+      <papx-producto-control
+        [producto]="producto"
+        (selection)="selectProducto($event)"
+      ></papx-producto-control>
     </ion-col>
   </ion-row>
   <ion-row>

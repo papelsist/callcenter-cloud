@@ -1,9 +1,18 @@
+import { addDays } from 'date-fns';
+
 export class Periodo {
   static parse(json: string) {
     const pJson = JSON.parse(json);
     const f1 = new Date(pJson.fechaInicial);
     const f2 = new Date(pJson.fechaFinal);
     return new Periodo(f1, f2);
+  }
+
+  static fromNow(days: number): Periodo {
+    const today = new Date();
+    // const today = addDays(new Date(), 1);
+    const f1 = addDays(today, days * -1);
+    return new Periodo(f1, today);
   }
 
   /*
@@ -26,11 +35,7 @@ export class Periodo {
     }
   }
 
-  static fromNow(days: number): Periodo {
-    const f1 = moment().subtract(days, 'days');
-    const f2 = moment();
-    return new Periodo(f1.toDate(), f2.toDate());
-  }
+
 
   static monthToDay(): Periodo {
     const now = moment();
@@ -44,7 +49,7 @@ export class Periodo {
     const f2 = moment();
     return new Periodo(f1.toDate(), f2.toDate());
   }
-  
+
   static fromStorage(key: string, notFound: Periodo = Periodo.monthToDay()) {
     return this.fromJson(localStorage.getItem(key)) || notFound;
   }

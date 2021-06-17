@@ -26,7 +26,9 @@ export class PedidoItemComponent implements OnInit {
   @Output() duplicar = new EventEmitter<number>();
   constructor(private cd: ChangeDetectorRef, private alert: AlertController) {}
 
-  ngOnInit() {}
+  ngOnInit() {
+    // console.log('Item: ', this.item);
+  }
 
   getLabel() {
     return `${this.item.clave} - ${this.item.descripcion} (${this.item.unidad})`;
@@ -43,7 +45,7 @@ export class PedidoItemComponent implements OnInit {
   }
 
   isCargo() {
-    const cve = this.item.producto.clave;
+    const cve = this.item.clave;
     if (cve === 'CORTE') return true;
     if (cve.includes('MANIOBRA')) return true;
     return false;

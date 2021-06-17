@@ -8,6 +8,7 @@ export interface Cliente {
   rfc: string;
   formaDePago?: string | number | FormaDePago;
   cfdiMail?: string;
+  usoDeCfdi?: string;
   credito?: ClienteCredito;
   permiteCheque: boolean;
   folioRFC: number;

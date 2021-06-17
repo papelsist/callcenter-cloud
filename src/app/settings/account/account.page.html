@@ -37,6 +37,17 @@
             </ion-item>
 
             <ion-item>
+              <ion-label position="floating">Sucursal preferente</ion-label>
+              <ion-input [value]="userInfo.sucursal" disabled></ion-input>
+              <ion-button
+                fill="clear"
+                slot="end"
+                (click)="modificarSucursal(userInfo)"
+                >Modificar</ion-button
+              >
+            </ion-item>
+
+            <ion-item>
               <ion-avatar slot="start">
                 <img
                   src="https://via.placeholder.com/150?text='Puede tomar su foto de perfil'"

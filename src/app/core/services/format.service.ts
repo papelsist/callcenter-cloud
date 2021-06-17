@@ -1,5 +1,10 @@
 import { Injectable, Inject, LOCALE_ID } from '@angular/core';
-import { formatCurrency, formatDate, formatPercent } from '@angular/common';
+import {
+  formatCurrency,
+  formatDate,
+  formatPercent,
+  formatNumber,
+} from '@angular/common';
 
 @Injectable({ providedIn: 'root' })
 export class FormatService {
@@ -23,6 +28,11 @@ export class FormatService {
     } else {
       return '';
     }
+  }
+  formatNumber(value: any, format: string = '3.0-0') {
+    if (value) {
+      return formatNumber(value, this.locale, format);
+    } else return '';
   }
 
   capitalize(s: string) {

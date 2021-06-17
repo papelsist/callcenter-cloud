@@ -6,6 +6,8 @@ import {
   EventEmitter,
   Input,
   ChangeDetectorRef,
+  AfterViewInit,
+  ViewChild,
 } from '@angular/core';
 
 import {
@@ -14,16 +16,25 @@ import {
   tap,
   map,
   distinctUntilChanged,
+  finalize,
 } from 'rxjs/operators';
 import { merge, Observable } from 'rxjs';
 
 import round from 'lodash-es/round';
+import toNumber from 'lodash-es/toNumber';
 
 import { BaseComponent } from '@papx/core';
-import { Cliente, FormaDePago, Pedido, TipoDePedido } from '@papx/models';
+import {
+  Cliente,
+  FormaDePago,
+  Pedido,
+  PedidoDet,
+  TipoDePedido,
+} from '@papx/models';
 import { PcreateFacade } from './pcreate.facade';
 import { ToastController } from '@ionic/angular';
 import { FormatService } from 'src/app/core/services/format.service';
+import { LoadingService } from '@papx/common/ui-core';
 
 @Component({
   selector: 'papx-pedido-form',
@@ -32,12 +43,19 @@ import { FormatService } from 'src/app/core/services/format.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [PcreateFacade],
 })
-export class PedidoCreateFormComponent extends BaseComponent implements OnInit {
+export class PedidoCreateFormComponent
+  extends BaseComponent
+  implements OnInit, AfterViewInit
+{
+  @Input() data: Partial<Pedido> = {};
   @Output() save = new EventEmitter<Partial<Pedido>>();
   @Output() cerrarPedido = new EventEmitter<Partial<Pedido>>();
-  @Input() data: Partial<Pedido> = {};
+  @Output() imprimir = new EventEmitter();
+  @Output() email = new EventEmitter<Partial<Cliente>>();
   @Output() errors = new EventEmitter();
   @Output() warnings = new EventEmitter();
+  @Output() delete = new EventEmitter();
+  @Output() descuentEspecial = new EventEmitter();
 
   form = this.facade.form;
   partidas$ = this.facade.partidas$;
@@ -51,11 +69,14 @@ export class PedidoCreateFormComponent extends BaseComponent implements OnInit {
 
   descuentos$ = this.facade.descuentos$;
 
+  @ViewChild('options') options: any;
+
   constructor(
     private facade: PcreateFacade,
     private cd: ChangeDetectorRef,
     private toast: ToastController,
-    private format: FormatService
+    private format: FormatService,
+    private loading: LoadingService
   ) {
     super();
   }
@@ -63,7 +84,7 @@ export class PedidoCreateFormComponent extends BaseComponent implements OnInit {
   ngOnInit() {
     // this.form.disable({ onlySelf: true, emitEvent: true });
     this.facade.setPedido(this.data);
-    this.facade.actualizarProductos();
+    this.descuentEspecial.emit(this.data.descuentoEspecial);
     this.addListeners();
     this.facade.actualizarValidaciones();
 
@@ -88,8 +109,68 @@ export class PedidoCreateFormComponent extends BaseComponent implements OnInit {
       });
   }
 
-  actualizar() {
-    this.facade.actualizarProductos();
+  ngAfterViewInit() {
+    // setTimeout(() => this.actualizarExistencias(), 1000);
+  }
+
+  getAlmacen(): string {
+    const sucursal = this.form.get('sucursal').value;
+    let sname = sucursal.toLowerCase();
+    if (sname === 'calle 4') sname = 'calle4';
+    if (sname === 'vertiz 176') sname = 'vertis176';
+    return sname;
+  }
+
+  actualizarExistencias() {
+    // this.loading.startLoading('Actualizando existencias');
+
+    const partidas: Partial<PedidoDet[]> = [...this.facade.getPartidas()];
+    partidas.forEach((item, index) => {
+      if (!item.clave.includes('CORTE') && !item.clave.startsWith('MANIOBRA')) {
+        this.facade.getExistenciaActual(item).subscribe((prod) => {
+          console.log('Actualizando existencia de: %s', item.clave, index);
+          const almacen = prod.existencia[this.getAlmacen()];
+          console.log('Almacen: ', almacen);
+          const cantidad = item.cantidad;
+
+          const disponible = almacen ? toNumber(almacen.cantidad) : 0;
+          const faltante = disponible > cantidad ? 0 : cantidad - disponible;
+          console.log(
+            'Requerido: %f Disponible: %f Faltante: %f',
+            cantidad,
+            disponible,
+            faltante
+          );
+
+          item.disponible = disponible;
+          item.faltante = faltante;
+          this.facade.updateItem(item, index);
+          this.facade.actualizarValidaciones();
+          this.form.markAsDirty();
+          this.cd.markForCheck();
+        });
+      }
+    });
+    this.facade.actualizarValidaciones();
+    // console.log('Partidas recalculadas: ', partidas);
+    // this.loading.stopLoading();
+  }
+
+  async actualizarExistencias2() {
+    await this.loading.startLoading('Actualizando existencias');
+
+    this.facade.actualizarExistencias().subscribe(
+      () => this.loading.stopLoading('Existencias actualizadas'),
+      (err) => this.loading.stopLoading()
+    );
+  }
+
+  imprimirPedido() {
+    this.imprimir.emit();
+  }
+
+  enviarPedido() {
+    this.email.emit(this.form.get('cliente').value);
   }
 
   ngOnDestroy() {
@@ -105,6 +186,7 @@ export class PedidoCreateFormComponent extends BaseComponent implements OnInit {
     this.sucursalListener();
     this.errorsListener();
     this.clienteListener();
+    this.descuentoEspecialListener();
   }
 
   recalculoListener() {
@@ -159,6 +241,17 @@ export class PedidoCreateFormComponent extends BaseComponent implements OnInit {
         takeUntil(this.destroy$),
         distinctUntilChanged(),
         tap((cte) => this.ajustarTipo(cte))
+      )
+      .subscribe(() => {});
+  }
+
+  private descuentoEspecialListener() {
+    this.form
+      .get('descuentoEspecial')
+      .valueChanges.pipe(
+        takeUntil(this.destroy$),
+        distinctUntilChanged(),
+        tap((value) => this.descuentEspecial.emit(value))
       )
       .subscribe(() => {});
   }
@@ -227,7 +320,7 @@ export class PedidoCreateFormComponent extends BaseComponent implements OnInit {
     if (cliente.credito) {
       if (this.facade.tipo !== TipoDePedido.CREDITO) {
         this.controls.tipo.setValue(TipoDePedido.CREDITO, {
-          emitEvent: false,
+          emitEvent: true,
           onlySelf: true,
         });
         this.controls.formaDePago.setValue(FormaDePago.NO_DEFINIDO, {
@@ -238,7 +331,7 @@ export class PedidoCreateFormComponent extends BaseComponent implements OnInit {
     } else {
       if (this.facade.tipo === TipoDePedido.CREDITO) {
         this.controls.tipo.setValue(TipoDePedido.CONTADO, {
-          emitEvent: false,
+          emitEvent: true,
           onlySelf: true,
         });
       }
@@ -268,5 +361,17 @@ export class PedidoCreateFormComponent extends BaseComponent implements OnInit {
       ],
     });
     await t.present();
+  }
+
+  getCartState() {
+    return this.facade.resolvePedidoData();
+  }
+
+  getFacade() {
+    return this.facade;
+  }
+
+  showDescuentos() {
+    this.options.showDescuentos();
   }
 }

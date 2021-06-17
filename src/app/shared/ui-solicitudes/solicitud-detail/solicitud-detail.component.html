@@ -8,7 +8,7 @@
     </h1>
   </ion-label>
 </ion-list-header>
-<div class="container">
+<div class="row-3">
   <ion-item>
     <ion-label position="floating">Transferencia:</ion-label>
     <ion-input
@@ -38,37 +38,55 @@
     </ion-input>
     <ion-icon name="wallet" slot="start"></ion-icon>
   </ion-item>
-  <ion-item>
-    <ion-label position="floating"> Banco origen: </ion-label>
-    <ion-input color="warning" value="{{ solicitud.banco.nombre }}" readonly>
-    </ion-input>
-    <ion-icon size="small" slot="start" name="business"></ion-icon>
-  </ion-item>
-  <ion-item>
-    <ion-label position="floating">Cuenta destino:</ion-label>
-    <ion-input
-      color="warning"
-      readonly
-      value="{{ solicitud.cuenta.descripcion }} ({{ solicitud.cuenta.numero }})"
-    ></ion-input>
-    <ion-icon slot="start" name="folder"></ion-icon>
-  </ion-item>
-  <ion-item>
-    <ion-label position="floating"> Fecha Depósito: </ion-label>
-    <ion-input
-      color="warning"
-      readonly
-      value="{{ solicitud.fechaDeposito | date: 'dd/MM/yyyy' }}"
-    >
-    </ion-input>
-    <ion-icon slot="start" name="calendar"></ion-icon>
-  </ion-item>
-  <ion-item>
-    <ion-label position="floating">Referencia: </ion-label>
-    <ion-input color="warning" value="{{ solicitud.referencia }}" readonly>
-    </ion-input>
-    <ion-icon slot="start" name="information-circle"></ion-icon>
-  </ion-item>
+</div>
+<div class="container">
+  <div class="row-2">
+    <ion-item>
+      <ion-label position="floating"> Banco origen: </ion-label>
+      <ion-input color="warning" value="{{ solicitud.banco.nombre }}" readonly>
+      </ion-input>
+      <ion-icon size="small" slot="start" name="business"></ion-icon>
+    </ion-item>
+    <ion-item>
+      <ion-label position="floating">Cuenta destino:</ion-label>
+      <ion-input
+        color="warning"
+        class="ion-text-wrap"
+        readonly
+        value="{{ solicitud.cuenta.descripcion }} ({{
+          solicitud.cuenta.numero
+        }})"
+      ></ion-input>
+      <ion-icon slot="start" name="folder"></ion-icon>
+    </ion-item>
+  </div>
+  <div class="row">
+    <ion-item>
+      <ion-label position="floating"> F. Depósito: </ion-label>
+      <ion-input
+        color="warning"
+        readonly
+        value="{{ solicitud.fechaDeposito | date: 'dd/MM/yyyy' }}"
+      >
+      </ion-input>
+      <ion-icon slot="start" name="calendar"></ion-icon>
+    </ion-item>
+    <ion-item>
+      <ion-label position="floating">Referencia: </ion-label>
+      <ion-input color="warning" value="{{ solicitud.referencia }}" readonly>
+      </ion-input>
+      <ion-icon slot="start" name="information-circle"></ion-icon>
+    </ion-item>
+    <ion-item>
+      <ion-label position="floating"> Sucursal: </ion-label>
+      <ion-input
+        value="{{ solicitud.sucursal ? solicitud.sucursal : 'ND' }}"
+        readonly
+      >
+      </ion-input>
+      <ion-icon slot="start" name="storefront"></ion-icon>
+    </ion-item>
+  </div>
 
   <ion-item>
     <ion-label position="floating"> Solicito: </ion-label>
@@ -91,16 +109,6 @@
       {{ retraso }}
     </ion-note>
   </ion-item>
-
-  <ion-item>
-    <ion-label position="floating"> Sucursal: </ion-label>
-    <ion-input
-      value="{{ solicitud.sucursal ? solicitud.sucursal : 'ND' }}"
-      readonly
-    >
-    </ion-input>
-    <ion-icon slot="start" name="storefront"></ion-icon>
-  </ion-item>
 </div>
 <ion-item>
   <ion-label class="ion-text-wrap" color="secondary">
@@ -108,6 +116,19 @@
   </ion-label>
   <ion-icon name="people-circle" slot="start"></ion-icon>
 </ion-item>
+
+<ion-item *ngIf="solicitud.pedido as pedido">
+  <ion-label>
+    Pedido: {{ pedido.folio }} ({{
+      pedido.fecha.toDate() | date: "dd/MM/yyyy"
+    }})
+  </ion-label>
+  <ion-icon name="cart" slot="start"></ion-icon>
+  <ion-chip slot="end" color="success">
+    {{ pedido.total | currency }}
+  </ion-chip>
+</ion-item>
+
 <div *ngIf="solicitud.status === 'RECHAZADO'">
   <ion-list class="ion-padding-buttom">
     <ion-list-header color="warning">

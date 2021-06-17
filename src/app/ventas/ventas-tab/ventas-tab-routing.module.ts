@@ -22,6 +22,7 @@ const routes: Routes = [
             (m) => m.FacturasPageModule
           ),
       },
+
       {
         path: 'pendientes',
         loadChildren: () =>
@@ -29,6 +30,7 @@ const routes: Routes = [
             (m) => m.PendientesPageModule
           ),
       },
+
       {
         path: '',
         redirectTo: '/ventas/cotizaciones',
@@ -44,17 +46,50 @@ const routes: Routes = [
       ),
   },
   {
+    path: 'cotizaciones/new',
+    loadChildren: () =>
+      import(
+        '../../features/pedidos/xpedido-create/xpedido-create.module'
+      ).then((m) => m.XPedidosCreateModule),
+  },
+
+  {
     path: 'cotizaciones/create/item',
     loadChildren: () =>
       import('../pedido-item/pedido-item.module').then(
         (m) => m.PedidoItemPageModule
       ),
   },
+
   {
     path: 'cotizaciones/:id',
     loadChildren: () =>
       import('../pedido-edit/pedido-edit.module').then(
         (m) => m.PedidoEditPageModule
+      ),
+  },
+  {
+    path: 'cotizaciones/view/:id',
+    data: { tipo: 'cotizacion' },
+    loadChildren: () =>
+      import('../pedido-view/pedido-view.module').then(
+        (m) => m.PedidoViewPageModule
+      ),
+  },
+  {
+    path: 'pendientes/:id',
+    data: { tipo: 'pedido' },
+    loadChildren: () =>
+      import('../pedido-view/pedido-view.module').then(
+        (m) => m.PedidoViewPageModule
+      ),
+  },
+  {
+    path: 'facturas/:id',
+    data: { tipo: 'facturas' },
+    loadChildren: () =>
+      import('../pedido-view/pedido-view.module').then(
+        (m) => m.PedidoViewPageModule
       ),
   },
 

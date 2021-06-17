@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 
 import { AngularFireAuth } from '@angular/fire/auth';
-import { AngularFireFunctions } from '@angular/fire/functions';
 
 import { throwError, of, Observable } from 'rxjs';
 import {
@@ -11,23 +10,16 @@ import {
   shareReplay,
   switchMap,
   take,
-  tap,
 } from 'rxjs/operators';
 
 import { AngularFirestore } from '@angular/fire/firestore';
-
-import { environment } from '@papx/environment/environment';
 import { User, UserInfo } from '../@models/user';
 import { mapUser } from './utils';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  readonly hostUrl = environment.hostUrl;
-
-  readonly user$ = this.auth.user.pipe(
-    map((user) => (user ? mapUser(user) : null)),
-    take(1),
-    shareReplay()
+  readonly user$ = this.auth.authState.pipe(
+    map((user) => (user ? mapUser(user) : null))
   );
 
   readonly claims$ = this.auth.idTokenResult.pipe(
@@ -35,26 +27,19 @@ export class AuthService {
   );
 
   readonly userInfo$: Observable<UserInfo | null> = this.user$.pipe(
-    switchMap((user) => {
-      return user ? this.getUserByEmail(user.email) : of(null);
-    }),
-
+    switchMap((user) => (user ? this.getUser(user.uid) : of(null))),
     catchError((err) => throwError(err))
   );
 
+  readonly sucursal$ = this.userInfo$.pipe(pluck('sucursal'), shareReplay(1));
+
   constructor(
     private readonly auth: AngularFireAuth,
-    private readonly fns: AngularFireFunctions,
     private readonly firestore: AngularFirestore
   ) {}
 
   async singOut() {
     await this.auth.signOut();
-  }
-
-  async signInAnonymously() {
-    const { user } = await this.auth.signInAnonymously();
-    return mapUser(user);
   }
 
   async signIn(email: string, password: string) {
@@ -65,80 +50,40 @@ export class AuthService {
       );
       return user;
     } catch (error) {
-      /*
-      let message = null;
-      switch (error.code) {
-        case 'auth/user-not-found':
-          message = 'Usuario no registrado';
-          break;
-        case 'auth/wrong-password':
-          message = 'Nombre de corrreo ó contraseña incorrectas';
-          break;
-        default:
-          message = error.message;
-          break;
-      }
-      */
+      console.error('EX: ', error);
       throw new Error('Credenciales incorrectas');
     }
   }
 
-  async createUser(email: string, password: string, displayName: string) {
-    const credentials = await this.auth.createUserWithEmailAndPassword(
-      email,
-      password
-    );
-    return credentials;
-    // return credentials;
-
-    /*
-    await credentials.user.sendEmailVerification({
-      url: this.hostUrl,
-      handleCodeInApp: false,
-    });
-    */
-    // return credentials;
-  }
-
   sendEmailVerification(user: User) {
-    const url = `https://${location.host}/home`;
-    console.log('Sending verification email return url: ', url);
     return user.firebaseUser.sendEmailVerification({
-      url: url,
+      url: location.origin,
       handleCodeInApp: false,
     });
   }
 
-  createSiipapUser(email: string, password: string, displayName: string) {
-    const data = { email, password, displayName };
-    const callable = this.fns.httpsCallable('createSiipapUser');
-    return callable(data).pipe(
-      map(() => this.auth.signInWithEmailAndPassword(email, password)),
-      /*
-      map(async (p) => {
-        const d = await p;
-        const user = d.user;
-        await user.sendEmailVerification({
-          url: this.hostUrl,
-          handleCodeInApp: false,
-        });
+  updateProfile(profile: { displayName: string }) {
+    return this.user$.pipe(
+      take(1),
+      switchMap(async (user) => {
+        await user.firebaseUser.updateProfile(profile);
         return user;
       }),
-      */
-      catchError((err) => throwError(err))
+      switchMap(
+        async (user) => await this.updateProfileInUsers(user.uid, profile)
+      )
     );
   }
 
-  getUserByUid(uid: string): Observable<UserInfo | null> {
+  getUser(uid: string) {
+    return this.firestore.doc<UserInfo>(`usuarios/${uid}`).valueChanges();
+  }
+
+  getUserByUid(uid: string): Observable<UserInfo> {
     return this.firestore
-      .collection<UserInfo>('usuarios', (ref) => {
-        return ref.where('uid', '==', uid).limit(1);
-      })
-      .valueChanges()
-      .pipe(
-        map((users) => (users.length > 0 ? users[0] : null)),
-        catchError((err) => throwError(err))
-      );
+      .collection<UserInfo>('usuarios')
+      .doc(uid)
+      .valueChanges({ idField: 'uid' });
   }
 
   getUserByEmail(email: string): Observable<UserInfo | null> {
@@ -152,5 +97,16 @@ export class AuthService {
         map((users) => (users.length > 0 ? users[0] : null)),
         catchError((err) => throwError(err))
       );
+  }
+
+  async updateSucursal(user: UserInfo, sucursal: string) {
+    await this.firestore
+      .collection('usuarios')
+      .doc(user.uid)
+      .update({ sucursal });
+  }
+
+  async updateProfileInUsers(uid: string, profile: any) {
+    await this.firestore.collection('usuarios').doc(uid).update(profile);
   }
 }

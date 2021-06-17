@@ -1,0 +1,57 @@
+<ion-list *ngIf="pedidos">
+  <ion-item-sliding *ngFor="let pedido of pedidos; index as idx">
+    <ion-item button [routerLink]="[pedido.id]">
+      <ion-label class="ion-text-wrap ion-no-padding">
+        <h2>{{ pedido.nombre }}</h2>
+        <p>
+          <span>{{ pedido.status }}</span>
+          <ion-text color="warning" class="ion-padding-start">
+            <span>{{ pedido.sucursal }} </span>
+          </ion-text>
+          <span class=""
+            >/{{ pedido.fecha.toDate() | date: "dd/MM/yyyy" }})</span
+          >
+          <ion-text [color]="getRetrasoColor(pedido)">
+            <span class="ion-padding-start">
+              {{ fromNow(pedido.lastUpdated) }}
+            </span>
+          </ion-text>
+        </p>
+        <div class="row">
+          <span>Creado por: {{ pedido.createUser }}</span>
+          <span class="ion-padding-start"
+            >Actualizado: {{ pedido.updateUser }}</span
+          >
+          <span class="ion-padding-start"
+            >({{
+              pedido.lastUpdated.toDate() | date: "dd/MM/yyyy HH:mm"
+            }})</span
+          >
+        </div>
+      </ion-label>
+
+      <ion-badge slot="start" color="warning"> {{ pedido.folio }} </ion-badge>
+      <ion-chip slot="end" color="primary">
+        {{ pedido.total | currency }}
+      </ion-chip>
+    </ion-item>
+
+    <ion-item-options side="end">
+      <ion-item-option
+        (click)="regresar.emit(pedido)"
+        *ngIf="pedido.status === 'EN_SUCURSAL'"
+      >
+        <ion-icon slot="start" name="arrow-undo"></ion-icon>
+        Regresar
+      </ion-item-option>
+      <ion-item-option
+        (click)="autorizar.emit(pedido)"
+        color="success"
+        *ngIf="pedido.warnings && pedido.warnings.length > 0"
+      >
+        <ion-icon slot="start" name="thumbs-up-outline"></ion-icon>
+        Autorizar
+      </ion-item-option>
+    </ion-item-options>
+  </ion-item-sliding>
+</ion-list>

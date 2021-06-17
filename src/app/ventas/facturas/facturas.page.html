@@ -1,34 +1,44 @@
-<papx-ventas-header
-  title="Facturas"
-  [filterActivated]="false"
-  (filter)="onFilter()"
-></papx-ventas-header>
+<ng-container *ngIf="vm$ | async as vm">
+  <papx-ventas-header
+    [title]="getTitle(vm.filtrar)"
+    [filterActivated]="vm.filtrar"
+    (filter)="filtrarPorUsuario($event)"
+  ></papx-ventas-header>
 
-<ion-content>
-  <ion-list *ngIf="facturas$ | async as facturas">
-    <ion-item *ngFor="let pedido of facturas; index as idx">
-      <ion-label class="ion-text-wrap">
-        <h2>
-          {{ pedido.nombre }}
-          <span class="ion-padding-start ion-hide-md-down">
-            F.Pago: {{ pedido.formaDePago }}
-          </span>
-        </h2>
-        <p>
-          <ion-text color="warning"> {{ pedido.sucursal }} </ion-text>
-
-          <span class="ion-padding-start">
-            {{ getDate(pedido.fecha) | date: "dd/MM/yyyy" }}
-          </span>
-
-          <sub class="ion-padding-start"> ({{ pedido.updateUser }}) </sub>
-        </p>
+  <ion-content>
+    <papx-facturas-grid
+      [pedidos]="filteredFacturas$ | async"
+      (consultar)="onConsultar($event)"
+    ></papx-facturas-grid>
+    <!-- <ion-toolbar>
+      <ion-searchbar
+        #searchBar
+        placeholder="Filtrar"
+        searchIcon=""
+        (ionChange)="onFilter(searchBar.value)"
+        debounce="600"
+      ></ion-searchbar>
+      <ion-buttons slot="end">
+        <papx-pedidos-search
+          (citeriaChanged)="onCriteriaChanged($event)"
+        ></papx-pedidos-search>
+      </ion-buttons>
+    </ion-toolbar> -->
+    <!-- <ion-list-header *ngIf="searchCriteria">
+      <ion-label>
+        <span>Filtro por: </span>
+        <span class="ion-padding-start">
+          Del: {{searchCriteria.fechaInicial | date: 'dd/MM/yyyy'}} al
+          {{searchCriteria.fechaFinal | date: 'dd/MM/yyyy'}}
+        </span>
       </ion-label>
-
-      <ion-badge slot="start" color="tertiary"> {{ pedido.folio }} </ion-badge>
-      <ion-chip slot="end" color="success">
-        {{ pedido.total | currency }}
-      </ion-chip>
-    </ion-item>
-  </ion-list>
-</ion-content>
+      <ion-button (click)="deleteCriteria()">
+        <ion-label> Quitar </ion-label>
+        <ion-icon name="close" slot="end"></ion-icon>
+      </ion-button>
+    </ion-list-header>
+    <papx-facturas-list
+      [facturas]="filteredFacturas$ | async"
+    ></papx-facturas-list> -->
+  </ion-content>
+</ng-container>

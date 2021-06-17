@@ -7,14 +7,16 @@ import { IonicModule } from '@ionic/angular';
 import { VentasTabPageRoutingModule } from './ventas-tab-routing.module';
 
 import { VentasTabPage } from './ventas-tab.page';
+import { ReportsModule } from '@papx/shared/reports/reports.module';
 
 @NgModule({
   imports: [
     CommonModule,
     FormsModule,
     IonicModule,
-    VentasTabPageRoutingModule
+    ReportsModule,
+    VentasTabPageRoutingModule,
   ],
-  declarations: [VentasTabPage]
+  declarations: [VentasTabPage],
 })
 export class VentasTabPageModule {}

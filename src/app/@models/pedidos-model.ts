@@ -5,10 +5,12 @@ import { Producto } from './producto';
 import { Transporte } from './transporte';
 
 import firebase from 'firebase/app';
+import { Periodo } from './periodo';
 
 export interface Pedido {
   id?: string;
-  fecha: string;
+  version?: any;
+  fecha: firebase.firestore.Timestamp;
   sucursal: string;
   sucursalId?: string;
   folio?: number;
@@ -48,8 +50,9 @@ export interface Pedido {
   autorizacion?: PedidoAutorizacion;
   autorizacionesRequeridas?: string;
   cerrado?: string;
+  cierre?: PedidoCierre;
   appVersion?: number;
-  vigencia?: string;
+  vigencia?: firebase.firestore.Timestamp;
   warnings?: Warning[];
   envioPorCorreo?: boolean;
   solicitarConfirmacion?: boolean;
@@ -62,9 +65,14 @@ export interface Pedido {
   dateCreated?: firebase.firestore.Timestamp;
   lastUpdated?: firebase.firestore.Timestamp;
   createUser?: string;
+  createUserId?: string;
   updateUser?: string;
   updateUserId?: string;
-  uid?: string;
+  venta?: string;
+  solicitud?: {
+    folio: number; // Solicitud de autorizacion de deposito vinculada
+    id: string;
+  };
 }
 
 export interface PedidoDet {
@@ -95,6 +103,7 @@ export interface PedidoDet {
   descuentoOriginal?: number; // % Calculado por el sistema
   descuentoEspecial?: number;
   importeCortes?: number;
+  disponible?: number;
   faltante?: number;
   faltanteSucursal?: number;
 
@@ -135,6 +144,7 @@ export type Status =
   | 'COTIZACION'
   | 'POR_AUTORIZAR'
   | 'CERRADO'
+  | 'EN_SUCURSAL'
   | 'PENDIENTE'
   | 'ATENDIDO'
   | 'POR_FACTURAR'
@@ -154,14 +164,19 @@ export interface InstruccionDeEnvio {
 }
 
 export interface PedidoAutorizacion {
-  solicita: string;
   autoriza: string;
+  solicita: string;
   uid: string;
-  fecha: string;
-  sucursal?: string;
-  tags?: string;
   comentario?: string;
-  dateCreated: string;
+  dateCreated: firebase.firestore.Timestamp;
+  replicado?: firebase.firestore.Timestamp;
+}
+
+export interface PedidoCierre {
+  userUid: string;
+  userName: string;
+  replicado: firebase.firestore.Timestamp;
+  cerrado: firebase.firestore.Timestamp;
 }
 
 export class PedidoLog {
@@ -198,9 +213,9 @@ export interface Factura {
   serie: string;
   folio: string;
   uuid: string;
+  cfdi: string;
   creado: string;
   createUser: string;
-  updateUser: string;
   cancelado?: string;
   canceladoComentario?: string;
 }
@@ -261,3 +276,22 @@ export interface Warning {
   error: string;
   descripcion: string;
 }
+
+export interface PedidosSearchCriteria {
+  fechaInicial: string;
+  fechaFinal: string;
+  registros: number;
+  createUser?: string;
+}
+
+export const buildCriteria = (
+  periodo: Periodo = Periodo.fromNow(3)
+): PedidosSearchCriteria => {
+  const { fechaInicial, fechaFinal } = periodo.toApiJSON();
+  const registros = 20;
+  return {
+    fechaInicial,
+    fechaFinal,
+    registros,
+  };
+};

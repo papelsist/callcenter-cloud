@@ -44,13 +44,13 @@ const routes: Routes = [
         (m) => m.CreateSolicitudPageModule
       ),
   },
-  // {
-  //   path: 'rechazadas/:solicitudId',
-  //   loadChildren: () =>
-  //     import('../edit-solicitud/edit-solicitud.module').then(
-  //       (m) => m.EditSolicitudPageModule
-  //     ),
-  // },
+  {
+    path: 'rechazadas/:solicitudId',
+    loadChildren: () =>
+      import('./edit-solicitud/edit-solicitud.module').then(
+        (m) => m.EditSolicitudPageModule
+      ),
+  },
 ];
 
 @NgModule({

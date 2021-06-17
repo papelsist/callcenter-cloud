@@ -17,6 +17,7 @@ import { es } from 'date-fns/locale';
 
 import { SolicitudDeDeposito } from '@papx/models';
 import { ModalController } from '@ionic/angular';
+import { SolicitudDetailModalComponent } from '@papx/shared/ui-solicitudes/solicitud-detail-modal/solicitud-detail-modal.component';
 
 @Component({
   selector: 'papx-solicitudes-peneintes-list',
@@ -100,6 +101,9 @@ import { ModalController } from '@ionic/angular';
               </ion-col>
             </ion-row>
           </ion-grid>
+          <p *ngIf="sol.pedido as pedido">
+            <ion-text color="warning"> Pedido: {{ pedido.folio }} </ion-text>
+          </p>
         </ion-label>
 
         <ion-note slot="start" color="primary">
@@ -186,7 +190,6 @@ export class SolicitudesPendientesListComponent implements OnInit {
   }
 
   async showDetail(solicitud: SolicitudDeDeposito) {
-    /*
     const modal = await this.modalController.create({
       component: SolicitudDetailModalComponent,
       cssClass: 'solicitud-detail-modal',
@@ -196,6 +199,5 @@ export class SolicitudesPendientesListComponent implements OnInit {
       },
     });
     return await modal.present();
-    */
   }
 }
