@@ -31,13 +31,13 @@ import { take } from 'rxjs/operators';
       </ion-select>
     </ion-item>
   `,
-  // changeDetection: ChangeDetectionStrategy.OnPush,
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TransporteFieldComponent implements OnInit {
   @Input() parent: FormGroup;
   @Input() property = 'transporte';
   @Input() label = 'Transporte';
-  @Input() disabled = true;
+  @Input() disabled = false;
 
   transportes$ = this.afs
     .collection<Transporte>('transportes', (ref) => ref.orderBy('nombre'))
@@ -56,18 +56,7 @@ export class TransporteFieldComponent implements OnInit {
 
   constructor(private afs: AngularFirestore) {}
 
-  ngOnInit() {
-    this.parent
-      .get('tipo')
-      .valueChanges.pipe(take(1))
-      .subscribe((value) => {
-        if (value === 'FORANEO' || value === 'OCURRE') {
-          this.disabled = false;
-        } else {
-          this.disabled = true;
-        }
-      });
-  }
+  ngOnInit() {}
 
   compareWith(currentValue: any, compareValue: any) {
     if (!compareValue) {
