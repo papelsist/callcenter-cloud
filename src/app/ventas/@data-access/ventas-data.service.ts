@@ -290,7 +290,11 @@ export class VentasDataService {
     });
   }
 
-  async autorizarPedido(pedido: Pedido, comentario: string, user: User) {
+  async autorizarPedido(
+    pedido: Partial<Pedido>,
+    comentario: string,
+    user: User
+  ) {
     const aut: PedidoAutorizacion = {
       comentario,
       solicita: pedido.updateUser,

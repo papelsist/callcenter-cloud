@@ -210,16 +210,30 @@ export class PendientesGridComponent implements OnInit {
         valueFormatter: (params) => this.format.formatCurrency(params.value),
       },
       {
-        headerName: 'Autorizar',
-        colId: 'cerrar',
+        headerName: 'Regresar',
+        colId: 'regresar',
         pinned: 'right',
         width: 110,
-        cellRenderer: (params) => {
-          return params.data.status === 'POR_AUTORIZAR'
-            ? `<ion-button fill="clear" expand="full"><ion-label>Autorizar</ion-label></ion-button>`
-            : '';
+        cellRendererFramework: IconRendererComponent,
+        cellRendererParams: {
+          name: 'arrow-undo',
+          color: 'warning',
+          callback: (event: Event, data: any) => {
+            this.regresar.emit(data);
+          },
         },
       },
+      // {
+      //   headerName: 'Autorizar',
+      //   colId: 'cerrar',
+      //   pinned: 'right',
+      //   width: 110,
+      //   cellRenderer: (params) => {
+      //     return params.data.status === 'POR_AUTORIZAR'
+      //       ? `<ion-button fill="clear" expand="full"><ion-label>Autorizar</ion-label></ion-button>`
+      //       : '';
+      //   },
+      // },
     ];
   }
 }

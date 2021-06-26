@@ -21,8 +21,8 @@
 .address {
   display: grid;
   align-items: center;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  font-size: 0.9rem;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  font-size: 1rem;
   font-style: italic;
   color: var(--ion-color-medium-shade);
 }

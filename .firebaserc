@@ -15,8 +15,8 @@
     },
     "papx-ws-prod": {
       "hosting": {
-        "papws-callcenter": [
-          "callcenter"
+        "callcenter": [
+          "papws-callcenter"
         ]
       }
     }

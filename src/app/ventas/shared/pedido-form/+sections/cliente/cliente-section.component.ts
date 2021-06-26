@@ -148,4 +148,13 @@ export class ClienteSectionComponent extends BaseComponent implements OnInit {
   get isContado() {
     return this.parent.get('tipo').value !== TipoDePedido.CREDITO;
   }
+
+  getTelefonos(cliente: Partial<Cliente>) {
+    return cliente.medios
+      ? cliente.medios
+          .filter((item) => item.tipo === 'TEL')
+          .map((item) => item.descripcion)
+          .join(',')
+      : '';
+  }
 }

@@ -24,6 +24,7 @@ import { ProductoController } from '@papx/shared/productos/producto-selector';
 
 // import { isString } from 'lodash-es';
 import toNumber from 'lodash-es/toNumber';
+import round from 'lodash-es/round';
 
 import { combineLatest, Observable } from 'rxjs';
 import {
@@ -103,7 +104,6 @@ export class ItemFormComponent extends BaseComponent implements OnInit {
 
   findProductByClave(clave: any) {
     this.productoController.findByClave(clave).subscribe(async (p) => {
-      // console.log('Found: ', p);
       if (p) {
         this.selectNewProduct(p);
         await this.cantidadEl.setFocus();
@@ -129,8 +129,15 @@ export class ItemFormComponent extends BaseComponent implements OnInit {
     const { precioCredito, precioContado } = prod;
     producto.setValue(prod);
     descripcion.setValue(prod.descripcion);
-    precio.setValue(this.isCredito ? precioCredito : precioContado);
+    const pp = this.isCredito ? precioCredito : precioContado
+    precio.setValue(pp);
+    const factor = prod.unidad === 'MIL' ? 1000 : 1;
+    const importe = round(pp * (+this.cantidad / factor))
+    this.form.get('importe').setValue(importe);
+
     this.updateExistenciasPanel();
+    const faltante = this.resolverFaltante();
+    this.form.get('faltante').setValue(faltante);
   }
 
   updateExistenciasPanel() {
@@ -154,7 +161,8 @@ export class ItemFormComponent extends BaseComponent implements OnInit {
   onSubmit() {
     if (this.form.valid) {
       if (this.item) {
-        const updated = { ...this.item, ...this.form.getRawValue() };
+        const {clave, descripcion} = this.form.get('producto').value;
+        const updated = { ...this.item, ...this.form.getRawValue(), clave, descripcion };
         this.save.emit(updated);
       } else {
         const item = buildPedidoItem(this.tipo, this.form.getRawValue());
@@ -176,7 +184,10 @@ export class ItemFormComponent extends BaseComponent implements OnInit {
   private addListeners() {
     this.totales$
       .pipe(takeUntil(this.destroy$))
-      .subscribe((importes) => this.form.patchValue(importes));
+      .subscribe((importes) => {
+        console.log('Nuevos importes: ', importes)
+        this.form.patchValue(importes)
+      });
     this.disponibilidadListener();
   }
 

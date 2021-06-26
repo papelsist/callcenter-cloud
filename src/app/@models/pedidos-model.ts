@@ -73,6 +73,7 @@ export interface Pedido {
     folio: number; // Solicitud de autorizacion de deposito vinculada
     id: string;
   };
+  puesto?: any;
 }
 
 export interface PedidoDet {

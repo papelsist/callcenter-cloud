@@ -24,7 +24,6 @@ import { PcreateFacade } from '../create-form/pcreate.facade';
               interface="popover"
               [interfaceOptions]="cfdiPopoverOptions"
               formControlName="usoDeCfdi"
-              [compareWith]="compareWith"
             >
               <ion-select-option [value]="t.clave" *ngFor="let t of usos">
                 {{ t.descripcion }}
@@ -138,14 +137,6 @@ import { PcreateFacade } from '../create-form/pcreate.facade';
         </ion-col>
       </ion-row>
     </ion-grid>
-    <!-- <div *ngIf="summary$ | async as summary" class="summary">
-      <span class="imp"> Importe: {{ summary.importe | currency }} </span>
-      <span class="imp"> Descuento: {{ summary.descuento | currency }} </span>
-      <span class="imp"> Subtotal: {{ summary.subtotal | currency }} </span>
-      <span class="imp"> IVA: {{ summary.impuesto | currency }} </span>
-      <span class="imp"> Total: {{ summary.total | currency }} </span>
-    </div> -->
-    <!-- <ion-grid *ngIf="summary$ | async as summary" class="summary"> </ion-grid> -->
   `,
   styles: [
     `
@@ -184,10 +175,6 @@ export class ResumenSectionComponent implements OnInit {
 
   get especial() {
     return this.parent.get('descuentoEspecial').value > 0;
-  }
-
-  compareWith(objA: any, objB: any) {
-    return objA && objB ? objA.clave === objB.clave : objA === objB;
   }
 
   setComprador({ detail: { value } }) {

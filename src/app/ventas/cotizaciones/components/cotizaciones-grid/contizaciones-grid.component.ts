@@ -64,7 +64,7 @@ export class CotizacionesGridComponent implements OnInit {
 
   onFirstDataRendered(params: FirstDataRenderedEvent) {
     // console.log('Data: ', this.cotizaciones);
-    params.columnApi.autoSizeAllColumns();
+    // params.columnApi.autoSizeAllColumns();
   }
 
   rowClicked(event: RowClickedEvent) {}
@@ -138,6 +138,7 @@ export class CotizacionesGridComponent implements OnInit {
         sortable: true,
         filter: true,
         resizable: true,
+        minWidth: 250
       },
       {
         headerName: 'Tipo',
@@ -165,6 +166,7 @@ export class CotizacionesGridComponent implements OnInit {
       {
         headerName: 'Total',
         field: 'total',
+        width: 120,
         sortable: true,
         filter: true,
         valueFormatter: (params) => this.format.formatCurrency(params.value),
@@ -172,6 +174,7 @@ export class CotizacionesGridComponent implements OnInit {
       {
         headerName: 'Estatus',
         field: 'status',
+        width: 120,
         valueGetter: (params) => {
           if (params.data.autorizacionesRequeridas) {
             return `${params.data.status.substr(

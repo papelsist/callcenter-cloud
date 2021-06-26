@@ -107,6 +107,10 @@ export class PedidoCreateFormComponent
             );
         }
       });
+
+      this.summary$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(value => console.debug('Summary: ', value))
   }
 
   ngAfterViewInit() {
@@ -195,7 +199,8 @@ export class PedidoCreateFormComponent
         tap((tipo) => {
           // Side effect para limpiar el descuento especial
           if (tipo === TipoDePedido.CREDITO && this.facade.descuentoEspecial) {
-            this.facade.setDescuentoEspecial(0.0, true); // Sin detonar eventos
+            // this.facade.setDescuentoEspecial(0.0, true); // Sin detonar eventos
+            this.form.get('descuentoEspecial').setValue(0.0)
           }
         })
       ),

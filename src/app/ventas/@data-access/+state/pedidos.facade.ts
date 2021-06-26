@@ -171,10 +171,18 @@ export class PedidosFacade {
 
   async autorizar(pedido: Partial<Pedido>) {
     console.log('Evaluando pedido: ', pedido);
+    /*
     const inputs = pedido.warnings.map((it) => ({
       disabled: true,
       value: it.descripcion,
     }));
+    */
+    const inputs = [
+      {
+        disabled: true,
+        value: pedido.autorizacionesRequeridas,
+      },
+    ];
     const alert = await this.alertController.create({
       header: 'Autorizar pedido: ' + pedido.folio,
       subHeader: pedido.nombre,

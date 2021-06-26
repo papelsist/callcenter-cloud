@@ -27,7 +27,7 @@ export class PendientesController {
     const alert = await this.alert.create({
       header: 'Pedido: ' + pedido.folio,
       subHeader: 'De: ' + pedido.nombre,
-      message: 'Regresar a cotizaciones?',
+      message: 'Regresar pedido?',
       animated: true,
       cssClass: 'regreso-de-pedido-alert',
       buttons: [

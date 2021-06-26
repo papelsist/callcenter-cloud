@@ -21,6 +21,7 @@ import {
   Direccion,
 } from '@papx/models';
 import { CatalogosService } from '@papx/data-access';
+import { SUCURSALES } from '@papx/common/ui-forms/sucursal-control/sucursales';
 
 const hourToDate = (value: string): Date => {
   const [hours, minutes] = value.split(':').map((item) => parseFloat(item));
@@ -77,6 +78,7 @@ export class EnvioComponent extends BaseComponent implements OnInit {
   direcciones$: Observable<ClienteDireccion[]>;
   direcciones: ClienteDireccion[] = [];
 
+  disabledTransporte = true;
 
   constructor(private catalogos: CatalogosService) {
     super();
@@ -85,6 +87,7 @@ export class EnvioComponent extends BaseComponent implements OnInit {
   ngOnInit() {
     this.initForm();
     this.setControls();
+    this.registerTipoListener();
     this.setupHorarioControl();
     this.registerContactoListener();
     this.registerDireccionListener();
@@ -92,6 +95,8 @@ export class EnvioComponent extends BaseComponent implements OnInit {
       map((cte) => findDirecciones(cte)),
       takeUntil(this.destroy$)
     );
+
+    this.registerTransporteListener();
   }
 
   private initForm() {
@@ -114,6 +119,20 @@ export class EnvioComponent extends BaseComponent implements OnInit {
     const horario: AbstractControl = this.form.get('horario');
     horario.setValidators(HorarioValidator);
     horario.updateValueAndValidity();
+  }
+
+  private registerTipoListener() {
+    this.tipo.valueChanges.pipe(takeUntil(this.destroy$)).subscribe((val) => {
+      const validos = ['FORANEO', 'OCURRE'];
+      if (validos.includes(val)) {
+        this.disabledTransporte = false;
+        this.transporte.enable();
+      } else {
+        this.disabledTransporte = true;
+        this.transporte.setValue(null);
+        this.transporte.disable();
+      }
+    });
   }
 
   private registerContactoListener() {
@@ -145,6 +164,22 @@ export class EnvioComponent extends BaseComponent implements OnInit {
               }
             }
           });
+        }
+      });
+  }
+
+  private registerTransporteListener() {
+    this.transporte.valueChanges
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((val) => {
+        if (val && val.sucursal) {
+          const suc = SUCURSALES.find((item) => item.nombre === val.sucursal);
+          if (suc) {
+            const rootForm = this.form.parent;
+            if (rootForm) {
+              rootForm.get('sucursalEntity').setValue(suc);
+            }
+          }
         }
       });
   }

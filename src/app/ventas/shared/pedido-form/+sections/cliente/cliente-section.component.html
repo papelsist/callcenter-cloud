@@ -28,11 +28,12 @@
       </div>
     </ion-label>
     <ion-label *ngIf="cte.clave != '1'">
-      <div class="address" *ngIf="cte.direccion as d">
-        <span> Calle: {{ d.calle }} Ext:# {{ d.numeroExterior }} </span>
-        <span> Colonia: {{ d.colonia }} </span>
+      <div class="address ion-text-wrap" *ngIf="cte.direccion as d">
+        <div>Calle: {{ d.calle }} Ext:# {{ d.numeroExterior }}</div>
+        <div>Colonia: {{ d.colonia }}</div>
         <span> Mpo: {{ d.municipio }} ({{ d.estado }}) </span>
         <span> CP: {{ d.codigoPostal }} </span>
+        <span>Telefonos: {{ getTelefonos(cte) }}</span>
       </div>
     </ion-label>
     <ion-icon slot="start" name="people"></ion-icon>

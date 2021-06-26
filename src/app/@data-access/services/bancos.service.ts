@@ -1,11 +1,12 @@
 import { Injectable } from '@angular/core';
 
-import { Observable } from 'rxjs';
-import { map, shareReplay, take } from 'rxjs/operators';
+import { Observable, throwError } from 'rxjs';
+import { catchError, map, shareReplay, switchMap, take } from 'rxjs/operators';
 
 import { Banco, CuentaDeBanco } from '@papx/models';
 
 import { HttpClient } from '@angular/common/http';
+import { AngularFireStorage } from '@angular/fire/storage';
 
 @Injectable({ providedIn: 'root' })
 export class BancosService {
@@ -29,17 +30,33 @@ export class BancosService {
     shareReplay()
   );
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private fs: AngularFireStorage) {}
 
   fetchCuentas(): Observable<CuentaDeBanco[]> {
-    const url =
-      'https://firebasestorage.googleapis.com/v0/b/papx-ws-dev.appspot.com/o/catalogos%2Fcuentas.json?alt=media&token=01fd457f-d287-4e98-84c4-527adcf2b32d';
-    return this.http.get<CuentaDeBanco[]>(url);
+    return this.fs
+      .ref('catalogos/cuentas.json')
+      .getDownloadURL()
+      .pipe(
+        switchMap((url) => this.http.get<CuentaDeBanco[]>(url)),
+        catchError((err) =>
+          throwError(
+            'Error descargando catalogo de cuentas bancarias ' + err.message
+          )
+        )
+      );
   }
 
+
+
   fetchBancos(): Observable<Banco[]> {
-    const url =
-      'https://firebasestorage.googleapis.com/v0/b/papx-ws-dev.appspot.com/o/catalogos%2Fbancos.json?alt=media&token=b022e8d6-67e3-4ee0-962f-dbcba74d8aa0';
-    return this.http.get<Banco[]>(url);
+    return this.fs
+      .ref('catalogos/bancos.json')
+      .getDownloadURL()
+      .pipe(
+        switchMap((url) => this.http.get<Banco[]>(url)),
+        catchError((err) =>
+          throwError('Error descargando catalogo de bancos ' + err.message)
+        )
+      );
   }
 }

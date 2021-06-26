@@ -7,6 +7,7 @@ import {
 import { AngularFirestore } from '@angular/fire/firestore';
 
 import { FormGroup } from '@angular/forms';
+import { CatalogosService } from '@papx/data-access';
 
 import { Transporte } from '@papx/models';
 import { take } from 'rxjs/operators';
@@ -26,7 +27,7 @@ import { take } from 'rxjs/operators';
         [compareWith]="compareWith"
       >
         <ion-select-option [value]="s" *ngFor="let s of transportes$ | async">
-          {{ s.nombre }}
+          {{ s.nombre }} <sub>({{ s.sucursal }})</sub>
         </ion-select-option>
       </ion-select>
     </ion-item>
@@ -39,10 +40,7 @@ export class TransporteFieldComponent implements OnInit {
   @Input() label = 'Transporte';
   @Input() disabled = false;
 
-  transportes$ = this.afs
-    .collection<Transporte>('transportes', (ref) => ref.orderBy('nombre'))
-    .valueChanges({ idField: 'id' })
-    .pipe(take(1));
+  transportes$ = this.catalogos.transportes$;
 
   customPopoverOptions: any = {
     header: 'Transporte',
@@ -54,7 +52,7 @@ export class TransporteFieldComponent implements OnInit {
     header: 'Compañías de transportes',
   };
 
-  constructor(private afs: AngularFirestore) {}
+  constructor(private catalogos: CatalogosService) {}
 
   ngOnInit() {}
 

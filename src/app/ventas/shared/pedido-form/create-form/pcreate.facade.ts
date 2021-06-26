@@ -52,6 +52,8 @@ import * as utils from '../pedido-form.utils';
 import { PedidoForm } from '../pedido-form';
 import { PedidoWarnings } from '../validation/pedido-warning';
 
+import maxBy from 'lodash-es/maxBy';
+
 @Injectable()
 export class PcreateFacade {
   readonly form = new PedidoForm(this.fb);
@@ -160,7 +162,7 @@ export class PcreateFacade {
       const sucursalEntity = { id: data.sucursalId, nombre: data.sucursal };
       value = { ...value, sucursalEntity };
     }
-
+    console.log('Setting value: ', value);
     this.form.patchValue(value);
     if (data.partidas) {
       const summ = utils.getPedidoSummary(data);
@@ -189,21 +191,32 @@ export class PcreateFacade {
         // }
 
         if (cte.credito) {
-          this.form.get('usoDeCfdi').setValue(cte.usoDeCfdi);
+          const usoDeCfdi = this.form.get('usoDeCfdi').value;
+          if (!usoDeCfdi) {
+            this.form.get('usoDeCfdi').setValue(cte.usoDeCfdi);
+          }
           this.recalcular();
         }
-
         this.actualizarValidaciones();
         this.form.markAsDirty();
       });
   }
 
-  recalcular() {
-    console.log('RECALCULANDO PEDIDO...');
+  recalcular(descuentoEspecial = 0.0) {
+    console.debug(
+      `Recalculando pedido ${
+        descuentoEspecial > 0.0
+          ? 'Descuento especial del: ' + descuentoEspecial
+          : ''
+      }`
+    );
+
     const tipo = this.tipo;
     const cliente = this.cliente;
     const formaDePago = this.form.get('formaDePago').value;
-    const descuentoEspecial = this.form.get('descuentoEspecial').value;
+    // const descuentoEspecial = this.form.get('descuentoEspecial').value;
+    console.debug('Tipo: %s Forma de pago: %s', tipo, formaDePago);
+
     if (!cliente) return;
 
     const items = recalcularPartidas(
@@ -211,7 +224,7 @@ export class PcreateFacade {
       tipo,
       formaDePago,
       cliente,
-      descuentoEspecial
+      +descuentoEspecial
     );
     this._currentPartidas = items;
 
@@ -226,11 +239,50 @@ export class PcreateFacade {
 
     const summary = buildSummary(this._currentPartidas);
 
+    if (descuentoEspecial <= 0.0) {
+      this.form.get('descuentoEspecial').setValue(0.0);
+    }
+
     this._summary.next(summary);
     this.form.patchValue(summary);
     this.actualizarValidaciones();
-    console.log('Form value: ', this.resolvePedidoData());
+    console.debug('Form value: ', this.resolvePedidoData());
+
     this.form.markAsDirty();
+  }
+
+  aplicarDescuentoEspecial(descuentoEspecial: number) {
+    console.debug('Aplicando descuento especial del: ', descuentoEspecial);
+
+    const tipo = this.tipo;
+    const formaDePago = this.form.get('formaDePago').value;
+    console.debug('Tipo: %s Forma de pago: %s', tipo, formaDePago);
+
+    const items = recalcularPartidas(
+      this._currentPartidas,
+      tipo,
+      formaDePago,
+      this.cliente,
+      +descuentoEspecial
+    );
+    this._currentPartidas = items;
+    console.debug('Partidas actualizadas:', items);
+
+    const cargos = this.aplicarCargos(items, tipo, formaDePago);
+    if (cargos.length > 0) {
+      const newItems = [...items, ...cargos];
+      this._currentPartidas = [...newItems];
+    }
+
+    this._partidas.next(this._currentPartidas);
+
+    const summary = buildSummary(this._currentPartidas);
+
+    this._summary.next(summary);
+    this.form.patchValue(summary);
+    this.actualizarValidaciones();
+    this.form.markAsDirty();
+    console.debug('Form value: ', this.resolvePedidoData());
   }
 
   private aplicarCargos(
@@ -321,15 +373,24 @@ export class PcreateFacade {
     this.recalcular();
   }
 
-  setDescuentoEspecial(descuento: number, slinetly = false) {
+  setDescuentoEspecial(descuento: number) {
+    // this.aplicarDescuentoEspecial(descuento);
+    this.form
+      .get('descuentoEspecial')
+      .setValue(+descuento, { emitEvent: true, onlySelf: true });
+    this.recalcular(+descuento);
+
+    /*
     if (slinetly) {
       this.form
         .get('descuentoEspecial')
         .setValue(descuento, { emitEvent: false, onlySelf: true });
     } else {
+      console.debug('Aplicando descuento especial: ', descuento);
       this.form.get('descuentoEspecial').setValue(descuento);
       this.recalcular();
     }
+    */
     return this;
   }
 
@@ -342,9 +403,9 @@ export class PcreateFacade {
       this.registrarClienteNuevo();
     } else {
       if (selected) {
+        console.log('Cliente seleccionado: ', selected);
         this.setCliente(selected);
         this.form.get('cfdiMail').setValue(selected.cfdiMail);
-        console.log('Cliente seleccionado: ', selected);
       }
     }
   }
@@ -397,15 +458,18 @@ export class PcreateFacade {
 
   resolvePedidoData(): Partial<Pedido> {
     const { sucursalEntity, envio, ...rest } = this.form.value;
-
+    const maxOriginal = maxBy(this._currentPartidas, 'descuentoOriginal');
+    const descuentoOriginal = maxOriginal ? maxOriginal.descuentoOriginal : 0.0;
     this._currentPartidas = this._currentPartidas.map((item) => {
       return {
         ...item,
         producto: utils.reduceProducto(item.producto),
+        descripcion: item.producto.descripcion,
       };
     });
     const res = {
       ...rest,
+      descuentoOriginal,
       cliente: utils.reduceCliente(this.cliente),
       partidas: [...this._currentPartidas],
       autorizacionesRequeridas: this._autorizaciones,

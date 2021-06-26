@@ -230,7 +230,7 @@ export class ReportsService {
   }
 
   buildParaametrosRow(pedido: Partial<Pedido>, cliente: Partial<Cliente>) {
-    const { fecha } = pedido;
+    const { fecha, tipo } = pedido;
     let sfecha: any = fecha;
     if (sfecha instanceof firebase.firestore.Timestamp) {
       sfecha = (sfecha as firebase.firestore.Timestamp).toDate().toISOString();
@@ -321,7 +321,7 @@ export class ReportsService {
             columns: [
               { text: 'Tipo:', fontSize: 12, alignment: 'right' },
               {
-                text: 'COD',
+                text: tipo,
                 width: '25%',
                 alignment: 'right',
                 fontSize: 12,

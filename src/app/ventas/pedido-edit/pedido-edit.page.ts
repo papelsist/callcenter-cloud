@@ -51,7 +51,9 @@ export class PedidoEditPage implements OnInit, OnDestroy {
     private alertController: AlertController
   ) {}
 
-  ngOnInit() {}
+  ngOnInit() {
+
+  }
 
   ngOnDestroy() {
     this.facade.setCurrent(null);

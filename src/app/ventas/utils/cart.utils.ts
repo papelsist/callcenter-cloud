@@ -112,11 +112,12 @@ export function recalcularPartidas(
   tipo: TipoDePedido,
   fpago: FormaDePago,
   cliente: Partial<Cliente>,
-  descuentoEspecial: number
+  descuentoEspecial: number = 0.0
 ): PedidoDet[] {
   const items = filtrarPartidasAutomaticas(partidas);
   let descuento = calcularDescuento(items, tipo, cliente);
   const descuentoOriginal = descuento;
+  // let descuentoEspecial = 0.0;
 
   console.groupCollapsed('Recalculando partidas');
   console.log('Descuento calculado: ', descuento);
@@ -137,12 +138,6 @@ export function recalcularPartidas(
       descuento = descuento - 1;
     }
   }
-  // if (fpago === FormaDePago.TARJETA_CRE && descuento > 2) {
-  //   descuento = descuento - 2;
-  // }
-  // if (fpago === FormaDePago.TARJETA_DEB && descuento > 1) {
-  //   descuento = descuento - 1;
-  // }
 
   console.log('Dscto aplicado: ', descuento);
 
@@ -154,7 +149,7 @@ export function recalcularPartidas(
     } else {
       if (item.modoVenta === 'B') {
         rdesc = descuento;
-        descuentoEspecial = 0;
+        // descuentoEspecial = 0;
       } else {
         rdesc = 0;
         descuentoEspecial = 0;

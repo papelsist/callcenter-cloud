@@ -44,11 +44,21 @@ export class CerrarPedidoComponent implements OnInit {
     );
   }
 
+  // faltaAutoracionDelDeposito() {
+  //   if(this.requiereDeposito()) {
+  //     if(this.solicitud) {
+  //       return !this.solicitud.autorizacion
+  //     }
+  //   }
+  //   return false;
+  // }
+
   isDisabled() {
     if (this.requiereAutorizacion()) {
       return true;
     } else if (this.requiereDeposito()) {
-      return !this.solicitud ? this.solicitud.status !== 'AUTORIZADO' : true;
+      // return this.solicitud ? this.solicitud.status !== 'AUTORIZADO' : true;
+      return false;
     } else {
       return false;
     }

@@ -68,7 +68,7 @@ export class FacturasGridComponent implements OnInit {
 
   onFirstDataRendered(params: FirstDataRenderedEvent) {
     // console.log('Data: ', this.cotizaciones);
-    params.columnApi.autoSizeAllColumns();
+    // params.columnApi.autoSizeAllColumns();
   }
 
   rowClicked(event: RowClickedEvent) {}

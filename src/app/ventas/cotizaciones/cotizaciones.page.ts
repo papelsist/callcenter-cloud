@@ -12,9 +12,11 @@ import {
   withLatestFrom,
 } from 'rxjs/operators';
 
-import sortBy from 'lodash-es/sortBy';
 import { formatISO } from 'date-fns';
 import { parseISO } from 'date-fns';
+
+import sortBy from 'lodash-es/sortBy';
+import isEmty from 'lodash-es/isEmpty';
 
 import { AuthService } from '@papx/auth';
 import { BaseComponent } from '@papx/core';
@@ -198,19 +200,17 @@ export class CotizacionesPage extends BaseComponent implements OnInit {
     const { autorizar, comentario } = await this.pedidosFacade.autorizar(
       pedido
     );
-    console.log('Autorizar: ', autorizar);
-    console.log('Comentario: ', comentario);
-
-    // if (autorizar && !isEmty(comentario)) {
-    //   await this.controller.starLoading();
-    //   try {
-    //     await this.dataService.autorizarPedido(pedido, comentario, user);
-    //     await this.controller.stopLoading();
-    //   } catch (error) {
-    //     await this.controller.stopLoading();
-    //     this.controller.handelError(error);
-    //   }
-    // }
+    if (autorizar && !isEmty(comentario)) {
+      await this.ventasController.starLoading();
+      try {
+        await this.dataService.autorizarPedido(pedido, comentario, user);
+        await this.dataService.cerrarPedido(pedido, user);
+        await this.ventasController.stopLoading();
+      } catch (error) {
+        await this.ventasController.stopLoading();
+        this.ventasController.handelError(error);
+      }
+    }
   }
 
   async onCerrar1(event: Partial<Pedido>, user: User) {

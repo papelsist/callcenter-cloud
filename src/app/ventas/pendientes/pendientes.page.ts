@@ -75,17 +75,19 @@ export class PendientesPage {
   }
 
   async regresar(pedido: Pedido, user: User) {
-    if (['CERRADO', 'EN_SUCURSAL'].includes(pedido.status)) {
-      const res = await this.controller.regresar(pedido);
+    if (['EN_SUCURSAL'].includes(pedido.status)) {
+      if (!pedido.puesto) {
+        const res = await this.controller.regresar(pedido);
 
-      if (res) {
-        await this.controller.starLoading();
-        try {
-          await this.dataService.regresarPedido(pedido, user);
-          await this.controller.stopLoading();
-        } catch (error) {
-          await this.controller.stopLoading();
-          this.controller.handelError(error);
+        if (res) {
+          await this.controller.starLoading();
+          try {
+            await this.dataService.regresarPedido(pedido, user);
+            await this.controller.stopLoading();
+          } catch (error) {
+            await this.controller.stopLoading();
+            this.controller.handelError(error);
+          }
         }
       }
     }

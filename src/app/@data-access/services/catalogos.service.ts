@@ -22,6 +22,11 @@ export class CatalogosService {
     .collection<DescuentoPorVolumen>('descuentos_volumen')
     .valueChanges();
 
+  transportes$ = this.firestore
+    .collection<Transporte>('transportes', (ref) => ref.orderBy('nombre'))
+    .valueChanges({ idField: 'id' })
+    .pipe(shareReplay(1));
+
   readonly sucursales: Sucursal[] = [
     {
       id: '402880fc5e4ec411015e4ec64f8e0131',
