@@ -19,7 +19,7 @@ export class CerrarPedidoController {
         .get(pedido.solicitud.id)
         .pipe(take(1))
         .toPromise();
-      console.log('Solicitud found: ', solicitud);
+      // console.debug('Solicitud found: ', solicitud);
     }
     const popover = await this.popoverController.create({
       component: CerrarPedidoComponent,

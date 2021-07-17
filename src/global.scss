@@ -30,12 +30,27 @@
 @import "../node_modules/ag-grid-community/dist/styles/ag-grid.css";
 @import "../node_modules/ag-grid-community/dist/styles/ag-theme-alpine.css";
 // @import "../node_modules/ag-grid-community/dist/styles/ag-theme-balham-dark.css";
+@import "~ionic4-auto-complete/auto-complete";
 
 ag-grid-angular.ag-theme-alpine {
   .ag-row .ag-cell ion-button {
     margin: 0px;
     padding: 0px;
   }
+  .ag-row .ag-cell {
+    font-size: 0.8rem;
+  }
+  .ag-row {
+    height: 0.5rem;
+  }
+}
+.ag-row-hover {
+  /* putting in !important so it overrides the theme's styling as it hovers the row also */
+  background-color: #dfdfff !important;
+}
+
+.ag-column-hover {
+  background-color: #dfffdf;
 }
 
 .create-solicitud-custom-alert {
@@ -138,4 +153,9 @@ ion-popover.menu {
 
 .pedido-popover-modal {
   --width: 65%;
+}
+
+.maniobra-modal {
+  --width: 375px;
+  --height: 250px;
 }

@@ -119,10 +119,10 @@ export function recalcularPartidas(
   const descuentoOriginal = descuento;
   // let descuentoEspecial = 0.0;
 
-  console.groupCollapsed('Recalculando partidas');
-  console.log('Descuento calculado: ', descuento);
-  console.log('Descuento especial: ', descuentoEspecial);
-  console.log('Descuento original: ', descuentoOriginal);
+  // console.groupCollapsed('Recalculando partidas');
+  // console.log('Descuento calculado: ', descuento);
+  // console.log('Descuento especial: ', descuentoEspecial);
+  // console.log('Descuento original: ', descuentoOriginal);
 
   if (tipo === TipoDePedido.CREDITO) {
     descuentoEspecial = 0;
@@ -139,7 +139,7 @@ export function recalcularPartidas(
     }
   }
 
-  console.log('Dscto aplicado: ', descuento);
+  // console.log('Dscto aplicado: ', descuento);
 
   const res: PedidoDet[] = [];
   items.map((item) => {
@@ -159,17 +159,17 @@ export function recalcularPartidas(
     det.descuentoOriginal = descuentoOriginal;
     det.descuentoEspecial = descuentoEspecial > 0 ? descuentoEspecial : 0;
 
-    console.log(
-      'Importe: %f Descto:%f Subtotal: %f Iva:%f Total:%f',
-      det.importe,
-      det.descuentoImporte,
-      det.subtotal,
-      det.impuesto,
-      det.total
-    );
+    // console.log(
+    //   'Importe: %f Descto:%f Subtotal: %f Iva:%f Total:%f',
+    //   det.importe,
+    //   det.descuentoImporte,
+    //   det.subtotal,
+    //   det.impuesto,
+    //   det.total
+    // );
     res.push(det);
   });
-  console.groupEnd();
+  // console.groupEnd();
   return res;
 }
 

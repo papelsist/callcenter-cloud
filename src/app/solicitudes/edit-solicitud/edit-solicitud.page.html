@@ -21,6 +21,7 @@
     <papx-solicitud-edit-form
       [solicitud]="vm.solicitud"
       (save)="onSave(vm.solicitud, $event, vm.user)"
+      (valueReady)="validarDuplicado($event)"
     ></papx-solicitud-edit-form>
     <div *ngIf="vm.solicitud.rechasosAnteriores as anteriores">
       <ion-list>

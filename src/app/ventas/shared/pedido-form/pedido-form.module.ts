@@ -24,6 +24,7 @@ import { SharedClienteFormModule } from '@papx/shared/clientes/cliente-form/clie
 import { DescuentosModalComponent } from './options/descuentos-modal.component';
 import { ClienteControlModule } from './cliente-control/cliente-control.module';
 import { ShortcutsModalComponent } from './options/shortcuts-modal.component';
+import { ManiobraModalComponent } from './options/maniobra/maniobra-modal.component';
 
 const components = [
   PedidoCreateFormComponent,
@@ -41,6 +42,7 @@ const components = [
   SocioSelectorComponent,
   DescuentosModalComponent,
   ShortcutsModalComponent,
+  ManiobraModalComponent,
 ];
 
 @NgModule({

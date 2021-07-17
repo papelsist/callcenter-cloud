@@ -44,7 +44,8 @@ import { FormaDePago } from '@papx/models';
   ],
 })
 export class FormaDePagoControlComponent
-  implements OnInit, ControlValueAccessor {
+  implements OnInit, ControlValueAccessor
+{
   onChange: any;
   onTouch: any;
   disabled = false;

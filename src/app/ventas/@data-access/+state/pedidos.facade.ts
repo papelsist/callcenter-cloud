@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { AlertController, LoadingController } from '@ionic/angular';
 import { AuthService } from '@papx/auth';
 import { LoadingService } from '@papx/common/ui-core';
-import { MailService } from '@papx/data-access';
+import { CatalogosService, MailService } from '@papx/data-access';
 import { Pedido, User } from '@papx/models';
 import { ReportsService } from '@papx/shared/reports/reports.service';
 import { BehaviorSubject, combineLatest } from 'rxjs';
@@ -58,12 +58,17 @@ export class PedidosFacade {
     private mailService: MailService,
     private loading: LoadingService,
     private alertController: AlertController,
-    private cerrarPedidoController: CerrarPedidoController
+    private cerrarPedidoController: CerrarPedidoController,
+    private catalogos: CatalogosService
   ) {}
 
   setCurrent(pedido: Pedido) {
     _state = { ..._state, current: pedido };
     this.store.next(_state);
+  }
+
+  getSucursalByNombre(nombre: string) {
+    return this.catalogos.getSucursalByName(nombre);
   }
 
   async updatePedido(id: string, pedido: Partial<Pedido>, user: User) {
@@ -213,6 +218,18 @@ export class PedidosFacade {
       ],
     });
     await alert.present();
+    const { data } = await alert.onDidDismiss();
+    return data;
+    // if (data) {
+    //   const {
+    //     autorizar,
+    //     values: { comentario },
+    //   } = data;
+    //   return { autorizar, comentario };
+    // } else {
+    //   return null;
+    // }
+    /*
     const {
       data: {
         autorizar,
@@ -220,5 +237,6 @@ export class PedidosFacade {
       },
     } = await alert.onDidDismiss();
     return { autorizar, comentario };
+    */
   }
 }

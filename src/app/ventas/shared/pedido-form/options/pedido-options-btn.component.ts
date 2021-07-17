@@ -16,6 +16,7 @@ import { TipoDePedido, DescuentoPorVolumen } from '@papx/models';
 
 import { PcreateFacade } from '../create-form/pcreate.facade';
 import { DescuentosModalComponent } from './descuentos-modal.component';
+import { ManiobraModalComponent } from './maniobra/maniobra-modal.component';
 import { PedidoOptionsComponent } from './pedido-options.component';
 import { ShortcutsModalComponent } from './shortcuts-modal.component';
 
@@ -39,6 +40,8 @@ export class PedidoOptionsButtonComponent implements OnInit {
   @Output() print = new EventEmitter();
   @Output() email = new EventEmitter();
   @Output() delete = new EventEmitter();
+  @Output() clean = new EventEmitter();
+  @Output() nuevo = new EventEmitter();
   @Input() descuentos: DescuentoPorVolumen[] = [];
 
   constructor(
@@ -46,7 +49,7 @@ export class PedidoOptionsButtonComponent implements OnInit {
     private facade: PcreateFacade,
     private actionSheet: ActionSheetController,
     private alert: AlertController,
-    private modal: ModalController
+    private modalController: ModalController
   ) {}
 
   ngOnInit() {}
@@ -59,7 +62,7 @@ export class PedidoOptionsButtonComponent implements OnInit {
       buttons: [
         ...this.buildOptionButtons(),
         {
-          text: 'Cancelar',
+          text: 'Cerrar',
           role: 'cancel',
         },
       ],
@@ -78,6 +81,20 @@ export class PedidoOptionsButtonComponent implements OnInit {
       options.push(this.buildDescuentosPorVolumenOption());
     }
     options.push(this.buildShortcutsOption());
+    if (!this.facade.getPedido()) {
+      options.push({
+        text: 'Limpiar',
+        icon: 'refresh',
+        handler: () => this.clean.emit(),
+      });
+    }
+    if (this.facade.getPedido()) {
+      options.push({
+        text: 'Nuevo pedido',
+        icon: 'refresh',
+        handler: () => this.nuevo.emit(),
+      });
+    }
     return options;
   }
 
@@ -95,6 +112,7 @@ export class PedidoOptionsButtonComponent implements OnInit {
         icon: 'archive',
         handler: () => this.setDescuentoEspecial(),
       },
+      this.buildManiobraOption(),
     ];
     return options;
   }
@@ -104,6 +122,14 @@ export class PedidoOptionsButtonComponent implements OnInit {
       text: 'Descuentos (Vol)',
       icon: 'archive',
       handler: () => this.showDescuentos(),
+    };
+  }
+
+  private buildManiobraOption() {
+    return {
+      text: 'Maniobra',
+      icon: 'bag-add',
+      handler: () => this.showManiobra(),
     };
   }
 
@@ -159,6 +185,7 @@ export class PedidoOptionsButtonComponent implements OnInit {
         icon: 'trash',
         handler: () => this.delete.emit(),
       },
+      this.buildManiobraOption(),
     ];
   }
 
@@ -219,6 +246,21 @@ export class PedidoOptionsButtonComponent implements OnInit {
       cssClass: 'menu',
     });
     await modal.present();
+  }
+
+  async showManiobra() {
+    const modal = await this.modalController.create({
+      component: ManiobraModalComponent,
+      // componentProps: { tipo: this.facade.getTipoDeEnvio() },
+      componentProps: { tipo: 'ENVIO_CARGO' },
+      animated: true,
+      cssClass: 'maniobra-modal',
+    });
+    await modal.present();
+    const { data } = await modal.onWillDismiss();
+    if (data) {
+      this.facade.setCargoPorManiobra(data.importe);
+    }
   }
 
   async showShortcuts() {

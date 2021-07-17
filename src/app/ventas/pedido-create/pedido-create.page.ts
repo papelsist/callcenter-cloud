@@ -16,7 +16,7 @@ import { PedidoCreateFacade } from './pedido-create.facade';
 import { PedidoCreateFormComponent } from '../shared/pedido-form';
 import { getClienteMostrador } from '../utils';
 import { PedidosFacade } from '../@data-access/+state';
-import { map, mergeMap, tap } from 'rxjs/operators';
+import { map, mergeMap, switchMap, tap } from 'rxjs/operators';
 import { combineLatest } from 'rxjs';
 
 @Component({
@@ -26,35 +26,45 @@ import { combineLatest } from 'rxjs';
   providers: [PedidoCreateFacade],
 })
 export class PedidoCreatePage implements OnInit, OnDestroy {
-  private _data = {
-    sucursal: 'TACUBA',
-    sucursalId: '402880fc5e4ec411015e4ec64e70012e',
-    cliente: getClienteMostrador(),
-    nombre: 'MOSTRADOR',
-  };
-
   errors: any;
   warnings: any[];
   private _user: UserInfo = null;
   user$ = this.authService.userInfo$.pipe(tap((u) => (this._user = u)));
   private _saveCart = true;
   cart$ = this.user$.pipe(
-    mergeMap((user) =>
+    switchMap((user) =>
       this.pedidoFacade.getCartState(user).pipe(
         map((state) => {
           if (state) {
             if (state.envio === null) delete state.envio;
             return state;
-          } else return this._data;
+          } else {
+            const res = {
+              sucursal: 'TACUBA',
+              sucursalId: '402880fc5e4ec411015e4ec64e70012e',
+              cliente: getClienteMostrador(),
+              nombre: 'MOSTRADOR',
+            };
+
+            if (user.sucursal) {
+              const ss = this.pedidoFacade.getSucursalByNombre(user.sucursal);
+              if (ss) {
+                (res.sucursal = ss.nombre), (res.sucursalId = ss.id);
+              }
+            }
+            return res;
+          }
         })
       )
     )
   );
 
+  sucursal$ = this.authService.sucursal$;
+
   vm$ = combineLatest([this.user$, this.cart$]).pipe(
     map(([user, cart]) => ({ user, cart }))
   );
-
+  descuentEspecial = 0.0;
   @ViewChild(PedidoCreateFormComponent) form: PedidoCreateFormComponent;
   constructor(
     private authService: AuthService,
@@ -72,9 +82,11 @@ export class PedidoCreatePage implements OnInit, OnDestroy {
   ngOnDestroy() {}
 
   ionViewDidLeave() {
+    /*
     if (this._user && this._saveCart) {
       this.pedidoFacade.saveCartState(this.form.getCartState(), this._user);
     }
+    */
   }
 
   async onSave(pedido: Partial<Pedido>, user: User) {
@@ -82,7 +94,7 @@ export class PedidoCreatePage implements OnInit, OnDestroy {
     pedido.createUser = user.displayName;
     pedido.updateUser = user.displayName;
     pedido.status = 'COTIZACION';
-    console.log('Salvando pedido: ', pedido);
+
     try {
       await this.dataService.createPedido(pedido, user);
       this._saveCart = false;
@@ -100,6 +112,26 @@ export class PedidoCreatePage implements OnInit, OnDestroy {
   onWarnings(warnings: any[]) {
     this.warnings = warnings;
   }
+  onDescuentoEspecial(descuento: number) {
+    this.descuentEspecial = descuento;
+  }
+
+  async onClean(form: any, user: User) {
+    try {
+      await this.startLoading('Limpiando pedido');
+      await this.pedidoFacade.cleanCart(user);
+      form.cleanForm();
+      await this.stopLoading();
+    } catch (error) {
+      await this.stopLoading();
+      const alert = await this.alertController.create({
+        header: 'Error limpiando el pedido',
+        subHeader: '',
+        message: error.message,
+      });
+      await alert.present();
+    }
+  }
 
   async startLoading(message: string = 'Procesando') {
     const loading = await this.loadingController.create({
@@ -113,17 +145,12 @@ export class PedidoCreatePage implements OnInit, OnDestroy {
   }
 
   async handleHerror(err: any) {
-    console.error('MY ERR', err);
     const alert = await this.alertController.create({
       header: 'Error de base de datos',
       subHeader: '',
       message: err.message,
     });
     await alert.present();
-  }
-
-  async showErrors(errors: any) {
-    console.log('Mostrar errores: ', errors);
   }
 
   /** Insert item */
@@ -141,7 +168,6 @@ export class PedidoCreatePage implements OnInit, OnDestroy {
   /** Show descuentos */
   @HostListener('document:keydown.control.d', ['$event'])
   async onHotKeyShowDescuentos(event: KeyboardEvent) {
-    console.log('Mostrar descuentos por volumen...');
     await this.form.showDescuentos();
   }
 
@@ -158,7 +184,6 @@ export class PedidoCreatePage implements OnInit, OnDestroy {
 
   @HostListener('document:keydown.f2', ['$event'])
   onHotKeyAltP(event: KeyboardEvent) {
-    console.log('Localizar producto...');
     // this.productoServie
     //   .openSelector()
     //   .subscribe((prod) => this.facade.addCartItem(prod));

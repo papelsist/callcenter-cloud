@@ -44,14 +44,16 @@ export class CerrarPedidoComponent implements OnInit {
     );
   }
 
-  // faltaAutoracionDelDeposito() {
-  //   if(this.requiereDeposito()) {
-  //     if(this.solicitud) {
-  //       return !this.solicitud.autorizacion
-  //     }
-  //   }
-  //   return false;
-  // }
+  faltaAutoracionDelDeposito() {
+    if (this.requiereDeposito()) {
+      if (this.solicitud) {
+        return !this.solicitud.autorizacion;
+      } else {
+        return true;
+      }
+    }
+    return false;
+  }
 
   isDisabled() {
     if (this.requiereAutorizacion()) {

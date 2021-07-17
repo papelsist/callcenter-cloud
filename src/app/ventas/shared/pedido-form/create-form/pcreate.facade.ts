@@ -43,7 +43,12 @@ import { ClienteFormController } from '@papx/shared/clientes/cliente-form/client
 import { CatalogosService } from '@papx/data-access';
 
 import * as cargosBuilder from '../../../utils/cargos';
-import { recalcularPartidas, buildSummary, normalize } from '../../../utils';
+import {
+  recalcularPartidas,
+  buildSummary,
+  normalize,
+  getClienteMostrador,
+} from '../../../utils';
 import { ItemController } from '../../ui-pedido-item';
 import { AutorizacionesDePedido } from '../../../utils';
 import * as cartUtils from '../../../utils/cart.utils';
@@ -103,7 +108,7 @@ export class PcreateFacade {
   destroy$ = new Subject<boolean>();
 
   private _reorderItems = false;
-  reorderItems$ = new BehaviorSubject(this._reorderItems);
+  private reorderItems$ = new BehaviorSubject(this._reorderItems);
 
   private currentPedido: Pedido;
   private user: User;
@@ -138,7 +143,7 @@ export class PcreateFacade {
     private clienteDataService: ClientesDataService,
     private productoDataService: ProductoService,
     private catalogos: CatalogosService,
-    auth: AuthService,
+    private auth: AuthService,
     private fb: FormBuilder
   ) {
     auth.user$.pipe(take(1)).subscribe((user) => (this.user = user));
@@ -149,8 +154,6 @@ export class PcreateFacade {
   }
 
   setPedido(data: Partial<Pedido>) {
-    console.log('Registrando datos iniciales del pedido: 😅', data);
-
     if (data.id) {
       this.currentPedido = data as Pedido;
       if (this.currentPedido.envio === null) {
@@ -162,7 +165,7 @@ export class PcreateFacade {
       const sucursalEntity = { id: data.sucursalId, nombre: data.sucursal };
       value = { ...value, sucursalEntity };
     }
-    console.log('Setting value: ', value);
+
     this.form.patchValue(value);
     if (data.partidas) {
       const summ = utils.getPedidoSummary(data);
@@ -195,6 +198,9 @@ export class PcreateFacade {
           if (!usoDeCfdi) {
             this.form.get('usoDeCfdi').setValue(cte.usoDeCfdi);
           }
+          if (!this.currentPedido) {
+            this.form.get('tipo').setValue(TipoDePedido.CREDITO);
+          }
           this.recalcular();
         }
         this.actualizarValidaciones();
@@ -203,19 +209,19 @@ export class PcreateFacade {
   }
 
   recalcular(descuentoEspecial = 0.0) {
-    console.debug(
-      `Recalculando pedido ${
-        descuentoEspecial > 0.0
-          ? 'Descuento especial del: ' + descuentoEspecial
-          : ''
-      }`
-    );
+    // console.debug(
+    //   `Recalculando pedido ${
+    //     descuentoEspecial > 0.0
+    //       ? 'Descuento especial del: ' + descuentoEspecial
+    //       : ''
+    //   }`
+    // );
 
     const tipo = this.tipo;
     const cliente = this.cliente;
     const formaDePago = this.form.get('formaDePago').value;
     // const descuentoEspecial = this.form.get('descuentoEspecial').value;
-    console.debug('Tipo: %s Forma de pago: %s', tipo, formaDePago);
+    // console.debug('Tipo: %s Forma de pago: %s', tipo, formaDePago);
 
     if (!cliente) return;
 
@@ -246,17 +252,17 @@ export class PcreateFacade {
     this._summary.next(summary);
     this.form.patchValue(summary);
     this.actualizarValidaciones();
-    console.debug('Form value: ', this.resolvePedidoData());
+    // console.debug('Form value: ', this.resolvePedidoData());
 
     this.form.markAsDirty();
   }
 
   aplicarDescuentoEspecial(descuentoEspecial: number) {
-    console.debug('Aplicando descuento especial del: ', descuentoEspecial);
+    // console.debug('Aplicando descuento especial del: ', descuentoEspecial);
 
     const tipo = this.tipo;
     const formaDePago = this.form.get('formaDePago').value;
-    console.debug('Tipo: %s Forma de pago: %s', tipo, formaDePago);
+    // console.debug('Tipo: %s Forma de pago: %s', tipo, formaDePago);
 
     const items = recalcularPartidas(
       this._currentPartidas,
@@ -266,7 +272,7 @@ export class PcreateFacade {
       +descuentoEspecial
     );
     this._currentPartidas = items;
-    console.debug('Partidas actualizadas:', items);
+    // console.debug('Partidas actualizadas:', items);
 
     const cargos = this.aplicarCargos(items, tipo, formaDePago);
     if (cargos.length > 0) {
@@ -282,7 +288,7 @@ export class PcreateFacade {
     this.form.patchValue(summary);
     this.actualizarValidaciones();
     this.form.markAsDirty();
-    console.debug('Form value: ', this.resolvePedidoData());
+    // console.debug('Form value: ', this.resolvePedidoData());
   }
 
   private aplicarCargos(
@@ -326,7 +332,7 @@ export class PcreateFacade {
       this.sucursal
     );
     if (newItem) {
-      console.log('Partida editada: ', newItem);
+      // console.log('Partida editada: ', newItem);
       const clone = [...this._currentPartidas];
       clone[index] = newItem;
       this._currentPartidas = [...clone];
@@ -394,6 +400,43 @@ export class PcreateFacade {
     return this;
   }
 
+  getCargoPorManiobra() {
+    const item: Partial<PedidoDet> = this._currentPartidas.find(
+      (item) => item.clave === 'MANIOBRAF'
+    );
+    return item ? item.precio : 0.0;
+  }
+
+  setCargoPorManiobra(importe: number) {
+    console.debug('Cargo por maniobra: ', importe);
+    // this.recalcular(+descuento);
+    let item: Partial<PedidoDet> = this._currentPartidas.find(
+      (item) => item.clave === 'MANIOBRAF'
+    );
+    if (!item) {
+      item = cargosBuilder.generarCargoPorFlete();
+    }
+    item.producto.precioContado = importe;
+    item.producto.precioCredito = importe;
+    item.precio = importe;
+    item.precioLista = importe;
+    item.precioOriginal = importe;
+
+    const items = [
+      ...this._currentPartidas.filter((item) => item.clave !== 'MANIOBRAF'),
+      item,
+    ];
+    this._currentPartidas = items;
+    this._partidas.next(this._currentPartidas);
+    this.recalcular();
+  }
+
+  getTipoDeEnvio() {
+    const envioForm = this.form.get('envio');
+    if (!envioForm || envioForm.disabled) return null;
+    return envioForm.get('tipo').value;
+  }
+
   async cambiarCliente() {
     const props = {
       tipo: this.isCredito() ? 'CREDITO' : 'TODOS',
@@ -403,7 +446,6 @@ export class PcreateFacade {
       this.registrarClienteNuevo();
     } else {
       if (selected) {
-        console.log('Cliente seleccionado: ', selected);
         this.setCliente(selected);
         this.form.get('cfdiMail').setValue(selected.cfdiMail);
       }
@@ -424,6 +466,7 @@ export class PcreateFacade {
     if (cliente.credito)
       // Solo para clientes de credito vale la pena
       this.refreshCliente(cliente.id);
+
     this.recalcular();
   }
 
@@ -517,9 +560,9 @@ export class PcreateFacade {
 
     return merge(...tasks).pipe(
       tap((p) => {
-        console.log('Actualizando disponible de %s', p.clave);
+        // console.log('Actualizando disponible de %s', p.clave);
         const found = current.filter((item) => item.clave === p.clave);
-        console.log('Fou');
+        // console.log('Fou');
         /*
         const current: Partial<PedidoDet>[] = [...this._currentPartidas];
         const found = current.filter((item) => item.clave === p.clave);
@@ -558,11 +601,13 @@ export class PcreateFacade {
     exis: { [id: string]: Almacen },
     sucursal: string
   ): Partial<PedidoDet> {
+    /*
     console.log(
       '---- Actualizando disponible Sucursal: %s  Prod: %s',
       sucursal,
       item.clave
     );
+    */
     const cant = item.cantidad;
     if (exis) {
       const disp = exis[sucursal] ? toNumber(exis[sucursal].cantidad) : 0;
@@ -576,7 +621,7 @@ export class PcreateFacade {
   }
 
   closeLiveSubscriptions() {
-    console.log('Closing live subscriptions....');
+    // console.log('Closing live subscriptions....');
     this.closeClienteSubs();
     this.destroy$.next(true);
     this.destroy$.complete();
@@ -584,16 +629,15 @@ export class PcreateFacade {
 
   private closeClienteSubs() {
     if (this.liveClienteSub) {
-      console.log('Closing live cliente subscription...');
       this.liveClienteSub.unsubscribe();
     }
   }
 
   public actualizarValidaciones() {
-    console.groupCollapsed('---- Actualizando validaciones -------');
+    // console.groupCollapsed('---- Actualizando validaciones -------');
     this.warnings();
     this.autorizaciones();
-    console.groupEnd();
+    // console.groupEnd();
   }
 
   private warnings() {
@@ -609,7 +653,6 @@ export class PcreateFacade {
     if (this.currentPedido) {
       this.currentPedido.warnings = warnings;
     }
-    console.log('Warnings: ', warnings);
     this._warnings.next(warnings);
   }
 
@@ -618,8 +661,20 @@ export class PcreateFacade {
     const items = this._currentPartidas;
     const descuentoEspecial = this.descuentoEspecial ?? 0.0;
     const aut = AutorizacionesDePedido.Requeridas(items, descuentoEspecial);
-    console.log('Autorizacion requerida: ', aut);
     this._autorizaciones = aut;
     this.autorizaciones$.next(this._autorizaciones);
+  }
+
+  cleanForm() {
+    if (!this.getPedido()) {
+      const cleanValue: Partial<Pedido> = {
+        cliente: getClienteMostrador(),
+        nombre: 'MOSTRADOR',
+        partidas: [],
+      };
+      // this.form.reset();
+      this.setPedido(cleanValue);
+      this.form.markAsPending();
+    }
   }
 }

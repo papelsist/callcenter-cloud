@@ -8,6 +8,7 @@ import { IonicModule } from '@ionic/angular';
 import { AutorizadasPage } from './autorizadas.page';
 import { AutorizadaItemComponent } from './list-view/autorizada-item.component';
 import { AutorizadasListComponent } from './list-view/autorizadas-list.component';
+import { SharedFiltersModule } from '@papx/shared/filters/shared-filters.module';
 
 const routes: Routes = [
   {
@@ -21,6 +22,7 @@ const routes: Routes = [
     CommonModule,
     FormsModule,
     IonicModule,
+    SharedFiltersModule,
     RouterModule.forChild(routes),
   ],
   declarations: [

@@ -1,4 +1,33 @@
-import { FormBuilder, Validators } from '@angular/forms';
+import {
+  FormBuilder,
+  FormGroup,
+  ValidatorFn,
+  Validators,
+  ValidationErrors,
+  AbstractControl,
+} from '@angular/forms';
+
+// export function direccionValidator(control: AbstractControl) {
+//   const form = control.parent;
+//   const tipo = form.controls['tipo'].value;
+//   const direccion = control.value;
+//   if (tipo === 'OCURRE') {
+//     return null;
+//   } else {
+//     return direccion === null ? { required: true } : null;
+//   }
+// }
+// export function direccionValidator(): ValidatorFn {
+//   return (form: FormGroup) => {
+//     const tipo = form.controls['tipo'].value;
+//     const direccion = form.controls['direccion'].value;
+//     if(tipo === 'OCURRE') {
+//       return null;
+//     } else {
+//       return (direccion === null ) ? {required: true} : null;
+//     }
+//   }
+// }
 
 export function createEnvioForm(fb: FormBuilder) {
   return fb.group(
@@ -10,7 +39,7 @@ export function createEnvioForm(fb: FormBuilder) {
         {
           validators: [
             Validators.required,
-            Validators.minLength(5),
+            Validators.minLength(3),
             Validators.maxLength(50),
           ],
           updateOn: 'blur', // Required to capitalize de value
@@ -30,7 +59,7 @@ export function createEnvioForm(fb: FormBuilder) {
       ],
       comentario: [],
       fechaDeEntrega: [new Date().toISOString()],
-      direccion: [{ value: null, disabled: true }],
+      direccion: [{ value: null, disabled: true }, [Validators.required]],
     },
     { updateOn: 'change' }
   );

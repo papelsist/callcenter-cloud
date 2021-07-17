@@ -30,7 +30,7 @@ export class PedidoItemListComponent implements OnInit {
   @Input() fabButton = false;
 
   @ViewChildren(PedidoItemComponent) children: QueryList<PedidoItemComponent>;
-  reorder$ = this.facade.reorderItems$;
+  //reorder$ = this.facade.reorderItems$;
   constructor(private facade: PcreateFacade, private cd: ChangeDetectorRef) {}
 
   ngOnInit() {}

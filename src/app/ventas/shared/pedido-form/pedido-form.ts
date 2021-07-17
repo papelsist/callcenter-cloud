@@ -52,6 +52,7 @@ export class PedidoForm extends FormGroup {
           PedidoValidators.ChequesDevueltos,
           PedidoValidators.SocioRequerido,
           PedidoValidators.EnvioRequerido,
+          PedidoValidators.EnvioConCargoRequerido,
           CreditoValidators.CreditoRequired,
           CreditoValidators.ValidarPostFechado,
         ],

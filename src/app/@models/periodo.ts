@@ -85,3 +85,21 @@ export class Periodo {
     };
   }
 }
+
+export interface PeriodoSearchCriteria {
+  fechaInicial: string;
+  fechaFinal: string;
+  registros: number;
+}
+
+export const buildPeriodoCriteria = (
+  dias: number = 3,
+  registros = 20
+): PeriodoSearchCriteria => {
+  const { fechaInicial, fechaFinal } = Periodo.fromNow(dias).toApiJSON();
+  return {
+    fechaInicial,
+    fechaFinal,
+    registros,
+  };
+};

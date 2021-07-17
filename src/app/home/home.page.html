@@ -21,17 +21,14 @@
   </ion-header>
 
   <div id="container" *ngIf="user$ | async as user">
-    <div class="home-image">
+    <!-- <div class="home-image">
       <img
         src="https://firebasestorage.googleapis.com/v0/b/papx-ws-prod.appspot.com/o/images%2Fpapel-logo2.svg?alt=media&token=b20eea1b-98e3-4c5f-b129-d8725d05e9f9"
         alt=""
       />
-    </div>
-    <strong>SIIPAPX Callcenter App</strong>
-    <p>
-      Bienvenido
-      <ion-text color="warning">{{user.displayName}}</ion-text>
-      al sistema de ventas telefónicas de Papel S.A.
-    </p>
+    </div> -->
+    <h1>SX-CALLCENTER 2</h1>
+    <p>Bienvenido al sistema de ventas telefónicas.</p>
+    <p>Usuario :<ion-text color="warning">{{user.displayName}}</ion-text></p>
   </div>
 </ion-content>

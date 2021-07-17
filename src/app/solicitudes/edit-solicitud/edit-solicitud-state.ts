@@ -52,4 +52,8 @@ export class EditSolicitudState {
     console.log('Actualizando id: ', sol.id);
     return this.dataService.update({ id: sol.id, changes }, userInfo);
   }
+
+  buscarDuplicado(solicitud: Partial<SolicitudDeDeposito>) {
+    return this.dataService.buscarDuplicado(solicitud);
+  }
 }

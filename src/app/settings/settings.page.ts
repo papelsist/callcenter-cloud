@@ -6,7 +6,8 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./settings.page.scss'],
 })
 export class SettingsPage implements OnInit {
-  appVersion = '1.0.38 (26/06/2021: 09:30:00)';
+  appVersion = '1.0.55 (16/07/2021: 09:40)';
+
   constructor() {}
 
   ngOnInit() {}

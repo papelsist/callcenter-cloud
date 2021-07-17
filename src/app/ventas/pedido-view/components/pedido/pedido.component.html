@@ -16,6 +16,9 @@
       <span>Factura: {{ factura.serie }}-{{ factura.folio }}</span>
       <span>UUID: {{ factura.uuid }}</span>
     </div>
+    <div class="row-3" *ngIf="pedido.status === 'FACTURADO_CANCELADO'">
+      <span>Factura CANCELADA</span>
+    </div>
   </div>
 
   <div class="partidas">

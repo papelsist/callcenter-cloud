@@ -74,6 +74,9 @@ export interface Pedido {
     id: string;
   };
   puesto?: any;
+  atendido?: any;
+  atencion?: any;
+  embarqueLog?: EmbarqueLog;
 }
 
 export interface PedidoDet {
@@ -150,7 +153,8 @@ export type Status =
   | 'ATENDIDO'
   | 'POR_FACTURAR'
   | 'FACTURADO'
-  | 'FACTURADO_TIMBRADO';
+  | 'FACTURADO_TIMBRADO'
+  | 'FACTURADO_CANCELADO';
 
 export interface InstruccionDeEnvio {
   tipo: 'ENVIO' | 'FORANEO' | 'OCURRE' | 'ENVIO_CARGO';
@@ -286,10 +290,10 @@ export interface PedidosSearchCriteria {
 }
 
 export const buildCriteria = (
-  periodo: Periodo = Periodo.fromNow(3)
+  periodo: Periodo = Periodo.fromNow(20)
 ): PedidosSearchCriteria => {
   const { fechaInicial, fechaFinal } = periodo.toApiJSON();
-  const registros = 20;
+  const registros = 100;
   return {
     fechaInicial,
     fechaFinal,

@@ -14,7 +14,7 @@ import {
   Validators,
 } from '@angular/forms';
 import { Cliente, SolicitudDeDeposito, UpdateSolicitud } from '@papx/models';
-import { merge } from 'rxjs';
+import { combineLatest, merge } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { BaseComponent } from 'src/app/core';
 
@@ -26,9 +26,12 @@ import { BaseComponent } from 'src/app/core';
 })
 export class SolicitudEditFormComponent
   extends BaseComponent
-  implements OnInit {
+  implements OnInit
+{
   @Input() solicitud: Partial<SolicitudDeDeposito>;
   @Output() save = new EventEmitter<Partial<SolicitudDeDeposito>>();
+  @Output() valueReady = new EventEmitter<Partial<SolicitudDeDeposito>>();
+
   form: FormGroup;
   controls: { [key: string]: AbstractControl };
 
@@ -39,26 +42,32 @@ export class SolicitudEditFormComponent
   ngOnInit() {
     this.form = this.buildForm();
     this.setControls();
-    this.form.patchValue(this.solicitud, { emitEvent: false });
-    console.log('Editando solicitud: ', this.solicitud);
-    console.log('Form: ', this.form.value);
+
+    this.validacionDeNoDuplicados();
+    this.form.patchValue(this.solicitud, { emitEvent: true });
+
+    // console.log('Editando solicitud: ', this.solicitud);
+    // console.log('Form: ', this.form.value);
 
     this.registerTransferenciaListener();
     this.registerEfectivoChequeListener();
   }
 
   private buildForm(): FormGroup {
-    return this.fb.group({
-      cliente: [null, [Validators.required]],
-      banco: [null, [Validators.required]],
-      cuenta: [null, [Validators.required]],
-      efectivo: [null, [Validators.min(0.0)]],
-      cheque: [null, [Validators.min(0.0)]],
-      transferencia: [null, [Validators.min(0.0)]],
-      total: [null, [Validators.required, Validators.min(10.0)]],
-      referencia: [null, [Validators.required]],
-      fechaDeposito: [null, [Validators.required]],
-    });
+    return this.fb.group(
+      {
+        cliente: [null, [Validators.required]],
+        banco: [null, [Validators.required]],
+        cuenta: [null, [Validators.required]],
+        efectivo: [null, [Validators.min(0.0)]],
+        cheque: [null, [Validators.min(0.0)]],
+        transferencia: [null, [Validators.min(0.0)]],
+        total: [null, [Validators.required, Validators.min(10.0)]],
+        referencia: [null, [Validators.required]],
+        fechaDeposito: [null, [Validators.required]],
+      },
+      { updateOn: 'blur' }
+    );
   }
 
   private setControls() {
@@ -142,5 +151,19 @@ export class SolicitudEditFormComponent
   getCliente(): Partial<Cliente> {
     const { id, clave, nombre } = this.form.get('cliente').value;
     return { id, clave, nombre };
+  }
+
+  private validacionDeNoDuplicados() {
+    const fechaDeposito$ = this.form.get('fechaDeposito').valueChanges;
+    const total$ = this.form.get('total').valueChanges;
+    const banco$ = this.form.get('banco').valueChanges;
+    const cuenta$ = this.form.get('cuenta').valueChanges;
+
+    const merg = combineLatest([fechaDeposito$, total$, banco$, cuenta$])
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(([fechaDeposito, total, banco, cuenta]) => {
+        const command = { fechaDeposito, total, banco, cuenta };
+        this.valueReady.emit(command);
+      });
   }
 }

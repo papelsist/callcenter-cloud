@@ -30,66 +30,57 @@ import { SolicitudDetailModalComponent } from '@papx/shared/ui-solicitudes/solic
       mode="ios"
     >
       <ion-label>
-        <ion-grid>
+        <ion-grid class="ion-no-padding">
           <ion-row>
-            <!-- 1 Importes -->
-            <ion-col
-              class="ion-text-wrap ion-text-center"
-              size-xs="12"
-              size-sm="6"
-              size-md="4"
-              size-lg="3"
-            >
-              <ion-text [color]="importeColor">
+            <ion-col size="12" size-md="5" size-lg="2">
+              <ion-text color="primary">
                 <h2>
                   {{ sol.total | currency }}
                 </h2>
               </ion-text>
-              <ion-chip>
-                <ion-icon name="key" color="success"></ion-icon>
-                <ion-label
-                  >Autorizada:
+            </ion-col>
+            <ion-col size="12" size-md="5" size-lg="2" class="ion-text-warp">
+              <ion-text color="primary">
+                <h2>F.Depósito:{{ sol.fechaDeposito | date: 'dd/MM/yyyy' }}</h2>
+              </ion-text>
+            </ion-col>
+
+            <ion-col size="12" size-md="3" size-lg="4" class="ion-text-warp">
+              <ion-text color="primary">
+                <h2>{{ sol.banco.nombre }}</h2>
+              </ion-text>
+            </ion-col>
+
+            <ion-col size="12" size-md="3" size-lg="4" class="ion-text-warp">
+              <ion-text color="primary">
+                <h2>
+                  Cta:
+                  {{ sol.cuenta.numero }} ({{ sol.cuenta.descripcion }})
+                </h2>
+              </ion-text>
+            </ion-col>
+
+            <ion-col size="12" size-md="12" size-lg="4" class="ion-text-warp">
+              <h2 class="ion-text-wrap cliente">
+                {{ sol.cliente.nombre }}
+              </h2>
+            </ion-col>
+
+            <ion-col size="12" size-md="6" size-lg="4" class="ion-text-wrap">
+              <h2 class="ion-text-wrap  solicita">
+                Solicita: {{ sol.solicita }}
+                <span class="sucursal">({{ sol.sucursal }} )</span>
+              </h2>
+            </ion-col>
+            <ion-col size="12" size-lg="4" class="ion-text-end">
+              <h2>
+                <span class="ion-padding-right">Autorizada:</span>
+                <ion-text color="success">
                   {{
                     sol.autorizacion.fecha.toDate() | date: 'dd/MM/yyyy HH:mm'
-                  }}</ion-label
-                >
-              </ion-chip>
-            </ion-col>
-
-            <!-- 2 Banos -->
-            <ion-col
-              size-xs="12"
-              size-sm="6"
-              size-md="4"
-              size-lg="3"
-              class="ion-text-wrap ion-text-center"
-            >
-              <ion-text color="secondary">
-                <h5 class="cuenta">
-                  {{ sol.cuenta.descripcion }}
-                  <strong> ({{ sol.cuenta.numero }}) </strong>
-                </h5>
-              </ion-text>
-              <h5 class="banco-origen">Origen: {{ sol.banco.nombre }}</h5>
-            </ion-col>
-
-            <!-- 3 Cliente -->
-            <ion-col
-              class="ion-hide-md-down ion-padding-start cliente"
-              size-md="4"
-              size-lg="3"
-            >
-              <h5 class="ion-text-wrap ">
-                {{ sol.cliente.nombre }}
-              </h5>
-            </ion-col>
-
-            <!-- 4 Solicita -->
-            <ion-col class="ion-hide-lg-down ion-text-center" size-lg="3">
-              <h5 class="ion-text-wrap  solicita">
-                {{ sol.solicita }}
-              </h5>
-              <h5 class="sucursal">({{ sol.sucursal }} )</h5>
+                  }}
+                </ion-text>
+              </h2>
             </ion-col>
           </ion-row>
         </ion-grid>
@@ -97,6 +88,11 @@ import { SolicitudDetailModalComponent } from '@papx/shared/ui-solicitudes/solic
       <ion-note slot="start" color="primary">
         {{ sol.folio }}
       </ion-note>
+      <ion-icon
+        name="checkmark-done"
+        slot="end"
+        [color]="sol.cobro ? 'success' : 'warning'"
+      ></ion-icon>
     </ion-item>
   `,
   styles: [
@@ -119,6 +115,7 @@ import { SolicitudDetailModalComponent } from '@papx/shared/ui-solicitudes/solic
       .fechas {
       }
       .cliente {
+        font-size: 1rem;
       }
       .solicita {
       }
@@ -148,7 +145,7 @@ export class AutorizadaItemComponent implements OnInit {
   }
 
   updateRetraso() {
-    let fecha = parseISO(this.sol.lastUpdated);
+    let fecha = parseISO(this.sol.fecha);
     if (this.isSBC()) {
       fecha = addBusinessDays(fecha, 1); //addHours(fecha, 24);
     }

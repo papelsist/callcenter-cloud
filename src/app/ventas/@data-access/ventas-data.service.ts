@@ -129,7 +129,10 @@ export class VentasDataService {
   findFacturas(criteria: PedidosSearchCriteria) {
     return this.afs
       .collection<Pedido>(this.PEDIDOS_COLLECTION, (ref) => {
-        let query = ref.where('status', '==', 'FACTURADO_TIMBRADO');
+        let query = ref.where('status', 'in', [
+          'FACTURADO_TIMBRADO',
+          'FACTURADO_CANCELADO',
+        ]);
         if (criteria) {
           const { fechaInicial, fechaFinal } = criteria;
           query = query
@@ -199,6 +202,7 @@ export class VentasDataService {
         updateUser: user.displayName,
         createUserId: user.uid,
         appVersion: 2,
+        atendido: false,
       };
 
       const folioRef = this.afs.doc('folios/pedidos').ref;
@@ -251,11 +255,11 @@ export class VentasDataService {
 
   async cerrarPedido(pedido: Partial<Pedido>, user: User) {
     try {
-      const status =
-        pedido.warnings && pedido.warnings.length ? 'POR_AUTORIZAR' : 'CERRADO';
+      // const status =
+      //   pedido.warnings && pedido.warnings.length ? 'POR_AUTORIZAR' : 'CERRADO';
 
       const payload: Partial<Pedido> = {
-        status,
+        status: 'CERRADO',
         cerrado: new Date().toISOString(),
         cierre: {
           userUid: user.uid,
@@ -304,7 +308,6 @@ export class VentasDataService {
     };
 
     const data: Partial<Pedido> = {
-      status: 'CERRADO',
       autorizacion: aut,
     };
     return this.updatePedido(pedido.id, data, user);

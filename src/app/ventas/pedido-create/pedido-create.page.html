@@ -5,6 +5,8 @@
       (save)="onSave($event, vm.user)"
       (errors)="onErrors($event)"
       (warnings)="onWarnings($event)"
+      (clean)="onClean(form, vm.user)"
+      (descuentEspecial)="onDescuentoEspecial($event)"
       [data]="vm.cart"
     ></papx-pedido-form>
   </ion-content>
@@ -19,6 +21,20 @@
       </ion-buttons>
       <ion-title class="ion-text-center" color="success">
         Total: {{ summary['total'] | currency}}
+        <ion-text color="warning">
+          <small
+            class="ion-padding-start"
+            *ngIf="descuentEspecial <= 0 else especial"
+          >
+            Dscto: {{summary['descuento'] / 100 | percent}}
+          </small>
+          <ng-template #especial>
+            <small class="ion-padding-start" *ngIf="descuentEspecial > 0">
+              Dscto: {{descuentEspecial / 100 | percent}} (Original:
+              {{summary['descuentoOriginal'] / 100 | percent}})
+            </small>
+          </ng-template>
+        </ion-text>
       </ion-title>
       <ion-buttons slot="end">
         <!-- <papx-errors-btn [errors]="errors"></papx-errors-btn> -->

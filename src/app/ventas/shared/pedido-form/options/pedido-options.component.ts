@@ -71,7 +71,7 @@ export class PedidoOptionsComponent implements OnInit {
       ],
       buttons: [
         {
-          text: 'Cancelar',
+          text: 'Cerrar',
           role: 'cancel',
         },
         {

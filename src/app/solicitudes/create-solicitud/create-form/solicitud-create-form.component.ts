@@ -225,6 +225,7 @@ export class SolicitudCreateFormComponent implements OnInit, OnDestroy {
       if (this.pedido) {
         payload.pedido = this.pedido;
       }
+      this.form.markAsPristine();
       this.save.emit(payload);
     }
   }

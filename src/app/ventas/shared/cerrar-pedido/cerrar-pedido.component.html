@@ -55,8 +55,20 @@
     <ion-row *ngIf="solicitud">
       <ion-col>
         <ion-item>
+          <ion-label> Solicitud: {{ solicitud.folio }} </ion-label>
+        </ion-item>
+      </ion-col>
+      <ion-col>
+        <ion-item>
           <ion-label>
-            Depósito: {{ solicitud.folio }} Status: {{ solicitud.status }}
+            Status:
+            <ion-text
+              [color]="
+                solicitud.status !== 'AUTORIZADO' ? 'warning' : 'success'
+              "
+            >
+              {{ solicitud.status }}
+            </ion-text>
           </ion-label>
         </ion-item>
       </ion-col>
@@ -68,7 +80,7 @@
     </ion-list-header>
   </div>
   <div class="ion-padding" *ngIf="requiereDeposito()">
-    <ion-list-header color="warning">
+    <ion-list-header color="warning" *ngIf="faltaAutoracionDelDeposito()">
       <ion-label>
         ALERTA: Forma de pago {{ pedido.formaDePago }} requiere deposito
         AUTORIZADO

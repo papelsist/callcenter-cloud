@@ -10,6 +10,7 @@
       (delete)="onDelete(vm.pedido, vm.user)"
       (errors)="onErrors($event)"
       (warnings)="onWarnings($event)"
+      (nuevo)="goToNuevoPedido($event)"
       (descuentEspecial)="onDescuentoEspecial($event)"
     ></papx-pedido-form>
   </ion-content>
@@ -33,9 +34,18 @@
       <ion-title class="ion-text-center" color="success">
         Total: {{ summary['total'] | currency}}
         <ion-text color="warning">
-          <small class="ion-padding-start" *ngIf="descuentEspecial > 0">
-            (Dscto especial: {{descuentEspecial / 100 | percent}})
+          <small
+            class="ion-padding-start"
+            *ngIf="descuentEspecial <= 0 else especial"
+          >
+            Dscto: {{summary['descuento'] / 100 | percent}}
           </small>
+          <ng-template #especial>
+            <small class="ion-padding-start" *ngIf="descuentEspecial > 0">
+              Dscto: {{descuentEspecial / 100 | percent}} (Original:
+              {{summary['descuentoOriginal'] / 100 | percent}})
+            </small>
+          </ng-template>
         </ion-text>
       </ion-title>
       <ion-buttons slot="end">

@@ -51,9 +51,7 @@ export class PedidoEditPage implements OnInit, OnDestroy {
     private alertController: AlertController
   ) {}
 
-  ngOnInit() {
-
-  }
+  ngOnInit() {}
 
   ngOnDestroy() {
     this.facade.setCurrent(null);
@@ -156,6 +154,10 @@ export class PedidoEditPage implements OnInit, OnDestroy {
     console.log('Err: ', err);
   }
   showErrors(errrors: any) {}
+
+  goToNuevoPedido(event: any) {
+    this.router.navigateByUrl('/ventas/cotizaciones');
+  }
 
   /** Insert item */
   @HostListener('document:keydown.meta.i', ['$event'])

@@ -8,22 +8,8 @@
   <ion-content>
     <papx-pendientes-grid
       [pedidos]="vm.pedidos"
-      (regresar)="regresar($event, vm.user)"
+      (regresar)="regresar($event, vm.user, vm.claims)"
       (consultar)="onConsultar($event)"
     ></papx-pendientes-grid>
-    <!-- <ion-toolbar>
-      <ion-searchbar
-        #searchBar
-        placeholder="Filtrar"
-        searchIcon=""
-        (ionChange)="onFilter(searchBar.value)"
-        debounce="600"
-      ></ion-searchbar>
-      <ion-buttons slot="end"> </ion-buttons>
-    </ion-toolbar>
-    <papx-pendientes-list
-      [pedidos]="vm.pedidos"
-      (regresar)="regresar($event, vm.user)"
-    ></papx-pendientes-list> -->
   </ion-content>
 </ng-container>

@@ -129,10 +129,10 @@ export class ItemFormComponent extends BaseComponent implements OnInit {
     const { precioCredito, precioContado } = prod;
     producto.setValue(prod);
     descripcion.setValue(prod.descripcion);
-    const pp = this.isCredito ? precioCredito : precioContado
+    const pp = this.isCredito ? precioCredito : precioContado;
     precio.setValue(pp);
     const factor = prod.unidad === 'MIL' ? 1000 : 1;
-    const importe = round(pp * (+this.cantidad / factor))
+    const importe = round(pp * (+this.cantidad / factor));
     this.form.get('importe').setValue(importe);
 
     this.updateExistenciasPanel();
@@ -160,9 +160,20 @@ export class ItemFormComponent extends BaseComponent implements OnInit {
 
   onSubmit() {
     if (this.form.valid) {
+      this.actualizarFaltante();
       if (this.item) {
-        const {clave, descripcion} = this.form.get('producto').value;
-        const updated = { ...this.item, ...this.form.getRawValue(), clave, descripcion };
+        const {
+          clave,
+          descripcion,
+          id: productoId,
+        } = this.form.get('producto').value;
+        const updated = {
+          ...this.item,
+          ...this.form.getRawValue(),
+          productoId,
+          clave,
+          descripcion,
+        };
         this.save.emit(updated);
       } else {
         const item = buildPedidoItem(this.tipo, this.form.getRawValue());
@@ -182,12 +193,9 @@ export class ItemFormComponent extends BaseComponent implements OnInit {
   }
 
   private addListeners() {
-    this.totales$
-      .pipe(takeUntil(this.destroy$))
-      .subscribe((importes) => {
-        console.log('Nuevos importes: ', importes)
-        this.form.patchValue(importes)
-      });
+    this.totales$.pipe(takeUntil(this.destroy$)).subscribe((importes) => {
+      this.form.patchValue(importes);
+    });
     this.disponibilidadListener();
   }
 
@@ -197,22 +205,24 @@ export class ItemFormComponent extends BaseComponent implements OnInit {
       .subscribe((cantidad) => {
         if (cantidad) {
           const faltante = this.resolverFaltante();
-          this.form.get('faltante').setValue(faltante);
+          this.form.get('faltante').setValue(+faltante);
         }
       });
   }
 
+  actualizarFaltante() {
+    const cantidad = this.cantidad;
+    const faltante = this.resolverFaltante();
+    this.form.get('faltante').setValue(+faltante);
+  }
+
   getDisponible(): number {
+    const name = this.sucursal.toLowerCase().replace(/\s+/g, '');
     if (this.existencia) {
-      const almacen = this.existencia[this.sucursal.toLowerCase()];
+      const almacen = this.existencia[name];
       if (almacen) {
         return toNumber(almacen.cantidad);
       }
-      // const disponible = Object.keys(this.existencia).reduce(
-      //   (p, c) => p + toNumber(this.existencia[c].cantidad),
-      //   0.0
-      // );
-      // return disponible;
     }
     return 0;
   }
@@ -221,6 +231,12 @@ export class ItemFormComponent extends BaseComponent implements OnInit {
     const can = this.cantidad;
     const dis = this.getDisponible();
     const faltante = dis > can ? 0 : can - dis;
+    console.debug(
+      'Cantidad: %f Disponible: %f Faltante: %f',
+      can,
+      dis,
+      faltante
+    );
     return faltante;
   }
 }

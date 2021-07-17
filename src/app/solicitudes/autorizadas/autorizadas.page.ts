@@ -1,61 +1,82 @@
 import { Component, OnInit } from '@angular/core';
-import { AuthService } from '@papx/auth';
 
-import { SolicitudDeDeposito, UserInfo } from '@papx/models';
+import { BehaviorSubject, combineLatest } from 'rxjs';
+import { map, shareReplay, switchMap } from 'rxjs/operators';
+
+import isEmpty from 'lodash-es/isEmpty';
+import orderBy from 'lodash-es/orderBy';
+
+import { AuthService } from '@papx/auth';
 import { SolicitudesService } from '@papx/shared/solicitudes/@data-access/solicitudes.service';
-import {
-  BehaviorSubject,
-  combineLatest,
-  Observable,
-  of,
-  throwError,
-} from 'rxjs';
-import { catchError, map, takeUntil, tap } from 'rxjs/operators';
 import { BaseComponent } from 'src/app/core';
+import { buildPeriodoCriteria, PeriodoSearchCriteria } from '@papx/models';
 
 @Component({
   selector: 'app-autorizadas',
   templateUrl: './autorizadas.page.html',
   styleUrls: ['./autorizadas.page.scss'],
 })
-export class AutorizadasPage implements OnInit {
-  autorizadas$: Observable<SolicitudDeDeposito[]>;
-  filtrar$ = new BehaviorSubject<boolean>(true);
+export class AutorizadasPage extends BaseComponent implements OnInit {
+  criteria$ = new BehaviorSubject<PeriodoSearchCriteria>(
+    buildPeriodoCriteria(2, 50)
+  );
+  search$ = new BehaviorSubject<string>('');
 
-  STORAGE_KEY = 'sx-depositos-pwa.solicitudes.autorizadas';
+  private _filtrar = new BehaviorSubject<boolean>(false);
+  filtrar$ = this._filtrar.asObservable().pipe(shareReplay());
 
-  constructor(private service: SolicitudesService, private auth: AuthService) {}
+  solicitudes$ = combineLatest([
+    this.criteria$,
+    this.auth.userInfo$,
+    this.filtrar$,
+  ]).pipe(
+    map(([criteria, user, filtrar]) => ({ criteria, user, filtrar })),
+    switchMap(({ criteria, user, filtrar }) =>
+      this.service.findAutorizadas(criteria).pipe(
+        map((rows) => orderBy(rows, ['folio'], ['desc'])),
+        map((rows) =>
+          filtrar
+            ? rows.filter((item) => item.updateUserUid === user.uid)
+            : rows
+        )
+      )
+    ),
+    shareReplay(1)
+  );
 
-  ngOnInit() {
-    this.loadConfig();
-    this.load();
+  filteredSolicitudes$ = combineLatest([this.search$, this.solicitudes$]).pipe(
+    map(([term, solicitudes]) =>
+      isEmpty(term)
+        ? solicitudes
+        : solicitudes.filter((item) => {
+            const data =
+              `${item.cliente.nombre}${item.total}${item.solicita}`.toLowerCase();
+            return data.includes(term.toLowerCase());
+          })
+    )
+  );
+
+  vm$ = combineLatest([this.filtrar$]).pipe(map(([filtrar]) => ({ filtrar })));
+
+  constructor(private service: SolicitudesService, private auth: AuthService) {
+    super();
   }
 
-  private load() {
-    this.autorizadas$ = combineLatest([
-      this.service.findAutorizadas(),
-      this.filtrar$.pipe(tap((val) => console.log('Filtrando: ', val))),
-      this.auth.user$,
-    ]).pipe(
-      map(([solicitudes, filtrar, user]) => {
-        return filtrar
-          ? solicitudes.filter((item) => item.updateUserUid === user.uid)
-          : solicitudes;
-      })
-    );
-  }
-
-  private loadConfig() {
-    const value = localStorage.getItem(this.STORAGE_KEY) || 'true';
-    this.filtrar$.next(value === 'true');
-  }
+  ngOnInit() {}
 
   filtrar(value: boolean) {
-    this.filtrar$.next(!value);
-    localStorage.setItem(this.STORAGE_KEY, value.toString());
+    this._filtrar.next(!value);
   }
 
-  private handleError(err: any) {
-    console.log('Error: ');
+  onSearch(event: string) {
+    this.search$.next(event);
+  }
+
+  changeCriteria(event: PeriodoSearchCriteria) {
+    this.criteria$.next(event);
+  }
+
+  getTitle(value: boolean) {
+    return value ? 'Mis solicitudes autorizadas' : 'Solicitudes Autorizadas';
   }
 }

@@ -28,7 +28,7 @@
       </ion-button>
       <ion-button
         color="primary"
-        [disabled]="form.form.pristine || form.form.invalid"
+        [disabled]="form.form.invalid"
         (click)="form.onSubmit()"
       >
         <ion-icon slot="start" name="save"></ion-icon>

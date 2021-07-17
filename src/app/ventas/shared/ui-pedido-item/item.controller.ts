@@ -53,6 +53,10 @@ export class ItemController {
     await modal.present();
     const { data } = await modal.onWillDismiss<Partial<PedidoDet>>();
     if (data) {
+      // console.debug('---->>>>>>>>  Data from modal: ', data);
+      // console.debug('---->>>>>>>>  Current item:    ', item);
+      // const res = { ...item, ...data };
+      // console.debug('---->>>>>>>>  Copy :    ', res);
       return { ...item, ...data };
     } else {
       return null;

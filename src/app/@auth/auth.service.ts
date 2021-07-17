@@ -19,11 +19,13 @@ import { mapUser } from './utils';
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   readonly user$ = this.auth.authState.pipe(
-    map((user) => (user ? mapUser(user) : null))
+    map((user) => (user ? mapUser(user) : null)),
+    shareReplay(1) // Evaluando
   );
 
   readonly claims$ = this.auth.idTokenResult.pipe(
-    map((res) => (res ? res.claims : {}))
+    map((res) => (res ? res.claims : {})),
+    shareReplay(1)
   );
 
   readonly userInfo$: Observable<UserInfo | null> = this.user$.pipe(

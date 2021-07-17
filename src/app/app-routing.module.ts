@@ -85,6 +85,13 @@ const routes2: Routes = [
           ),
       },
       {
+        path: 'analytics',
+        loadChildren: () =>
+          import('./features/analytics/analytics.module').then(
+            (m) => m.AnalyticsModule
+          ),
+      },
+      {
         path: '',
         redirectTo: 'home',
         pathMatch: 'full',
@@ -114,7 +121,8 @@ const routes: Routes = [
 
 @NgModule({
   imports: [
-    RouterModule.forRoot(routes2, { preloadingStrategy: PreloadAllModules }),
+    // RouterModule.forRoot(routes2, { preloadingStrategy: PreloadAllModules }),
+    RouterModule.forRoot(routes2),
   ],
   exports: [RouterModule],
 })

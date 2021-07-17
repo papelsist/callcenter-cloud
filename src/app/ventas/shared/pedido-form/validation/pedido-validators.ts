@@ -88,4 +88,16 @@ export class PedidoValidators {
     const envio = form.get('envio');
     return cod ? (envio.invalid ? { envioRequerido: true } : null) : null;
   }
+
+  static EnvioConCargoRequerido(form: FormGroup): ValidationErrors | null {
+    const envioForm = form.get('envio') as FormGroup;
+    if (!envioForm || envioForm.disabled) {
+      return null;
+    }
+    const tipoEnvio = envioForm.controls['tipo'].value;
+    if (tipoEnvio === 'ENVIO_CARGO') {
+      // console.log('Validar cargo por maniobra.....'); No se puede sin acceso al importe de la maniobra
+    }
+    return null;
+  }
 }

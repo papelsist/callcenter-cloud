@@ -93,7 +93,6 @@ export class CatalogosService {
   buscarSucursalPorZip(
     codigoPostal: string
   ): Observable<Partial<Sucursal> | null> {
-    console.log('Buscando sucursal para zip: ', codigoPostal);
     const zip = +codigoPostal;
     return this.firestore
       .collection('zonas', (rf) => {
@@ -102,7 +101,7 @@ export class CatalogosService {
       .valueChanges()
       .pipe(
         map((rows) => rows.filter((item) => item['cp_fin'] > zip)),
-        tap((rows) => console.log('rows: ', rows)),
+        // tap((rows) => console.log('rows: ', rows)),
         map((rows: any[]) => {
           if (rows && rows.length > 0) {
             const row = rows[0];

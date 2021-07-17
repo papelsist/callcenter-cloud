@@ -50,25 +50,30 @@ import { DireccionController } from '@papx/shared/direccion';
       </ion-item-options>
     </ion-item-sliding>
     <ion-item *ngIf="!!value">
-      <address>
-        <span
-          >Calle: {{ value.calle }} Número:
-          {{ value.numeroExterior }}
-          <span *ngIf="value.numeroInterior"
-            >Int: {{ value.numeroInterior }}</span
-          >
-        </span>
-        <div>
-          <span>Colonia: {{ value.colonia }}</span>
-        </div>
-        <div>
-          <span>Municipio: {{ value.municipio }}</span>
-          <span class="ion-padding-start">Estado: {{ value.estado }}</span>
-        </div>
-        <ion-text color="warning">
-          <div>CP: {{ value.codigoPostal }}</div>
-        </ion-text>
-      </address>
+      <ion-label>
+        {{ value.nombre }}
+        <address *ngIf="value.direccion as direccion">
+          <span
+            >Calle: {{ direccion.calle }} Número:
+            {{ direccion.numeroExterior }}
+            <span *ngIf="direccion.numeroInterior"
+              >Int: {{ direccion.numeroInterior }}</span
+            >
+          </span>
+          <div>
+            <span>Colonia: {{ direccion.colonia }}</span>
+          </div>
+          <div>
+            <span>Municipio: {{ direccion.municipio }}</span>
+            <span class="ion-padding-start"
+              >Estado: {{ direccion.estado }}</span
+            >
+          </div>
+          <ion-text color="warning">
+            <div>CP: {{ direccion.codigoPostal }}</div>
+          </ion-text>
+        </address>
+      </ion-label>
     </ion-item>
   `,
   providers: [

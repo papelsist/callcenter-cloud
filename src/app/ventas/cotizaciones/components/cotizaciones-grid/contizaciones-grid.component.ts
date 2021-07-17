@@ -20,6 +20,8 @@ import {
   RowDoubleClickedEvent,
 } from 'ag-grid-community';
 
+import isEmpty from 'lodash-es/isEmpty';
+
 @Component({
   selector: 'papx-cotizaciones-grid',
   template: `
@@ -45,6 +47,7 @@ export class CotizacionesGridComponent implements OnInit {
   @Output() consultar = new EventEmitter<any>();
   @Output() print = new EventEmitter<any>();
   @Output() cerrar = new EventEmitter<any>();
+  @Output() autorizar = new EventEmitter<any>();
   @Output() copiar = new EventEmitter<any>();
   @Output() showOptions = new EventEmitter<any>();
 
@@ -85,6 +88,13 @@ export class CotizacionesGridComponent implements OnInit {
     }
     if (params.data.status === 'CERRADO') {
       return { 'font-weight': 'bold', 'font-style': 'italic', color: 'green' };
+    }
+    if (params.data.autorizacion) {
+      return {
+        'font-weight': 'bold',
+        'font-style': 'italic',
+        color: 'var(--ion-color-success)',
+      };
     }
     if (params.data.autorizacionesRequeridas) {
       if (params.data.autorizacion) {
@@ -138,7 +148,7 @@ export class CotizacionesGridComponent implements OnInit {
         sortable: true,
         filter: true,
         resizable: true,
-        minWidth: 250
+        minWidth: 250,
       },
       {
         headerName: 'Tipo',
@@ -161,6 +171,7 @@ export class CotizacionesGridComponent implements OnInit {
         field: 'formaDePago',
         sortable: true,
         filter: true,
+        width: 110,
         valueGetter: (params) => params.data.formaDePago,
       },
       {
@@ -208,6 +219,14 @@ export class CotizacionesGridComponent implements OnInit {
 
         valueGetter: (params) => params.data.updateUser,
       },
+      {
+        headerName: 'Autorización',
+        field: 'vendedor',
+        width: 120,
+        resizable: true,
+        valueGetter: (params) => params.data.autorizacion,
+        valueFormatter: (value) => (value.data ? 'AUT:' : ''),
+      },
       /*
       {
         headerName: 'Copiar',
@@ -234,8 +253,14 @@ export class CotizacionesGridComponent implements OnInit {
         cellRendererParams: {
           name: 'download',
           color: 'success',
-          callback: (event: Event, data: any) => {
-            this.cerrar.emit(data);
+          callback: (event: Event, data: Partial<Pedido>) => {
+            if (!isEmpty(data.autorizacionesRequeridas) && !data.autorizacion) {
+              this.autorizar.emit(data);
+            } else {
+              this.cerrar.emit(data);
+            }
+
+            // this.cerrar.emit(data);
           },
         },
       },
@@ -255,5 +280,9 @@ export class CotizacionesGridComponent implements OnInit {
         },
       },
     ];
+  }
+
+  private isPorAutorizar(data: Partial<Pedido>) {
+    return !isEmpty(data.autorizacionesRequeridas) && !data.autorizacion;
   }
 }

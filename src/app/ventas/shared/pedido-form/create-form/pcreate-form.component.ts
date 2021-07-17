@@ -17,6 +17,7 @@ import {
   map,
   distinctUntilChanged,
   finalize,
+  skip,
 } from 'rxjs/operators';
 import { merge, Observable } from 'rxjs';
 
@@ -32,9 +33,10 @@ import {
   TipoDePedido,
 } from '@papx/models';
 import { PcreateFacade } from './pcreate.facade';
-import { ToastController } from '@ionic/angular';
+import { AlertController, ToastController } from '@ionic/angular';
 import { FormatService } from 'src/app/core/services/format.service';
 import { LoadingService } from '@papx/common/ui-core';
+import { FormGroup } from '@angular/forms';
 
 @Component({
   selector: 'papx-pedido-form',
@@ -55,6 +57,8 @@ export class PedidoCreateFormComponent
   @Output() errors = new EventEmitter();
   @Output() warnings = new EventEmitter();
   @Output() delete = new EventEmitter();
+  @Output() clean = new EventEmitter();
+  @Output() nuevo = new EventEmitter();
   @Output() descuentEspecial = new EventEmitter();
 
   form = this.facade.form;
@@ -76,7 +80,8 @@ export class PedidoCreateFormComponent
     private cd: ChangeDetectorRef,
     private toast: ToastController,
     private format: FormatService,
-    private loading: LoadingService
+    private loading: LoadingService,
+    private alertController: AlertController
   ) {
     super();
   }
@@ -108,9 +113,9 @@ export class PedidoCreateFormComponent
         }
       });
 
-      this.summary$
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(value => console.debug('Summary: ', value))
+    // this.summary$
+    //   .pipe(takeUntil(this.destroy$))
+    //   .subscribe((value) => console.debug('Summary: ', value));
   }
 
   ngAfterViewInit() {
@@ -184,13 +189,16 @@ export class PedidoCreateFormComponent
 
   addListeners() {
     this.cliente$ = this.controls.cliente.valueChanges.pipe(
-      startWith(this.cliente) /**Important!  Needs to start with*/
+      startWith(this.cliente) /**Important!  Needs to start with*/,
+      takeUntil(this.destroy$)
     );
     this.recalculoListener();
     this.sucursalListener();
     this.errorsListener();
     this.clienteListener();
     this.descuentoEspecialListener();
+
+    this.debugState();
   }
 
   recalculoListener() {
@@ -200,7 +208,7 @@ export class PedidoCreateFormComponent
           // Side effect para limpiar el descuento especial
           if (tipo === TipoDePedido.CREDITO && this.facade.descuentoEspecial) {
             // this.facade.setDescuentoEspecial(0.0, true); // Sin detonar eventos
-            this.form.get('descuentoEspecial').setValue(0.0)
+            this.form.get('descuentoEspecial').setValue(0.0);
           }
         })
       ),
@@ -211,14 +219,6 @@ export class PedidoCreateFormComponent
   }
 
   errorsListener() {
-    // this.form.statusChanges
-    //   .pipe(
-    //     distinctUntilChanged(),
-    //     tap(() => this.facade.runWarnings()), // Side effect to run warnings
-    //     takeUntil(this.destroy$)
-    //   )
-    //   .subscribe((status) => {});
-
     this.facade.errors$
       .pipe(takeUntil(this.destroy$))
       .subscribe((errors) => this.errors.emit(errors));
@@ -235,7 +235,6 @@ export class PedidoCreateFormComponent
         if (s) {
           this.form.get('sucursal').setValue(s.nombre);
           this.form.get('sucursalId').setValue(s.id);
-          // this.facade.actualizarExistenciasDeSucursal(s.nombre);
         }
       });
   }
@@ -245,7 +244,8 @@ export class PedidoCreateFormComponent
       .pipe(
         takeUntil(this.destroy$),
         distinctUntilChanged(),
-        tap((cte) => this.ajustarTipo(cte))
+        tap((cte) => this.ajustarTipo(cte)),
+        tap((cte) => this.prepararEnvio(cte))
       )
       .subscribe(() => {});
   }
@@ -265,8 +265,31 @@ export class PedidoCreateFormComponent
     return this.form.valid && this.form.dirty;
   }
 
-  submit() {
+  async submit() {
     if (this.canSubmit) {
+      // Validar envio
+      if (this.form.get('envio') && this.form.get('envio').enabled) {
+        const envioForm = this.form.get('envio') as FormGroup;
+        const tipo = envioForm.controls['tipo'].value;
+        if (tipo === 'ENVIO_CARGO') {
+          const cargo = this.facade.getCargoPorManiobra();
+          if (cargo <= 0.0) {
+            const modal = await this.alertController.create({
+              header: 'Envio con cargo',
+              message: 'Se requiere cargo por maniobra',
+              buttons: [
+                {
+                  text: 'Cerrar',
+                  role: 'cancel',
+                },
+              ],
+            });
+            await modal.present();
+            return;
+          }
+        }
+      }
+
       const data = this.facade.resolvePedidoData();
       this.facade.closeLiveSubscriptions();
       this.save.emit(data);
@@ -343,6 +366,8 @@ export class PedidoCreateFormComponent
     }
   }
 
+  prepararEnvio(cliente: Partial<Cliente>) {}
+
   toogleReordenar() {
     this.facade.toggleReorer();
   }
@@ -378,5 +403,35 @@ export class PedidoCreateFormComponent
 
   showDescuentos() {
     this.options.showDescuentos();
+  }
+
+  cleanForm() {
+    this.facade.cleanForm();
+  }
+
+  debugState() {
+    // this.form.statusChanges
+    //   .pipe(takeUntil(this.destroy$), skip(2))
+    //   .subscribe((state) => {
+    //     console.debug('Form state changed: ', state);
+    //   });
+    // this.form.valueChanges
+    //   .pipe(takeUntil(this.destroy$), skip(2))
+    //   .subscribe((value) => {
+    //     console.debug('Pedido form: ', this.form);
+    //   });
+    // this.form
+    //   .get('envio')
+    //   .valueChanges.pipe(takeUntil(this.destroy$), skip(2))
+    //   .subscribe((value) => {
+    //     console.debug('Envio Forem value changed: ', value);
+    //   });
+    // this.form
+    //   .get('envio')
+    //   .statusChanges.pipe(takeUntil(this.destroy$), skip(2))
+    //   .subscribe((state) => {
+    //     console.debug('ENVIO: ', state);
+    //     console.debug('EnvioForm: ', this.form.get('envio'));
+    //   });
   }
 }

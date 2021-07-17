@@ -52,7 +52,15 @@ export class CotizacionesPage extends BaseComponent implements OnInit {
     this.filtrarPorUsuario$,
     this.auth.userInfo$,
     this.criteria$,
-  ]).pipe(map(([filtrar, user, criteria]) => ({ filtrar, user, criteria })));
+    this.auth.claims$,
+  ]).pipe(
+    map(([filtrar, user, criteria, claims]) => ({
+      filtrar,
+      user,
+      criteria,
+      claims,
+    }))
+  );
 
   searchCriteria: any = null;
 
@@ -188,29 +196,43 @@ export class CotizacionesPage extends BaseComponent implements OnInit {
   }
 
   async onCerrar(event: Partial<Pedido>, user: User) {
-    console.log('Cerrando pedido: ', event);
-    if (event.autorizacionesRequeridas) {
-      await this.autorizar(event, user);
-    } else {
+    if (event.autorizacion || !event.autorizacionesRequeridas) {
       await this.pedidosFacade.cerrarPedido(event, user);
     }
   }
 
-  async autorizar(pedido: Partial<Pedido>, user: User) {
-    const { autorizar, comentario } = await this.pedidosFacade.autorizar(
-      pedido
-    );
-    if (autorizar && !isEmty(comentario)) {
-      await this.ventasController.starLoading();
-      try {
-        await this.dataService.autorizarPedido(pedido, comentario, user);
-        await this.dataService.cerrarPedido(pedido, user);
-        await this.ventasController.stopLoading();
-      } catch (error) {
-        await this.ventasController.stopLoading();
-        this.ventasController.handelError(error);
+  async onAutorizar(pedido: Partial<Pedido>, user: User, claims: any) {
+    if (pedido.autorizacion) {
+      return;
+    }
+    if (!pedido.autorizacionesRequeridas) {
+      return;
+    }
+    if (!claims['xpapCallcenterAdmin']) {
+      console.debug('No tiene derechos para autorizar pedidos');
+      return;
+    }
+
+    const data = await this.pedidosFacade.autorizar(pedido);
+    if (data) {
+      const {
+        autorizar,
+        values: { comentario },
+      } = data;
+      if (autorizar && !isEmty(comentario)) {
+        await this.ventasController.starLoading();
+        try {
+          await this.dataService.autorizarPedido(pedido, comentario, user);
+          await this.ventasController.stopLoading();
+        } catch (error) {
+          await this.ventasController.stopLoading();
+          this.ventasController.handelError(error);
+        }
       }
     }
+    // const { autorizar, comentario } = await this.pedidosFacade.autorizar(
+    //   pedido
+    // );
   }
 
   async onCerrar1(event: Partial<Pedido>, user: User) {

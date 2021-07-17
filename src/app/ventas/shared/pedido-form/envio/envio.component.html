@@ -28,6 +28,12 @@
         formControlName="direccion"
         [direcciones]="direcciones$ | async"
       ></sxcc-envio-direccion>
+      <ion-note
+        color="danger"
+        *ngIf="controls.direccion.hasError('required') && form.dirty"
+      >
+        Se requiere la dirección
+      </ion-note>
     </ion-col>
   </ion-row>
   <ion-row [formGroup]="form">

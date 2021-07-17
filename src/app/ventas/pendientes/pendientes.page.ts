@@ -35,13 +35,15 @@ export class PendientesPage {
     this.filtrarPorUsuario$,
     this.auth.userInfo$,
     this.filteredPedidos$,
+    this.auth.claims$,
   ]).pipe(
-    map(([filtrar, user, pedidos]) => ({
+    map(([filtrar, user, pedidos, claims]) => ({
       filtrar,
       user,
       pedidos: filtrar
         ? pedidos.filter((item) => item.updateUserId === user.uid)
         : pedidos,
+      claims,
     }))
   );
 
@@ -74,8 +76,12 @@ export class PendientesPage {
     }
   }
 
-  async regresar(pedido: Pedido, user: User) {
+  async regresar(pedido: Pedido, user: User, claims: any) {
     if (['EN_SUCURSAL'].includes(pedido.status)) {
+      if (!claims['xpapCallcenterAdmin']) {
+        console.debug('No tiene derechos para regresar pedidos');
+        return;
+      }
       if (!pedido.puesto) {
         const res = await this.controller.regresar(pedido);
 

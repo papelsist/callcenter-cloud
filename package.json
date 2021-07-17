@@ -29,6 +29,7 @@
     "ag-grid-community": "^25.2.1",
     "date-fns": "2.16.1",
     "firebase": "^7.0 || ^8.0",
+    "ionic4-auto-complete": "^2.9.8",
     "lodash-es": "^4.17.20",
     "pdfmake": "^0.1.71",
     "rxjs": "~6.6.0",

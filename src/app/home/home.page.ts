@@ -8,7 +8,7 @@ import { AuthService } from '../@auth/auth.service';
   styleUrls: ['home.page.scss'],
 })
 export class HomePage {
-  title = 'Callcenter App';
+  title = 'SX-CALLCENTER2';
   user$ = this.auth.userInfo$;
   host = location.href;
   constructor(private auth: AuthService) {}

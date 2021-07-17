@@ -13,7 +13,7 @@ import {
 import { Router } from '@angular/router';
 import { combineLatest } from 'rxjs';
 import { AuthService } from '@papx/auth';
-import { AlertController } from '@ionic/angular';
+import { AlertController, LoadingController } from '@ionic/angular';
 
 import { map, take } from 'rxjs/operators';
 import { SolicitudesService } from '@papx/shared/solicitudes/@data-access/solicitudes.service';
@@ -55,23 +55,32 @@ export class CreateSolicitudPage implements OnInit {
     private pedidoDataService: VentasDataService,
     private auth: AuthService,
     private router: Router,
-    private alertController: AlertController
+    private alertController: AlertController,
+    private loadingController: LoadingController
   ) {}
 
   ngOnInit() {}
 
   async onSave(sol: Partial<SolicitudDeDeposito>, user: User) {
+    sol.tipo = this.cartera;
+    console.log('Crear solicitud: ', sol);
+
+    const loading = await this.loadingController.create({
+      message: 'Salvando depósito',
+    });
     try {
-      sol.tipo = this.cartera;
-      console.log('Crear solicitud: ', sol);
+      await loading.present();
       const fol = await this.service.createSolicitud(sol, user);
+      await loading.dismiss();
       this.router.navigate(['solicitudes']);
     } catch (error) {
+      await loading.dismiss();
       this.handleError(error.message);
     }
   }
 
   async validarDuplicado(sol: Partial<SolicitudDeDeposito>) {
+    console.debug('Value ready: ', sol);
     const found = await this.service.buscarDuplicado(sol);
     if (found.length > 0) {
       const { sucursal, solicita, total } = found[0];
@@ -186,5 +195,12 @@ export class CreateSolicitudPage implements OnInit {
       ],
     });
     await al.present();
+  }
+
+  async startLoading(message: string) {
+    const loading = await this.loadingController.create({
+      message,
+    });
+    await loading.present();
   }
 }

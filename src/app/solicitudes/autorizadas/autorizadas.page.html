@@ -1,15 +1,29 @@
-<ion-header>
+<ion-header *ngIf="vm$ | async as vm">
   <ion-toolbar>
     <ion-buttons slot="start">
       <ion-menu-button></ion-menu-button>
     </ion-buttons>
-    <ion-title *ngIf="filtrar$ | async as filtrar">
-      {{filtrar ? 'Mis solicitudes autorizadas' : 'Solicitudes autorizadas'}}
+    <ion-title>
+      <div class="title">
+        <span>{{getTitle(vm.filtrar)}}</span>
+        <span
+          class="ion-text-center periodo"
+          *ngIf="criteria$ | async as criteria"
+        >
+          <span> {{criteria.fechaInicial | date: 'dd/MM/yyyy'}} al</span>
+          <span> {{criteria.fechaFinal | date: 'dd/MM/yyyy'}} </span>
+        </span>
+      </div>
     </ion-title>
     <ion-buttons slot="end">
+      <papx-periodo-selector-btn
+        [criteria]="criteria"
+        *ngIf="criteria$ | async as criteria"
+        (citeriaChanged)="changeCriteria($event)"
+      ></papx-periodo-selector-btn>
       <ion-button
-        (click)="filtrar(false)"
-        [color]="(filtrar$ | async) ? 'primary': ''"
+        (click)="filtrar(vm.filtrar)"
+        [color]="vm.filtrar ? 'primary': ''"
       >
         <ion-icon name="filter" slot="icon-only"></ion-icon>
       </ion-button>
@@ -18,7 +32,15 @@
 </ion-header>
 
 <ion-content class="ion-padding">
-  <!-- <papx-autorizadas-list
-    [solicitudes]="autorizadas$ | async"
-  ></papx-autorizadas-list> -->
+  <ion-toolbar>
+    <ion-searchbar
+      placeholder="Filtrar"
+      (ionChange)="onSearch(search.value)"
+      #search
+    ></ion-searchbar>
+  </ion-toolbar>
+
+  <papx-autorizadas-list
+    [solicitudes]="filteredSolicitudes$ | async"
+  ></papx-autorizadas-list>
 </ion-content>

@@ -50,7 +50,16 @@ const HorarioValidator = (
 };
 
 const findDirecciones = (cliente: Partial<Cliente>): ClienteDireccion[] => {
+  console.debug('Preparando direcciones de envio.....');
   if (cliente.rfc === 'XAXX010101000') return [];
+
+  const direccionFiscal = {
+    direccion: cliente.direccion,
+    nombre: 'Direccion Fiscal',
+  };
+  const direcciones = cliente.direcciones || [];
+  return [direccionFiscal, ...direcciones];
+  /*
   if (cliente.direcciones) {
     return cliente.direcciones;
   } else {
@@ -61,6 +70,7 @@ const findDirecciones = (cliente: Partial<Cliente>): ClienteDireccion[] => {
       },
     ];
   }
+  */
 };
 
 @Component({
@@ -85,6 +95,7 @@ export class EnvioComponent extends BaseComponent implements OnInit {
   }
 
   ngOnInit() {
+    // console.debug('Envio: ', this.parent.get('envio'));
     this.initForm();
     this.setControls();
     this.registerTipoListener();
@@ -112,6 +123,7 @@ export class EnvioComponent extends BaseComponent implements OnInit {
       telefono: this.form.controls.telefono,
       horario: this.form.controls.horario,
       fechaDeEntrega: this.form.controls.fechaDeEntrega,
+      direccion: this.form.controls.direccion,
     };
   }
 
@@ -154,7 +166,7 @@ export class EnvioComponent extends BaseComponent implements OnInit {
       .get('direccion')
       .valueChanges.pipe(takeUntil(this.destroy$))
       .subscribe((value: ClienteDireccion) => {
-        if (value) {
+        if (value && value.direccion) {
           const { codigoPostal } = value.direccion;
           this.catalogos.buscarSucursalPorZip(codigoPostal).subscribe((val) => {
             if (val) {
@@ -185,7 +197,18 @@ export class EnvioComponent extends BaseComponent implements OnInit {
   }
 
   setEnvio({ detail: { checked } }: any) {
-    checked ? this.form.enable() : this.form.disable();
+    if (checked) {
+      this.form.enable();
+      this.form.markAsDirty();
+    } else {
+      // this.form.disable();
+      this.parent.get('envio').disable();
+      this.form.reset();
+      // this.form.markAsPristine();
+      // this.form.clearValidators();
+      // this.form.markAsUntouched();
+    }
+
     this.parent.markAsDirty();
   }
 

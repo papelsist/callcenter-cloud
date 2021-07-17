@@ -89,6 +89,12 @@ export class FacturasGridComponent implements OnInit {
         color: 'var(--ion-color-tertiary)',
       };
     }
+    if (['FACTURADO_CANCELADO'].includes(params.data.status)) {
+      return {
+        'font-weight': 'bold',
+        color: 'var(--ion-color-danger)',
+      };
+    }
 
     return {};
   }
@@ -164,7 +170,12 @@ export class FacturasGridComponent implements OnInit {
               3
             )} (A${params.data.autorizacionesRequeridas.substr(0, 1)})`;
           } else {
-            return params.data.status;
+            const { status } = params.data;
+            return status === 'FACTURADO_TIMBRADO'
+              ? 'FACTURADO'
+              : status === 'FACTURADO_CANCELADO'
+              ? 'CANCELADO'
+              : status;
           }
         },
         onCellClicked: (params) => this.regresar.emit(params.data),

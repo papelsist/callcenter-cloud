@@ -19,7 +19,7 @@ import { Producto } from '@papx/models';
         <ion-col>
           <ion-item>
             <ion-label class="ion-text-start">
-              <span class="ion-padding-end"> Disponible: </span>
+              <span class="ion-padding-end"> Disponible (Global): </span>
               <ion-text color="success">
                 <span>
                   {{ getDisponible() | number: '1.0-0' }}

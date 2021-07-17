@@ -38,6 +38,8 @@ export interface SolicitudDeDeposito {
   retraso?: number;
   pedido?: Partial<Pedido>;
   appVersion?: number;
+  cerrado?: boolean;
+  cobro?: string;
   log?: {
     createTime: firebase.firestore.Timestamp;
     updateTime: firebase.firestore.Timestamp;

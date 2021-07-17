@@ -1,0 +1,23 @@
+.section {
+  display: grid;
+  align-items: center;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+}
+
+.section > span {
+  display: flex;
+  justify-content: flex-start;
+  gap: 10px;
+
+  span {
+    flex-grow: 1;
+    flex-shrink: 0;
+    flex-basis: auto;
+  }
+}
+
+.section-factura {
+  display: grid;
+  align-items: center;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+}

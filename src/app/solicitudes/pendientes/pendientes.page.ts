@@ -18,7 +18,7 @@ import { SolicitudDetailModalComponent } from '@papx/shared/ui-solicitudes/solic
 export class PendientesPage implements OnInit {
   filtrar$ = new BehaviorSubject<boolean>(false);
 
-  pendientes$ = this.service.findPendientes();
+  pendientes$ = this.service.pendientes$;
 
   pedidosFiltrados$ = combineLatest([
     this.pendientes$,

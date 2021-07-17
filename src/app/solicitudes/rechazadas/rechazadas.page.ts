@@ -14,7 +14,7 @@ import { BaseComponent } from 'src/app/core';
 })
 export class RechazadasPage implements OnInit {
   STORAGE_KEY = 'sx-depositos-pwa.solicitudes.rechazadas';
-  solicitudes$ = this.service.findRechazadas();
+  solicitudes$ = this.service.rechazadas$;
   filtrar$ = new BehaviorSubject<boolean>(false);
   filtroBtnColor$: Observable<string> = this.filtrar$.pipe(
     map((value) => (value ? 'primary' : ''))
