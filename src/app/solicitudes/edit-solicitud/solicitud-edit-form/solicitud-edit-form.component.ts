@@ -31,7 +31,7 @@ export class SolicitudEditFormComponent
   @Input() solicitud: Partial<SolicitudDeDeposito>;
   @Output() save = new EventEmitter<Partial<SolicitudDeDeposito>>();
   @Output() valueReady = new EventEmitter<Partial<SolicitudDeDeposito>>();
-
+  banco: any;
   form: FormGroup;
   controls: { [key: string]: AbstractControl };
 
@@ -51,6 +51,7 @@ export class SolicitudEditFormComponent
 
     this.registerTransferenciaListener();
     this.registerEfectivoChequeListener();
+    this.registerBancoListener();
   }
 
   private buildForm(): FormGroup {
@@ -93,6 +94,19 @@ export class SolicitudEditFormComponent
     } else {
       controls.forEach((ctrl) => ctrl.enable());
     }
+  }
+
+  cambioBanco(banco){
+    console.log(banco);
+    this.banco = banco;
+    this.form.markAsPristine();
+  }
+
+  private registerBancoListener(){
+    this.form.get('banco').valueChanges.subscribe((val) =>{
+        console.log('Desde El Listener');
+        console.log(val);
+    });
   }
 
   private registerTransferenciaListener() {
@@ -143,6 +157,7 @@ export class SolicitudEditFormComponent
   private perpare(form: FormGroup): Partial<SolicitudDeDeposito> {
     return {
       ...this.form.getRawValue(),
+      banco: this.banco ,
       cliente: this.getCliente(),
       sbc: this.getSbc(),
     };

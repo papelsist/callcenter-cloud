@@ -80,7 +80,6 @@ export class CreateSolicitudPage implements OnInit {
   }
 
   async validarDuplicado(sol: Partial<SolicitudDeDeposito>) {
-    console.debug('Value ready: ', sol);
     const found = await this.service.buscarDuplicado(sol);
     if (found.length > 0) {
       const { sucursal, solicita, total } = found[0];

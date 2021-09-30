@@ -1,78 +1,61 @@
 <div class="ion-padding" [formGroup]="form">
-  <div class="row row-bancos">
-    <papelx-banco-field formControlName="banco"></papelx-banco-field>
-    <papelx-cuenta-field formControlName="cuenta"></papelx-cuenta-field>
-  </div>
-  <div class="row row-importes">
-    <ion-item>
-      <ion-label position="floating">Transferencia</ion-label>
-      <ion-input type="number" formControlName="transferencia"></ion-input>
-      <ion-icon name="send" slot="start"></ion-icon>
-    </ion-item>
-    <ion-item>
-      <ion-label position="floating">Efectivo</ion-label>
-      <ion-input type="number" formControlName="efectivo"></ion-input>
-      <ion-icon name="cash" slot="start"></ion-icon>
-    </ion-item>
-    <ion-item>
-      <ion-label position="floating">Cheque</ion-label>
-      <ion-input type="number" formControlName="cheque"></ion-input>
-      <ion-icon name="wallet" slot="start"></ion-icon>
-    </ion-item>
-  </div>
+    <div class="row row-bancos">
+        <papelx-banco-field formControlName="banco" (cambio)="cambioBanco($event)"></papelx-banco-field>
+        <papelx-cuenta-field formControlName="cuenta"></papelx-cuenta-field>
+    </div>
+    <div class="row row-importes">
+        <ion-item>
+            <ion-label position="floating">Transferencia</ion-label>
+            <ion-input type="number" formControlName="transferencia"></ion-input>
+            <ion-icon name="send" slot="start"></ion-icon>
+        </ion-item>
+        <ion-item>
+            <ion-label position="floating">Efectivo</ion-label>
+            <ion-input type="number" formControlName="efectivo"></ion-input>
+            <ion-icon name="cash" slot="start"></ion-icon>
+        </ion-item>
+        <ion-item>
+            <ion-label position="floating">Cheque</ion-label>
+            <ion-input type="number" formControlName="cheque"></ion-input>
+            <ion-icon name="wallet" slot="start"></ion-icon>
+        </ion-item>
+    </div>
 
-  <div class="row row-fechas">
-    <ion-item>
-      <ion-label position="floating">Fecha depósito</ion-label>
-      <ion-datetime
-        pickerFormat="DD MMM YYYY"
-        displayFormat="DD MMM YYYY"
-        placeholder="Seleccione la fecha"
-        monthShortNames="ene, feb, mar, abr, may, jun, jul, ago, sep, oct, nov, dis"
-        cancelText="Cancelar"
-        doneText="Seleccionar"
-        formControlName="fechaDeposito"
-      ></ion-datetime>
-      <ion-icon name="calendar" slot="start"></ion-icon>
-    </ion-item>
+    <div class="row row-fechas">
+        <ion-item>
+            <ion-label position="floating">Fecha depósito</ion-label>
+            <ion-datetime pickerFormat="DD MMM YYYY" displayFormat="DD MMM YYYY" placeholder="Seleccione la fecha" monthShortNames="ene, feb, mar, abr, may, jun, jul, ago, sep, oct, nov, dis" cancelText="Cancelar" doneText="Seleccionar" formControlName="fechaDeposito"></ion-datetime>
+            <ion-icon name="calendar" slot="start"></ion-icon>
+        </ion-item>
 
-    <ion-item>
-      <ion-item>
-        <ion-label position="floating">Referencia</ion-label>
-        <ion-input formControlName="referencia"></ion-input>
-        <ion-icon slot="start" name="information-circle"></ion-icon>
-      </ion-item>
-    </ion-item>
-  </div>
-  <div>
-    <papelx-cliente-selector-field
-      formControlName="cliente"
-    ></papelx-cliente-selector-field>
-  </div>
+        <ion-item>
+            <ion-item>
+                <ion-label position="floating">Referencia</ion-label>
+                <ion-input formControlName="referencia"></ion-input>
+                <ion-icon slot="start" name="information-circle"></ion-icon>
+            </ion-item>
+        </ion-item>
+    </div>
+    <div>
+        <papelx-cliente-selector-field formControlName="cliente"></papelx-cliente-selector-field>
+    </div>
 
-  <div class="ion-text-center">
-    <h2>
-      <ion-text color="primary">
-        <span class="ion-padding-end">Total: </span>
-        {{ form.get("total").value | currency }}
-      </ion-text>
-    </h2>
-    <p *ngIf="form.get('total').hasError('min')">
-      <ion-text color="warning">
-        El importe mínimo permitido es de $10.00
-      </ion-text>
-    </p>
-  </div>
-  <div>
-    <ion-button
-      expand="block"
-      color="primary"
-      fill="solid"
-      (click)="onSubmit()"
-      [disabled]="form.invalid || form.pristine"
-    >
-      <ion-label>Salvar</ion-label>
-      <ion-icon name="save" slot="start"></ion-icon>
-    </ion-button>
-  </div>
+    <div class="ion-text-center">
+        <h2>
+            <ion-text color="primary">
+                <span class="ion-padding-end">Total: </span> {{ form.get("total").value | currency }}
+            </ion-text>
+        </h2>
+        <p *ngIf="form.get('total').hasError('min')">
+            <ion-text color="warning">
+                El importe mínimo permitido es de $10.00
+            </ion-text>
+        </p>
+    </div>
+    <div>
+        <ion-button expand="block" color="primary" fill="solid" (click)="onSubmit()" [disabled]="form.invalid || form.pristine">
+            <ion-label>Salvar</ion-label>
+            <ion-icon name="save" slot="start"></ion-icon>
+        </ion-button>
+    </div>
 </div>

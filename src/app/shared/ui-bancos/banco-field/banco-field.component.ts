@@ -4,6 +4,8 @@ import {
   ChangeDetectionStrategy,
   Input,
   ChangeDetectorRef,
+  Output,
+  EventEmitter,
 } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 
@@ -54,6 +56,7 @@ export class BancoFieldComponent implements OnInit, ControlValueAccessor {
   value: Banco;
 
   @Input() bancos: Banco[] = [];
+  @Output() cambio = new EventEmitter<Banco>();
 
   customPopoverOptions: any = {
     header: 'Catálogo de bancos',
@@ -97,8 +100,10 @@ export class BancoFieldComponent implements OnInit, ControlValueAccessor {
 
   onSelection({ detail: { value } }: any) {
     // const detail = {e}
+    // console.log(value);
     this.value = value;
     this.onChange(value);
+    this.cambio.emit(value);
     this.cd.markForCheck();
   }
 }
