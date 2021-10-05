@@ -42,6 +42,7 @@ export class SolicitudCreateFormComponent implements OnInit, OnDestroy {
   @Input() solcita: string;
   _pedido: Partial<Pedido> | null = null;
   form: FormGroup;
+  clicked ;
 
   controls: { [key: string]: AbstractControl };
 
@@ -257,4 +258,8 @@ export class SolicitudCreateFormComponent implements OnInit, OnDestroy {
       return false;
     }
   }
+
+  trueclick(){
+    this.clicked = true;
+    }
 }

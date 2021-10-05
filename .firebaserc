@@ -1,24 +1,14 @@
 {
-  "projects": {
-    "development": "papx-ws-dev",
-    "default": "papx-ws-dev",
-    "dev": "papx-ws-dev",
-    "prod": "papx-ws-prod"
-  },
-  "targets": {
-    "papx-ws-dev": {
-      "hosting": {
-        "callcenter": [
-          "papel-callcenter-dev"
-        ]
-      }
+    "projects": {
+        "cloud": "papel-cloud-9c1df"
     },
-    "papx-ws-prod": {
-      "hosting": {
-        "callcenter": [
-          "papws-callcenter"
-        ]
-      }
+    "targets": {
+        "papel-cloud-9c1df": {
+            "hosting": {
+                "papel-callcenter": [
+                    "papel-callcenter-cloud"
+                ]
+            }
+        }
     }
-  }
 }

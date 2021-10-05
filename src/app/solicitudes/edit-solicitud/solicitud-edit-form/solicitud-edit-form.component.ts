@@ -32,6 +32,7 @@ export class SolicitudEditFormComponent
   @Output() save = new EventEmitter<Partial<SolicitudDeDeposito>>();
   @Output() valueReady = new EventEmitter<Partial<SolicitudDeDeposito>>();
   banco: any;
+  cuenta: any;
   form: FormGroup;
   controls: { [key: string]: AbstractControl };
 
@@ -52,6 +53,7 @@ export class SolicitudEditFormComponent
     this.registerTransferenciaListener();
     this.registerEfectivoChequeListener();
     this.registerBancoListener();
+    this.registerCuentaListener();
   }
 
   private buildForm(): FormGroup {
@@ -63,7 +65,7 @@ export class SolicitudEditFormComponent
         efectivo: [null, [Validators.min(0.0)]],
         cheque: [null, [Validators.min(0.0)]],
         transferencia: [null, [Validators.min(0.0)]],
-        total: [null, [Validators.required, Validators.min(10.0)]],
+        total: [null, [Validators.required, Validators.min(1.0)]],
         referencia: [null, [Validators.required]],
         fechaDeposito: [null, [Validators.required]],
       },
@@ -99,11 +101,24 @@ export class SolicitudEditFormComponent
   cambioBanco(banco){
     console.log(banco);
     this.banco = banco;
-    this.form.markAsPristine();
+    this.form.markAsDirty();
+  }
+
+  cambioCuenta(cuenta){
+    console.log(cuenta);
+    this.cuenta = cuenta;
+    this.form.markAsDirty();
   }
 
   private registerBancoListener(){
-    this.form.get('banco').valueChanges.subscribe((val) =>{
+    this.form.get('banco').valueChanges.subscribe((val) => {
+        console.log('Desde El Listener');
+        console.log(val);
+    });
+  }
+
+  private registerCuentaListener(){
+    this.form.get('cuenta').valueChanges.subscribe((val) => {
         console.log('Desde El Listener');
         console.log(val);
     });
@@ -157,7 +172,8 @@ export class SolicitudEditFormComponent
   private perpare(form: FormGroup): Partial<SolicitudDeDeposito> {
     return {
       ...this.form.getRawValue(),
-      banco: this.banco ,
+      banco: this.banco ? this.banco : this.solicitud.banco  ,
+      cuenta: this.cuenta ? this.cuenta : this.solicitud.cuenta,
       cliente: this.getCliente(),
       sbc: this.getSbc(),
     };

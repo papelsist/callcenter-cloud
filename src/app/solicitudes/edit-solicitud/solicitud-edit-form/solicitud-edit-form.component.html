@@ -1,7 +1,7 @@
 <div class="ion-padding" [formGroup]="form">
     <div class="row row-bancos">
         <papelx-banco-field formControlName="banco" (cambio)="cambioBanco($event)"></papelx-banco-field>
-        <papelx-cuenta-field formControlName="cuenta"></papelx-cuenta-field>
+        <papelx-cuenta-field formControlName="cuenta" (cambio)="cambioCuenta($event)"></papelx-cuenta-field>
     </div>
     <div class="row row-importes">
         <ion-item>

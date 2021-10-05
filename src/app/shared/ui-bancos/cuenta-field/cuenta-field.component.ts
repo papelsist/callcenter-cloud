@@ -4,6 +4,8 @@ import {
   ChangeDetectionStrategy,
   Input,
   ChangeDetectorRef,
+  Output,
+  EventEmitter,
 } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 
@@ -71,6 +73,7 @@ export class CuentaFieldComponent implements OnInit, ControlValueAccessor {
   onTouch: any;
   disabled = false;
   value: CuentaDeBanco;
+  @Output() cambio = new EventEmitter<CuentaDeBanco>();
 
   @Input() cuentas: CuentaDeBanco[] = [];
 
@@ -112,6 +115,7 @@ export class CuentaFieldComponent implements OnInit, ControlValueAccessor {
   onSelect({ detail: { value } }: any) {
     this.value = value;
     this.onChange(value);
+    this.cambio.emit(value);
     this.cd.markForCheck();
   }
 
