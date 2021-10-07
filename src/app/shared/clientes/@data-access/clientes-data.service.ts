@@ -183,7 +183,7 @@ export class ClientesDataService {
       const id = this.afs.createId();
       const data = {
         ...cliente,
-        clave: `SX_CALL ${folio}`,
+        clave: `SXCC${folio}`,
         activo: true,
         id,
         dateCreated: new Date().toISOString(),
