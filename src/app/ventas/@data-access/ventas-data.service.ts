@@ -141,7 +141,7 @@ export class VentasDataService {
             .orderBy('fecha', 'desc')
             .limit(criteria.registros);
         } else {
-          query = query.orderBy('fecha', 'desc').limit(10);
+          query = query.orderBy('fecha', 'desc').limit(100);
         }
         return query;
       })
@@ -164,7 +164,7 @@ export class VentasDataService {
             'POR_FACTURAR',
           ])
           // .orderBy('folio', 'desc')
-          .limit(20)
+          .limit(100)
       )
       .valueChanges({ idField: 'id' })
       .pipe(

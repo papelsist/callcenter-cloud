@@ -126,6 +126,7 @@ export class ClientesDataService {
    * @param term
    */
   searchClientes(term: string, limit = 5) {
+    console.log('Buscando cliente');
     return combineLatest([
       this.serachByRfc(term, limit),
       this.searchByNombre(term),
@@ -133,6 +134,7 @@ export class ClientesDataService {
   }
 
   searchByNombre(term: string, limit = 5) {
+
     return this.afs
       .collection<Cliente>('clientes', (ref) =>
         ref
@@ -167,10 +169,21 @@ export class ClientesDataService {
   }
 
   async saveCliente(cliente: Partial<Cliente>, user: User) {
+
+    const folioRef =  await this.afs.doc('folios/clientes').ref;
+    const folioDoc = await folioRef.get();
+    const folio = folioDoc.data()['CALLCENTER'];
+    console.log(folio);
+
+    const folioNew = {
+      CALLCENTER: folio + 1
+    };
+
     try {
       const id = this.afs.createId();
       const data = {
         ...cliente,
+        clave: `SX_CALL ${folio}`,
         activo: true,
         id,
         dateCreated: new Date().toISOString(),
@@ -184,6 +197,7 @@ export class ClientesDataService {
         .doc(id).ref;
       await docRef.set(data);
       const snap = await docRef.get();
+      await folioRef.set(folioNew);
       return snap.data();
       // await this.afs.collection('clientes').doc(id).set(data);
       // return id;
