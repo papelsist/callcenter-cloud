@@ -37,6 +37,7 @@ export class SolicitudCreateFormComponent implements OnInit, OnDestroy {
   @Output() save = new EventEmitter<Partial<SolicitudDeDeposito>>();
   @Output() valueReady = new EventEmitter<Partial<SolicitudDeDeposito>>();
   @Output() lookupPedido = new EventEmitter();
+  @Output() cancelar = new EventEmitter();
   @Input() tipo: Cartera;
   @Input() sucursal: Partial<Sucursal>;
   @Input() solcita: string;
@@ -127,7 +128,7 @@ export class SolicitudCreateFormComponent implements OnInit, OnDestroy {
       efectivo: [null, [Validators.min(0.0)]],
       cheque: [null, [Validators.min(0.0)]],
       transferencia: [null, [Validators.min(0.0)]],
-      total: [null, [Validators.required, Validators.min(10.0)]],
+      total: [null, [Validators.required, Validators.min(0.01)]],
       referencia: [null, [Validators.required]],
       fechaDeposito: [null, [Validators.required]],
       solicita: [this.solcita, [Validators.required]],

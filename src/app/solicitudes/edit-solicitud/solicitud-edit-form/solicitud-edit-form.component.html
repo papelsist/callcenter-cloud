@@ -24,7 +24,15 @@
     <div class="row row-fechas">
         <ion-item>
             <ion-label position="floating">Fecha depósito</ion-label>
-            <ion-datetime pickerFormat="DD MMM YYYY" displayFormat="DD MMM YYYY" placeholder="Seleccione la fecha" monthShortNames="ene, feb, mar, abr, may, jun, jul, ago, sep, oct, nov, dis" cancelText="Cancelar" doneText="Seleccionar" formControlName="fechaDeposito"></ion-datetime>
+            <ion-datetime
+            pickerFormat="DD MMM YYYY"
+            displayFormat="DD MMM YYYY"
+            placeholder="Seleccione la fecha"
+            monthShortNames="ene, feb, mar, abr, may, jun, jul, ago, sep, oct, nov, dic"
+            cancelText="Cancelar"
+            doneText="Seleccionar"
+            formControlName="fechaDeposito"
+          ></ion-datetime>
             <ion-icon name="calendar" slot="start"></ion-icon>
         </ion-item>
 
@@ -37,13 +45,16 @@
         </ion-item>
     </div>
     <div>
-        <papelx-cliente-selector-field formControlName="cliente"></papelx-cliente-selector-field>
+        <papelx-cliente-selector-field
+        formControlName="cliente"
+        ></papelx-cliente-selector-field>
     </div>
 
     <div class="ion-text-center">
         <h2>
             <ion-text color="primary">
-                <span class="ion-padding-end">Total: </span> {{ form.get("total").value | currency }}
+                <span class="ion-padding-end">Total: </span>
+                {{ form.get("total").value | currency }}
             </ion-text>
         </h2>
         <p *ngIf="form.get('total').hasError('min')">

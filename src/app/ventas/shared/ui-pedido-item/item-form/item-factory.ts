@@ -43,7 +43,7 @@ export function buildForm(builder: FormBuilder): FormGroup {
         instruccion: [null],
         instruccionEspecial: [{ value: null, disabled: true }],
         cantidad: [0],
-        precio: [10.0],
+        precio: [15.0],
         refinado: false,
         limpio: false,
       }
